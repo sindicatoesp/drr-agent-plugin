@@ -212,6 +212,12 @@ node bin/cli.js delta-push \
   --intensity "0.35" \
   --notes "Live USGS Telemetry Event"
 
+# Query DELTA MCP 'docs' tool (data model & workflow reference):
+node bin/cli.js delta-docs
+
+# List live UNDRR/ISC HIP hazards directly from DELTA MCP:
+node bin/cli.js delta-hazards --limit 20
+
 # ---------------------------------------------------------
 # Deterministic Modeling & Alert Generation
 # ---------------------------------------------------------
@@ -237,7 +243,7 @@ node bin/cli.js cap-validate examples/earthquake-hazus-scenario/output-cap-alert
 
 ---
 
-## MCP Server Tools (10 Tools)
+## MCP Server Tools (11 Tools)
 
 | Tool Name | Description | Source / Methodology |
 | :--- | :--- | :--- |
@@ -250,6 +256,7 @@ node bin/cli.js cap-validate examples/earthquake-hazus-scenario/output-cap-alert
 | `drr_cap_alert_generate_validate`| Generate & validate ITU-T X.1303 CAP XML / briefs | OASIS CAP v1.2 Specification |
 | `drr_delta_push_draft_record` | Push validated assessment to DELTA as a Draft record | DELTA Resilience API / MCP |
 | `drr_delta_fetch_exposure` | Query administrative divisions & exposure from DELTA | DELTA Resilience Data Layer |
+| `drr_delta_docs` | Query DELTA MCP 'docs' tool for data model & HIP taxonomy | DELTA MCP Service |
 | `drr_monitor_check` | Evaluate active feeds against declarative rules | Autonomous Alert Daemon Engine |
 
 ---
