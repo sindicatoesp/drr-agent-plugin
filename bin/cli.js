@@ -74,7 +74,11 @@ Commands:
   delta-docs           Query DELTA MCP 'docs' tool for data model & workflow reference
     --mock                Dry-run simulation mode
 
-  delta-hazards        Retrieve live UNDRR/ISC HIP hazards list from DELTA MCP
+  delta-hazards        Retrieve live UNDRR/ISC HIP hazards list from DELTA MCP or in-code taxonomy
+    --search <query>      Search hazard name or code (e.g. "earthquake", "GH0001", "flood")
+    --local               Use in-code taxonomy directly (all 301 hazards offline)
+    --cluster <id>        Filter by cluster ID (e.g. 1068 for Seismogenic, 1072 for Flood)
+    --type <id>           Filter by type ID (e.g. 1041 for Geological, 1042 for Hydromet)
     --page <num>          Page number (default: 1)
     --limit <num>         Page size / limit (default: 50)
     --dimensions          Use analytics_dimensions instead of hip-hazard_list
@@ -305,7 +309,15 @@ async function main() {
 				const limit = options.limit ? parseInt(options.limit, 10) : 50;
 				const mode = options.dimensions ? "dimensions" : "list";
 				const hazards = await fetchDeltaHazards(
-					{ page, pageSize: limit, mode },
+					{
+						page,
+						pageSize: limit,
+						mode,
+						search: options.search || options.query || options.q,
+						clusterId: options.cluster || options.clusterId,
+						typeId: options.type || options.typeId,
+						local: options.local === true || options.offline === true,
+					},
 					{ mock: options.mock === true },
 				);
 				console.log(JSON.stringify(hazards, null, 2));

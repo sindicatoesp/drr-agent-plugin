@@ -1,0 +1,2392 @@
+{
+  "types": {
+    "1037": {
+      "id": "1037",
+      "name": "Biological"
+    },
+    "1038": {
+      "id": "1038",
+      "name": "Chemical"
+    },
+    "1039": {
+      "id": "1039",
+      "name": "Environmental"
+    },
+    "1040": {
+      "id": "1040",
+      "name": "Extraterrestrial"
+    },
+    "1041": {
+      "id": "1041",
+      "name": "Geohazards"
+    },
+    "1042": {
+      "id": "1042",
+      "name": "Meteorological and Hydrological"
+    },
+    "1043": {
+      "id": "1043",
+      "name": "Societal"
+    },
+    "1044": {
+      "id": "1044",
+      "name": "Technological"
+    }
+  },
+  "clusters": {
+    "1045": {
+      "id": "1045",
+      "typeId": "1037",
+      "name": "Fisheries and Aquaculture"
+    },
+    "1046": {
+      "id": "1046",
+      "typeId": "1037",
+      "name": "Insect Infestation"
+    },
+    "1047": {
+      "id": "1047",
+      "typeId": "1037",
+      "name": "Invasive Species"
+    },
+    "1048": {
+      "id": "1048",
+      "typeId": "1037",
+      "name": "Human Animal Interaction"
+    },
+    "1049": {
+      "id": "1049",
+      "typeId": "1037",
+      "name": "CBRNE (Chemical, Biological, Radiological, Nuclear and Explosive)"
+    },
+    "1050": {
+      "id": "1050",
+      "typeId": "1037",
+      "name": "Mental Health"
+    },
+    "1051": {
+      "id": "1051",
+      "typeId": "1037",
+      "name": "Food Safety"
+    },
+    "1052": {
+      "id": "1052",
+      "typeId": "1037",
+      "name": "Infectious Diseases (Plant)"
+    },
+    "1053": {
+      "id": "1053",
+      "typeId": "1037",
+      "name": "Infectious Diseases (Human and Animal)"
+    },
+    "1054": {
+      "id": "1054",
+      "typeId": "1037",
+      "name": "Infectious Diseases (Animal)"
+    },
+    "1055": {
+      "id": "1055",
+      "typeId": "1037",
+      "name": "Infectious Diseases (Aquaculture)"
+    },
+    "1056": {
+      "id": "1056",
+      "typeId": "1038",
+      "name": "Gases"
+    },
+    "1057": {
+      "id": "1057",
+      "typeId": "1038",
+      "name": "Heavy Metals"
+    },
+    "1058": {
+      "id": "1058",
+      "typeId": "1038",
+      "name": "Food Safety"
+    },
+    "1059": {
+      "id": "1059",
+      "typeId": "1038",
+      "name": "Pesticides"
+    },
+    "1060": {
+      "id": "1060",
+      "typeId": "1038",
+      "name": "Persistent Organic Pollutants (POPs)"
+    },
+    "1061": {
+      "id": "1061",
+      "typeId": "1038",
+      "name": "Hydrocarbons"
+    },
+    "1062": {
+      "id": "1062",
+      "typeId": "1038",
+      "name": "CBRNE (Chemical, Biological, Radiological, Nuclear and Explosive)"
+    },
+    "1063": {
+      "id": "1063",
+      "typeId": "1038",
+      "name": "Other Chemical Hazards and Toxins"
+    },
+    "1064": {
+      "id": "1064",
+      "typeId": "1038",
+      "name": "Fisheries and Aquaculture"
+    },
+    "1065": {
+      "id": "1065",
+      "typeId": "1039",
+      "name": "Environmental Degradation"
+    },
+    "1066": {
+      "id": "1066",
+      "typeId": "1039",
+      "name": "Environmental Degradation (Forestry)"
+    },
+    "1067": {
+      "id": "1067",
+      "typeId": "1040",
+      "name": "Extraterrestrial"
+    },
+    "1068": {
+      "id": "1068",
+      "typeId": "1041",
+      "name": "Seismogenic (Earthquakes)"
+    },
+    "1069": {
+      "id": "1069",
+      "typeId": "1041",
+      "name": "Volcanogenic"
+    },
+    "1070": {
+      "id": "1070",
+      "typeId": "1041",
+      "name": "Other Geohazard"
+    },
+    "1071": {
+      "id": "1071",
+      "typeId": "1042",
+      "name": "Convective Related"
+    },
+    "1072": {
+      "id": "1072",
+      "typeId": "1042",
+      "name": "Flood"
+    },
+    "1073": {
+      "id": "1073",
+      "typeId": "1042",
+      "name": "Lithometeors"
+    },
+    "1074": {
+      "id": "1074",
+      "typeId": "1042",
+      "name": "Marine"
+    },
+    "1075": {
+      "id": "1075",
+      "typeId": "1042",
+      "name": "Pressure Related"
+    },
+    "1076": {
+      "id": "1076",
+      "typeId": "1042",
+      "name": "Precipitation Related"
+    },
+    "1077": {
+      "id": "1077",
+      "typeId": "1042",
+      "name": "Temperature Related"
+    },
+    "1078": {
+      "id": "1078",
+      "typeId": "1042",
+      "name": "Terrestrial"
+    },
+    "1079": {
+      "id": "1079",
+      "typeId": "1042",
+      "name": "Wind Related"
+    },
+    "1080": {
+      "id": "1080",
+      "typeId": "1043",
+      "name": "Conflict"
+    },
+    "1081": {
+      "id": "1081",
+      "typeId": "1043",
+      "name": "Post Conflict"
+    },
+    "1082": {
+      "id": "1082",
+      "typeId": "1043",
+      "name": "Behavioural"
+    },
+    "1083": {
+      "id": "1083",
+      "typeId": "1043",
+      "name": "Economic"
+    },
+    "1084": {
+      "id": "1084",
+      "typeId": "1044",
+      "name": "Radiation"
+    },
+    "1085": {
+      "id": "1085",
+      "typeId": "1044",
+      "name": "CBRNE (Chemical, Biological, Radiological, Nuclear and Explosive)"
+    },
+    "1086": {
+      "id": "1086",
+      "typeId": "1044",
+      "name": "Structural Failure"
+    },
+    "1087": {
+      "id": "1087",
+      "typeId": "1044",
+      "name": "Infrastructure Failure"
+    },
+    "1088": {
+      "id": "1088",
+      "typeId": "1044",
+      "name": "Cyber Hazard"
+    },
+    "1089": {
+      "id": "1089",
+      "typeId": "1044",
+      "name": "Industrial Failure"
+    },
+    "1090": {
+      "id": "1090",
+      "typeId": "1044",
+      "name": "Waste"
+    },
+    "1091": {
+      "id": "1091",
+      "typeId": "1044",
+      "name": "Marine"
+    },
+    "1092": {
+      "id": "1092",
+      "typeId": "1044",
+      "name": "Flood"
+    },
+    "1093": {
+      "id": "1093",
+      "typeId": "1044",
+      "name": "Transportation"
+    }
+  },
+  "hazards": [
+    {
+      "id": "78385",
+      "code": "BI0001",
+      "name": "Harmful Algal Blooms",
+      "clusterId": "1045",
+      "typeId": "1037"
+    },
+    {
+      "id": "78386",
+      "code": "BI0002",
+      "name": "Insect Pest Infestations",
+      "clusterId": "1046",
+      "typeId": "1037"
+    },
+    {
+      "id": "78387",
+      "code": "BI0003",
+      "name": "Locust",
+      "clusterId": "1046",
+      "typeId": "1037"
+    },
+    {
+      "id": "78388",
+      "code": "BI0004",
+      "name": "Invasive Weeds",
+      "clusterId": "1047",
+      "typeId": "1037"
+    },
+    {
+      "id": "78389",
+      "code": "BI0005",
+      "name": "Invasive Species",
+      "clusterId": "1047",
+      "typeId": "1037"
+    },
+    {
+      "id": "78390",
+      "code": "BI0006",
+      "name": "Snake Envenomation",
+      "clusterId": "1048",
+      "typeId": "1037"
+    },
+    {
+      "id": "78391",
+      "code": "BI0007",
+      "name": "Human-Wildlife Conflict",
+      "clusterId": "1048",
+      "typeId": "1037"
+    },
+    {
+      "id": "78392",
+      "code": "BI0008",
+      "name": "Biological Agents",
+      "clusterId": "1049",
+      "typeId": "1037"
+    },
+    {
+      "id": "78393",
+      "code": "BI0009",
+      "name": "Suicide Cluster",
+      "clusterId": "1050",
+      "typeId": "1037"
+    },
+    {
+      "id": "78394",
+      "code": "BI0010",
+      "name": "Antimicrobial Resistance",
+      "clusterId": "1051",
+      "typeId": "1037"
+    },
+    {
+      "id": "78395",
+      "code": "BI0011",
+      "name": "Foodborne Microbial Hazards (including human enteric virus and foodborne parasite)",
+      "clusterId": "1051",
+      "typeId": "1037"
+    },
+    {
+      "id": "78396",
+      "code": "BI0012",
+      "name": "Bacterial Plant Disease",
+      "clusterId": "1052",
+      "typeId": "1037"
+    },
+    {
+      "id": "78397",
+      "code": "BI0013",
+      "name": "Fungal Plant Disease",
+      "clusterId": "1052",
+      "typeId": "1037"
+    },
+    {
+      "id": "78398",
+      "code": "BI0014",
+      "name": "Viral, Mycoplasma and Viroid Plant Disease",
+      "clusterId": "1052",
+      "typeId": "1037"
+    },
+    {
+      "id": "78399",
+      "code": "BI0015",
+      "name": "Anthrax",
+      "clusterId": "1053",
+      "typeId": "1037"
+    },
+    {
+      "id": "78400",
+      "code": "BI0016",
+      "name": "Airborne Diseases",
+      "clusterId": "1053",
+      "typeId": "1037"
+    },
+    {
+      "id": "78401",
+      "code": "BI0017",
+      "name": "Blood Borne Viruses",
+      "clusterId": "1053",
+      "typeId": "1037"
+    },
+    {
+      "id": "78402",
+      "code": "BI0018",
+      "name": "Waterborne Diseases",
+      "clusterId": "1053",
+      "typeId": "1037"
+    },
+    {
+      "id": "78403",
+      "code": "BI0019",
+      "name": "Foodborne Diseases",
+      "clusterId": "1053",
+      "typeId": "1037"
+    },
+    {
+      "id": "78404",
+      "code": "BI0020",
+      "name": "Sexually Transmitted Diseases (Human)",
+      "clusterId": "1053",
+      "typeId": "1037"
+    },
+    {
+      "id": "78405",
+      "code": "BI0021",
+      "name": "Neglected Tropical Diseases (Human)",
+      "clusterId": "1053",
+      "typeId": "1037"
+    },
+    {
+      "id": "78406",
+      "code": "BI0022",
+      "name": "Vaccine-Preventable Diseases (Human)",
+      "clusterId": "1053",
+      "typeId": "1037"
+    },
+    {
+      "id": "78453",
+      "code": "BI0069",
+      "name": "Rotavirus (Human)",
+      "clusterId": "1053",
+      "typeId": "1037"
+    },
+    {
+      "id": "78407",
+      "code": "BI0023",
+      "name": "Vector Borne Diseases (VBD) (Human)",
+      "clusterId": "1053",
+      "typeId": "1037"
+    },
+    {
+      "id": "78408",
+      "code": "BI0024",
+      "name": "Viral Haemorrhagic Fevers (Human)",
+      "clusterId": "1053",
+      "typeId": "1037"
+    },
+    {
+      "id": "78409",
+      "code": "BI0025",
+      "name": "Antimicrobial Resistant Microorganisms",
+      "clusterId": "1053",
+      "typeId": "1037"
+    },
+    {
+      "id": "78410",
+      "code": "BI0026",
+      "name": "Animal Diseases (Not Zoonoses)",
+      "clusterId": "1053",
+      "typeId": "1037"
+    },
+    {
+      "id": "78411",
+      "code": "BI0027",
+      "name": "Zoonotic Diseases",
+      "clusterId": "1053",
+      "typeId": "1037"
+    },
+    {
+      "id": "78412",
+      "code": "BI0028",
+      "name": "Diarrhoeal Diseases (Human)",
+      "clusterId": "1053",
+      "typeId": "1037"
+    },
+    {
+      "id": "78413",
+      "code": "BI0029",
+      "name": "Prion Diseases",
+      "clusterId": "1053",
+      "typeId": "1037"
+    },
+    {
+      "id": "78414",
+      "code": "BI0030",
+      "name": "Hepatitis B (Human)",
+      "clusterId": "1053",
+      "typeId": "1037"
+    },
+    {
+      "id": "78415",
+      "code": "BI0031",
+      "name": "Hepatitis C (human)",
+      "clusterId": "1053",
+      "typeId": "1037"
+    },
+    {
+      "id": "78416",
+      "code": "BI0032",
+      "name": "HIV and AIDS (Human)",
+      "clusterId": "1053",
+      "typeId": "1037"
+    },
+    {
+      "id": "78417",
+      "code": "BI0033",
+      "name": "COVID-19 (SARS-CoV-2) (Human)",
+      "clusterId": "1053",
+      "typeId": "1037"
+    },
+    {
+      "id": "78418",
+      "code": "BI0034",
+      "name": "Cholera (Human)",
+      "clusterId": "1053",
+      "typeId": "1037"
+    },
+    {
+      "id": "78419",
+      "code": "BI0035",
+      "name": "Cryptosporidium (Human)",
+      "clusterId": "1053",
+      "typeId": "1037"
+    },
+    {
+      "id": "78420",
+      "code": "BI0036",
+      "name": "Paratyphoid fever (Human)",
+      "clusterId": "1053",
+      "typeId": "1037"
+    },
+    {
+      "id": "78421",
+      "code": "BI0037",
+      "name": "Typhoid Fever (Human)",
+      "clusterId": "1053",
+      "typeId": "1037"
+    },
+    {
+      "id": "78422",
+      "code": "BI0038",
+      "name": "Hepatitis A (Human)",
+      "clusterId": "1053",
+      "typeId": "1037"
+    },
+    {
+      "id": "78423",
+      "code": "BI0039",
+      "name": "Escherichia Coli (STEC) (Human)",
+      "clusterId": "1053",
+      "typeId": "1037"
+    },
+    {
+      "id": "78424",
+      "code": "BI0040",
+      "name": "Listeriosis (Human)",
+      "clusterId": "1053",
+      "typeId": "1037"
+    },
+    {
+      "id": "78425",
+      "code": "BI0041",
+      "name": "Shigellosis (Human)",
+      "clusterId": "1053",
+      "typeId": "1037"
+    },
+    {
+      "id": "78454",
+      "code": "BI0071",
+      "name": "Vector-borne diseases (VBD) (Animals)",
+      "clusterId": "1053",
+      "typeId": "1037"
+    },
+    {
+      "id": "78426",
+      "code": "BI0042",
+      "name": "Avian Influenza (Human and Animal)",
+      "clusterId": "1053",
+      "typeId": "1037"
+    },
+    {
+      "id": "78427",
+      "code": "BI0043",
+      "name": "Pandemic Influenza (Human)",
+      "clusterId": "1053",
+      "typeId": "1037"
+    },
+    {
+      "id": "78428",
+      "code": "BI0044",
+      "name": "Seasonal Influenza (Human)",
+      "clusterId": "1053",
+      "typeId": "1037"
+    },
+    {
+      "id": "78429",
+      "code": "BI0045",
+      "name": "Cysticercosis",
+      "clusterId": "1053",
+      "typeId": "1037"
+    },
+    {
+      "id": "78430",
+      "code": "BI0046",
+      "name": "Leptospirosis (Human)",
+      "clusterId": "1053",
+      "typeId": "1037"
+    },
+    {
+      "id": "78431",
+      "code": "BI0047",
+      "name": "Plague (Human)",
+      "clusterId": "1053",
+      "typeId": "1037"
+    },
+    {
+      "id": "78432",
+      "code": "BI0048",
+      "name": "Leprosy",
+      "clusterId": "1053",
+      "typeId": "1037"
+    },
+    {
+      "id": "78433",
+      "code": "BI0049",
+      "name": "Chikungunya",
+      "clusterId": "1053",
+      "typeId": "1037"
+    },
+    {
+      "id": "78434",
+      "code": "BI0050",
+      "name": "Zika Virus (human)",
+      "clusterId": "1053",
+      "typeId": "1037"
+    },
+    {
+      "id": "78435",
+      "code": "BI0051",
+      "name": "Diphtheria (Human)",
+      "clusterId": "1053",
+      "typeId": "1037"
+    },
+    {
+      "id": "78436",
+      "code": "BI0052",
+      "name": "Measles (Human)",
+      "clusterId": "1053",
+      "typeId": "1037"
+    },
+    {
+      "id": "78437",
+      "code": "BI0053",
+      "name": "Meningococcal Meningitis (Human)",
+      "clusterId": "1053",
+      "typeId": "1037"
+    },
+    {
+      "id": "78438",
+      "code": "BI0054",
+      "name": "Pertussis (Human)",
+      "clusterId": "1053",
+      "typeId": "1037"
+    },
+    {
+      "id": "78439",
+      "code": "BI0055",
+      "name": "Polio (Human)",
+      "clusterId": "1053",
+      "typeId": "1037"
+    },
+    {
+      "id": "78440",
+      "code": "BI0056",
+      "name": "Smallpox (Human)",
+      "clusterId": "1053",
+      "typeId": "1037"
+    },
+    {
+      "id": "78441",
+      "code": "BI0057",
+      "name": "Varicella and herpes zoster (Human)",
+      "clusterId": "1053",
+      "typeId": "1037"
+    },
+    {
+      "id": "78442",
+      "code": "BI0058",
+      "name": "Yellow Fever (Human)",
+      "clusterId": "1053",
+      "typeId": "1037"
+    },
+    {
+      "id": "78443",
+      "code": "BI0059",
+      "name": "Dengue (Human)",
+      "clusterId": "1053",
+      "typeId": "1037"
+    },
+    {
+      "id": "78444",
+      "code": "BI0060",
+      "name": "Malaria (Human)",
+      "clusterId": "1053",
+      "typeId": "1037"
+    },
+    {
+      "id": "78445",
+      "code": "BI0061",
+      "name": "Crimean-Congo Haemorrhagic Fever (Human)",
+      "clusterId": "1053",
+      "typeId": "1037"
+    },
+    {
+      "id": "78446",
+      "code": "BI0062",
+      "name": "Ebola (Human)",
+      "clusterId": "1053",
+      "typeId": "1037"
+    },
+    {
+      "id": "78447",
+      "code": "BI0063",
+      "name": "Lassa Fever (Human)",
+      "clusterId": "1053",
+      "typeId": "1037"
+    },
+    {
+      "id": "78448",
+      "code": "BI0064",
+      "name": "Tuberculosis (Human and Animal)",
+      "clusterId": "1053",
+      "typeId": "1037"
+    },
+    {
+      "id": "78449",
+      "code": "BI0065",
+      "name": "Middle East Respiratory Syndrome (MERS)",
+      "clusterId": "1053",
+      "typeId": "1037"
+    },
+    {
+      "id": "78450",
+      "code": "BI0066",
+      "name": "Monkeypox (Human)",
+      "clusterId": "1053",
+      "typeId": "1037"
+    },
+    {
+      "id": "78451",
+      "code": "BI0067",
+      "name": "Rabies (Animal and Human)",
+      "clusterId": "1053",
+      "typeId": "1037"
+    },
+    {
+      "id": "78452",
+      "code": "BI0068",
+      "name": "Severe Acute Respiratory Syndrome (SARS)",
+      "clusterId": "1053",
+      "typeId": "1037"
+    },
+    {
+      "id": "78455",
+      "code": "BI0072",
+      "name": "Brucellosis (Animal)",
+      "clusterId": "1053",
+      "typeId": "1037"
+    },
+    {
+      "id": "78456",
+      "code": "BI0074",
+      "name": "Contagious Bovine Pleuropneumonia (CBPP) (Animal)",
+      "clusterId": "1053",
+      "typeId": "1037"
+    },
+    {
+      "id": "78457",
+      "code": "BI0075",
+      "name": "Contagious Caprine Pleuropneumonia (CCPP) (Animal)",
+      "clusterId": "1053",
+      "typeId": "1037"
+    },
+    {
+      "id": "78458",
+      "code": "BI0076",
+      "name": "Foot and Mouth Disease Virus (Animal)",
+      "clusterId": "1053",
+      "typeId": "1037"
+    },
+    {
+      "id": "78459",
+      "code": "BI0077",
+      "name": "Lumpy Skin Disease (Animal)",
+      "clusterId": "1053",
+      "typeId": "1037"
+    },
+    {
+      "id": "78460",
+      "code": "BI0078",
+      "name": "New World Screwworm (NWS) (Animal)",
+      "clusterId": "1053",
+      "typeId": "1037"
+    },
+    {
+      "id": "78461",
+      "code": "BI0079",
+      "name": "Newcastle Disease Virus (Animal)",
+      "clusterId": "1053",
+      "typeId": "1037"
+    },
+    {
+      "id": "78462",
+      "code": "BI0080",
+      "name": "Peste Des Petits Ruminants (Animal)",
+      "clusterId": "1053",
+      "typeId": "1037"
+    },
+    {
+      "id": "78463",
+      "code": "BI0081",
+      "name": "Q Fever",
+      "clusterId": "1053",
+      "typeId": "1037"
+    },
+    {
+      "id": "78464",
+      "code": "BI0082",
+      "name": "Rift Valley Fever (Animal)",
+      "clusterId": "1053",
+      "typeId": "1037"
+    },
+    {
+      "id": "78465",
+      "code": "BI0083",
+      "name": "Trypanosomosis (Animal)",
+      "clusterId": "1053",
+      "typeId": "1037"
+    },
+    {
+      "id": "78466",
+      "code": "BI0084",
+      "name": "West Nile Fever (Human)",
+      "clusterId": "1053",
+      "typeId": "1037"
+    },
+    {
+      "id": "78467",
+      "code": "BI0086",
+      "name": "Trypanosomiasis (Human)",
+      "clusterId": "1053",
+      "typeId": "1037"
+    },
+    {
+      "id": "78468",
+      "code": "BI0070",
+      "name": "African Swine Fever (Animal)",
+      "clusterId": "1054",
+      "typeId": "1037"
+    },
+    {
+      "id": "78469",
+      "code": "BI0073",
+      "name": "Classical Swine Fever (Animal)",
+      "clusterId": "1054",
+      "typeId": "1037"
+    },
+    {
+      "id": "78470",
+      "code": "BI0085",
+      "name": "Rinderpest (Animal)",
+      "clusterId": "1054",
+      "typeId": "1037"
+    },
+    {
+      "id": "78471",
+      "code": "BI0087",
+      "name": "Shrimp disease (bacterial) - Acute Hepatic",
+      "clusterId": "1055",
+      "typeId": "1037"
+    },
+    {
+      "id": "78472",
+      "code": "BI0088",
+      "name": "Oyster Disease Aquaculture",
+      "clusterId": "1055",
+      "typeId": "1037"
+    },
+    {
+      "id": "78473",
+      "code": "CH0001",
+      "name": "Ammonia",
+      "clusterId": "1056",
+      "typeId": "1038"
+    },
+    {
+      "id": "78474",
+      "code": "CH0002",
+      "name": "Carbon Monoxide",
+      "clusterId": "1056",
+      "typeId": "1038"
+    },
+    {
+      "id": "78490",
+      "code": "CH0018",
+      "name": "Benzene",
+      "clusterId": "1061",
+      "typeId": "1038"
+    },
+    {
+      "id": "78596",
+      "code": "MH0031",
+      "name": "Extra-tropical Cyclone",
+      "clusterId": "1075",
+      "typeId": "1042"
+    },
+    {
+      "id": "78475",
+      "code": "CH0015",
+      "name": "Phosphine",
+      "clusterId": "1056",
+      "typeId": "1038"
+    },
+    {
+      "id": "78476",
+      "code": "CH0016",
+      "name": "Chlorine",
+      "clusterId": "1056",
+      "typeId": "1038"
+    },
+    {
+      "id": "78477",
+      "code": "CH0003",
+      "name": "Arsenic",
+      "clusterId": "1057",
+      "typeId": "1038"
+    },
+    {
+      "id": "78478",
+      "code": "CH0004",
+      "name": "Cadmium",
+      "clusterId": "1057",
+      "typeId": "1038"
+    },
+    {
+      "id": "78479",
+      "code": "CH0005",
+      "name": "Lead",
+      "clusterId": "1057",
+      "typeId": "1038"
+    },
+    {
+      "id": "78480",
+      "code": "CH0006",
+      "name": "Mercury",
+      "clusterId": "1057",
+      "typeId": "1038"
+    },
+    {
+      "id": "78481",
+      "code": "CH0007",
+      "name": "Levels of Contaminants in Food and Feed",
+      "clusterId": "1058",
+      "typeId": "1038"
+    },
+    {
+      "id": "78482",
+      "code": "CH0008",
+      "name": "Pesticides – Highly Hazardous",
+      "clusterId": "1059",
+      "typeId": "1038"
+    },
+    {
+      "id": "78483",
+      "code": "CH0009",
+      "name": "Residue of Pesticides",
+      "clusterId": "1059",
+      "typeId": "1038"
+    },
+    {
+      "id": "78484",
+      "code": "CH0011",
+      "name": "Insecticides",
+      "clusterId": "1059",
+      "typeId": "1038"
+    },
+    {
+      "id": "78486",
+      "code": "CH0010",
+      "name": "Hazardous Pesticide Contamination in Soils",
+      "clusterId": "1060",
+      "typeId": "1038"
+    },
+    {
+      "id": "78487",
+      "code": "CH0013",
+      "name": "Dioxins and Dioxin-like Substances",
+      "clusterId": "1060",
+      "typeId": "1038"
+    },
+    {
+      "id": "78488",
+      "code": "CH0014",
+      "name": "Microplastics",
+      "clusterId": "1060",
+      "typeId": "1038"
+    },
+    {
+      "id": "78489",
+      "code": "CH0017",
+      "name": "Oil Pollution",
+      "clusterId": "1061",
+      "typeId": "1038"
+    },
+    {
+      "id": "78491",
+      "code": "CH0019",
+      "name": "Chemical Warfare Agents",
+      "clusterId": "1062",
+      "typeId": "1038"
+    },
+    {
+      "id": "78492",
+      "code": "CH0020",
+      "name": "Asbestos",
+      "clusterId": "1063",
+      "typeId": "1038"
+    },
+    {
+      "id": "78493",
+      "code": "CH0021",
+      "name": "Aflatoxins",
+      "clusterId": "1063",
+      "typeId": "1038"
+    },
+    {
+      "id": "78494",
+      "code": "CH0022",
+      "name": "Fluoride - Excess or inadequate intake",
+      "clusterId": "1063",
+      "typeId": "1038"
+    },
+    {
+      "id": "78495",
+      "code": "CH0023",
+      "name": "Methanol",
+      "clusterId": "1063",
+      "typeId": "1038"
+    },
+    {
+      "id": "78496",
+      "code": "CH0024",
+      "name": "Substandard and Falsified Medical Products",
+      "clusterId": "1063",
+      "typeId": "1038"
+    },
+    {
+      "id": "78497",
+      "code": "CH0025",
+      "name": "Marine Toxins",
+      "clusterId": "1064",
+      "typeId": "1038"
+    },
+    {
+      "id": "78498",
+      "code": "EN0001",
+      "name": "Household Air Pollution",
+      "clusterId": "1065",
+      "typeId": "1039"
+    },
+    {
+      "id": "78499",
+      "code": "EN0002",
+      "name": "Air Pollution (Point Source)",
+      "clusterId": "1065",
+      "typeId": "1039"
+    },
+    {
+      "id": "78500",
+      "code": "EN0003",
+      "name": "Ambient (Outdoor) Air Pollution",
+      "clusterId": "1065",
+      "typeId": "1039"
+    },
+    {
+      "id": "78501",
+      "code": "EN0004",
+      "name": "Land Degradation",
+      "clusterId": "1065",
+      "typeId": "1039"
+    },
+    {
+      "id": "78502",
+      "code": "EN0005",
+      "name": "Soil Degradation",
+      "clusterId": "1065",
+      "typeId": "1039"
+    },
+    {
+      "id": "78503",
+      "code": "EN0006",
+      "name": "Runoff / Nonpoint Source Pollution",
+      "clusterId": "1065",
+      "typeId": "1039"
+    },
+    {
+      "id": "78504",
+      "code": "EN0007",
+      "name": "Salinity",
+      "clusterId": "1065",
+      "typeId": "1039"
+    },
+    {
+      "id": "78505",
+      "code": "EN0008",
+      "name": "Biodiversity Loss",
+      "clusterId": "1065",
+      "typeId": "1039"
+    },
+    {
+      "id": "78506",
+      "code": "EN0010",
+      "name": "Forest Declines and Diebacks",
+      "clusterId": "1065",
+      "typeId": "1039"
+    },
+    {
+      "id": "78595",
+      "code": "MH0030",
+      "name": "Depression or Cyclone (Low Pressure Area)",
+      "clusterId": "1075",
+      "typeId": "1042"
+    },
+    {
+      "id": "78507",
+      "code": "EN0011",
+      "name": "Forest Disturbances",
+      "clusterId": "1065",
+      "typeId": "1039"
+    },
+    {
+      "id": "78508",
+      "code": "EN0014",
+      "name": "Desertification",
+      "clusterId": "1065",
+      "typeId": "1039"
+    },
+    {
+      "id": "78509",
+      "code": "EN0015",
+      "name": "Loss of Mangroves",
+      "clusterId": "1065",
+      "typeId": "1039"
+    },
+    {
+      "id": "78510",
+      "code": "EN0016",
+      "name": "Wetland Loss/Degradation",
+      "clusterId": "1065",
+      "typeId": "1039"
+    },
+    {
+      "id": "78511",
+      "code": "EN0017",
+      "name": "Coral Bleaching",
+      "clusterId": "1065",
+      "typeId": "1039"
+    },
+    {
+      "id": "78512",
+      "code": "EN0018",
+      "name": "Compressive Soils",
+      "clusterId": "1065",
+      "typeId": "1039"
+    },
+    {
+      "id": "78513",
+      "code": "EN0019",
+      "name": "Soil Erosion",
+      "clusterId": "1065",
+      "typeId": "1039"
+    },
+    {
+      "id": "78514",
+      "code": "EN0020",
+      "name": "Coastal Erosion and Shoreline Change",
+      "clusterId": "1065",
+      "typeId": "1039"
+    },
+    {
+      "id": "78515",
+      "code": "EN0021",
+      "name": "Permafrost Loss",
+      "clusterId": "1065",
+      "typeId": "1039"
+    },
+    {
+      "id": "78516",
+      "code": "EN0022",
+      "name": "Sand Mining",
+      "clusterId": "1065",
+      "typeId": "1039"
+    },
+    {
+      "id": "78517",
+      "code": "EN0023",
+      "name": "Sea Level Rise",
+      "clusterId": "1065",
+      "typeId": "1039"
+    },
+    {
+      "id": "78518",
+      "code": "EN0024",
+      "name": "Eutrophication",
+      "clusterId": "1065",
+      "typeId": "1039"
+    },
+    {
+      "id": "78519",
+      "code": "EN0009",
+      "name": "Deforestation",
+      "clusterId": "1066",
+      "typeId": "1039"
+    },
+    {
+      "id": "78520",
+      "code": "EN0012",
+      "name": "Forest Invasive Species",
+      "clusterId": "1066",
+      "typeId": "1039"
+    },
+    {
+      "id": "78521",
+      "code": "EN0013",
+      "name": "Wildfires",
+      "clusterId": "1066",
+      "typeId": "1039"
+    },
+    {
+      "id": "78522",
+      "code": "ET0001",
+      "name": "Airburst",
+      "clusterId": "1067",
+      "typeId": "1040"
+    },
+    {
+      "id": "78523",
+      "code": "ET0002",
+      "name": "Geomagnetic Storm (including energetic particles related to space weather, and solar flare radio blackout [R Scale])",
+      "clusterId": "1067",
+      "typeId": "1040"
+    },
+    {
+      "id": "78524",
+      "code": "ET0003",
+      "name": "UV Radiation",
+      "clusterId": "1067",
+      "typeId": "1040"
+    },
+    {
+      "id": "78525",
+      "code": "ET0004",
+      "name": "Meteorite Impact",
+      "clusterId": "1067",
+      "typeId": "1040"
+    },
+    {
+      "id": "78526",
+      "code": "ET0005",
+      "name": "Ionospheric Storms",
+      "clusterId": "1067",
+      "typeId": "1040"
+    },
+    {
+      "id": "78527",
+      "code": "ET0006",
+      "name": "Radio Blackout",
+      "clusterId": "1067",
+      "typeId": "1040"
+    },
+    {
+      "id": "78528",
+      "code": "ET0007",
+      "name": "Solar Storm (Solar Radiation Storm) (S Scale)",
+      "clusterId": "1067",
+      "typeId": "1040"
+    },
+    {
+      "id": "78529",
+      "code": "ET0008",
+      "name": "Space Hazard / Accident",
+      "clusterId": "1067",
+      "typeId": "1040"
+    },
+    {
+      "id": "78530",
+      "code": "ET0009",
+      "name": "Near-Earth Object",
+      "clusterId": "1067",
+      "typeId": "1040"
+    },
+    {
+      "id": "78531",
+      "code": "GH0001",
+      "name": "Earthquake",
+      "clusterId": "1068",
+      "typeId": "1041"
+    },
+    {
+      "id": "78532",
+      "code": "GH0002",
+      "name": "Ground Shaking (Earthquake)",
+      "clusterId": "1068",
+      "typeId": "1041"
+    },
+    {
+      "id": "78533",
+      "code": "GH0003",
+      "name": "Liquefaction (Earthquake Trigger)",
+      "clusterId": "1068",
+      "typeId": "1041"
+    },
+    {
+      "id": "78534",
+      "code": "GH0004",
+      "name": "Earthquake Surface Rupture, Fissures, and Tectonic Uplift/Subsidence",
+      "clusterId": "1068",
+      "typeId": "1041"
+    },
+    {
+      "id": "78535",
+      "code": "GH0005",
+      "name": "Subsidence and Uplift, Including Shoreline Change (Earthquake Trigger)",
+      "clusterId": "1068",
+      "typeId": "1041"
+    },
+    {
+      "id": "78536",
+      "code": "GH0006",
+      "name": "Tsunami (Earthquake Trigger)",
+      "clusterId": "1068",
+      "typeId": "1041"
+    },
+    {
+      "id": "78537",
+      "code": "GH0007",
+      "name": "Landslide or Debris Flow (Earthquake Trigger)",
+      "clusterId": "1068",
+      "typeId": "1041"
+    },
+    {
+      "id": "78538",
+      "code": "GH0008",
+      "name": "Ground Gases (Seismogenic)",
+      "clusterId": "1068",
+      "typeId": "1041"
+    },
+    {
+      "id": "78539",
+      "code": "GH0009",
+      "name": "Lava Flows (Lava Domes)",
+      "clusterId": "1069",
+      "typeId": "1041"
+    },
+    {
+      "id": "78540",
+      "code": "GH0010",
+      "name": "Ash/Tephra Fall (Physical and Chemical)",
+      "clusterId": "1069",
+      "typeId": "1041"
+    },
+    {
+      "id": "78541",
+      "code": "GH0011",
+      "name": "Ballistics (Volcanic)",
+      "clusterId": "1069",
+      "typeId": "1041"
+    },
+    {
+      "id": "78542",
+      "code": "GH0012",
+      "name": "Pyroclastic Density Current",
+      "clusterId": "1069",
+      "typeId": "1041"
+    },
+    {
+      "id": "78543",
+      "code": "GH0013",
+      "name": "Debris Flow/Lahars/Floods",
+      "clusterId": "1069",
+      "typeId": "1041"
+    },
+    {
+      "id": "78544",
+      "code": "GH0014",
+      "name": "Landslide (Volcanic Trigger)",
+      "clusterId": "1069",
+      "typeId": "1041"
+    },
+    {
+      "id": "78545",
+      "code": "GH0015",
+      "name": "Ground Shaking (Volcanic Earthquake)",
+      "clusterId": "1069",
+      "typeId": "1041"
+    },
+    {
+      "id": "78546",
+      "code": "GH0016",
+      "name": "Volcanic Gases and Aerosols",
+      "clusterId": "1069",
+      "typeId": "1041"
+    },
+    {
+      "id": "78547",
+      "code": "GH0017",
+      "name": "Tsunami (Volcanic Trigger)",
+      "clusterId": "1069",
+      "typeId": "1041"
+    },
+    {
+      "id": "78548",
+      "code": "GH0018",
+      "name": "Lightning (Volcanic Trigger)",
+      "clusterId": "1069",
+      "typeId": "1041"
+    },
+    {
+      "id": "78549",
+      "code": "GH0019",
+      "name": "Urban Fire (During/Following Volcanic Eruption)",
+      "clusterId": "1069",
+      "typeId": "1041"
+    },
+    {
+      "id": "78550",
+      "code": "GH0020",
+      "name": "Subsidence and Uplift, Including Shoreline Change (Magmatic/Volcanic Trigger)",
+      "clusterId": "1069",
+      "typeId": "1041"
+    },
+    {
+      "id": "78551",
+      "code": "GH0021",
+      "name": "Ground Shaking (induced earthquake, reservoir fill, dams, cavity collapse, underground explosion, impact, hydrocarbon fields, shale exploration, etc.)",
+      "clusterId": "1070",
+      "typeId": "1041"
+    },
+    {
+      "id": "78552",
+      "code": "GH0022",
+      "name": "Liquefaction (Groundwater Trigger)",
+      "clusterId": "1070",
+      "typeId": "1041"
+    },
+    {
+      "id": "78553",
+      "code": "GH0023",
+      "name": "Ground Fissuring",
+      "clusterId": "1070",
+      "typeId": "1041"
+    },
+    {
+      "id": "78554",
+      "code": "GH0024",
+      "name": "Subsidence and Uplift Including Shoreline Change",
+      "clusterId": "1070",
+      "typeId": "1041"
+    },
+    {
+      "id": "78555",
+      "code": "GH0025",
+      "name": "Shrink-Swell Subsidence",
+      "clusterId": "1070",
+      "typeId": "1041"
+    },
+    {
+      "id": "78556",
+      "code": "GH0026",
+      "name": "Sinkhole",
+      "clusterId": "1070",
+      "typeId": "1041"
+    },
+    {
+      "id": "78557",
+      "code": "GH0027",
+      "name": "Ground Gases (CH4, Rn, etc.)",
+      "clusterId": "1070",
+      "typeId": "1041"
+    },
+    {
+      "id": "78558",
+      "code": "GH0028",
+      "name": "Riverbank Erosion",
+      "clusterId": "1070",
+      "typeId": "1041"
+    },
+    {
+      "id": "78559",
+      "code": "GH0029",
+      "name": "Sand Encroachment",
+      "clusterId": "1070",
+      "typeId": "1041"
+    },
+    {
+      "id": "78560",
+      "code": "GH0030",
+      "name": "Aquifer Recharge (Systems Failure/Outages)",
+      "clusterId": "1070",
+      "typeId": "1041"
+    },
+    {
+      "id": "78561",
+      "code": "GH0031",
+      "name": "Submarine Landslide",
+      "clusterId": "1070",
+      "typeId": "1041"
+    },
+    {
+      "id": "78562",
+      "code": "GH0032",
+      "name": "Rockfall",
+      "clusterId": "1070",
+      "typeId": "1041"
+    },
+    {
+      "id": "78563",
+      "code": "GH0033",
+      "name": "Landscape Creep",
+      "clusterId": "1070",
+      "typeId": "1041"
+    },
+    {
+      "id": "78564",
+      "code": "GH0034",
+      "name": "Sediment Rock Avalanche",
+      "clusterId": "1070",
+      "typeId": "1041"
+    },
+    {
+      "id": "78565",
+      "code": "GH0035",
+      "name": "Tsunami (Submarine Landslide Trigger)",
+      "clusterId": "1070",
+      "typeId": "1041"
+    },
+    {
+      "id": "78566",
+      "code": "MH0001",
+      "name": "Downburst",
+      "clusterId": "1071",
+      "typeId": "1042"
+    },
+    {
+      "id": "78567",
+      "code": "MH0002",
+      "name": "Lightning (Electrical Storm)",
+      "clusterId": "1071",
+      "typeId": "1042"
+    },
+    {
+      "id": "78568",
+      "code": "MH0003",
+      "name": "Thunderstorm",
+      "clusterId": "1071",
+      "typeId": "1042"
+    },
+    {
+      "id": "78569",
+      "code": "MH0004",
+      "name": "Coastal Flood",
+      "clusterId": "1072",
+      "typeId": "1042"
+    },
+    {
+      "id": "78570",
+      "code": "MH0005",
+      "name": "Estuarine (Coastal) Flood",
+      "clusterId": "1072",
+      "typeId": "1042"
+    },
+    {
+      "id": "78571",
+      "code": "MH0006",
+      "name": "Flash Flood",
+      "clusterId": "1072",
+      "typeId": "1042"
+    },
+    {
+      "id": "78572",
+      "code": "MH0007",
+      "name": "Fluvial (Riverine) Flood",
+      "clusterId": "1072",
+      "typeId": "1042"
+    },
+    {
+      "id": "78573",
+      "code": "MH0008",
+      "name": "Groundwater Flood",
+      "clusterId": "1072",
+      "typeId": "1042"
+    },
+    {
+      "id": "78574",
+      "code": "MH0009",
+      "name": "Ice-Jam Flood Including Debris",
+      "clusterId": "1072",
+      "typeId": "1042"
+    },
+    {
+      "id": "78575",
+      "code": "MH0010",
+      "name": "Ponding (Drainage) Flood",
+      "clusterId": "1072",
+      "typeId": "1042"
+    },
+    {
+      "id": "78576",
+      "code": "MH0011",
+      "name": "Snowmelt Flood",
+      "clusterId": "1072",
+      "typeId": "1042"
+    },
+    {
+      "id": "78577",
+      "code": "MH0012",
+      "name": "Surface Water Flooding",
+      "clusterId": "1072",
+      "typeId": "1042"
+    },
+    {
+      "id": "78578",
+      "code": "MH0013",
+      "name": "Glacial Lake Outburst Flood",
+      "clusterId": "1072",
+      "typeId": "1042"
+    },
+    {
+      "id": "78579",
+      "code": "MH0014",
+      "name": "Black Carbon (Brown Clouds)",
+      "clusterId": "1073",
+      "typeId": "1042"
+    },
+    {
+      "id": "78580",
+      "code": "MH0015",
+      "name": "Dust storm or Sandstorm",
+      "clusterId": "1073",
+      "typeId": "1042"
+    },
+    {
+      "id": "78581",
+      "code": "MH0016",
+      "name": "Fog",
+      "clusterId": "1073",
+      "typeId": "1042"
+    },
+    {
+      "id": "78582",
+      "code": "MH0017",
+      "name": "Haze",
+      "clusterId": "1073",
+      "typeId": "1042"
+    },
+    {
+      "id": "78583",
+      "code": "MH0018",
+      "name": "Polluted Air",
+      "clusterId": "1073",
+      "typeId": "1042"
+    },
+    {
+      "id": "78584",
+      "code": "MH0019",
+      "name": "Sand haze",
+      "clusterId": "1073",
+      "typeId": "1042"
+    },
+    {
+      "id": "78585",
+      "code": "MH0020",
+      "name": "Smoke",
+      "clusterId": "1073",
+      "typeId": "1042"
+    },
+    {
+      "id": "78586",
+      "code": "MH0021",
+      "name": "Ocean Acidification",
+      "clusterId": "1074",
+      "typeId": "1042"
+    },
+    {
+      "id": "78587",
+      "code": "MH0022",
+      "name": "Rogue Wave",
+      "clusterId": "1074",
+      "typeId": "1042"
+    },
+    {
+      "id": "78588",
+      "code": "MH0023",
+      "name": "Sea Water Intrusion",
+      "clusterId": "1074",
+      "typeId": "1042"
+    },
+    {
+      "id": "78589",
+      "code": "MH0024",
+      "name": "Sea Ice (Ice Bergs)",
+      "clusterId": "1074",
+      "typeId": "1042"
+    },
+    {
+      "id": "78590",
+      "code": "MH0025",
+      "name": "Ice Flow",
+      "clusterId": "1074",
+      "typeId": "1042"
+    },
+    {
+      "id": "78591",
+      "code": "MH0026",
+      "name": "Seiche",
+      "clusterId": "1074",
+      "typeId": "1042"
+    },
+    {
+      "id": "78592",
+      "code": "MH0027",
+      "name": "Storm Surge",
+      "clusterId": "1074",
+      "typeId": "1042"
+    },
+    {
+      "id": "78593",
+      "code": "MH0028",
+      "name": "Storm Tides",
+      "clusterId": "1074",
+      "typeId": "1042"
+    },
+    {
+      "id": "78594",
+      "code": "MH0029",
+      "name": "Tsunami",
+      "clusterId": "1074",
+      "typeId": "1042"
+    },
+    {
+      "id": "78597",
+      "code": "MH0032",
+      "name": "Sub-Tropical Cyclone",
+      "clusterId": "1075",
+      "typeId": "1042"
+    },
+    {
+      "id": "78598",
+      "code": "MH0033",
+      "name": "Acid Rain",
+      "clusterId": "1076",
+      "typeId": "1042"
+    },
+    {
+      "id": "78599",
+      "code": "MH0034",
+      "name": "Blizzard",
+      "clusterId": "1076",
+      "typeId": "1042"
+    },
+    {
+      "id": "78600",
+      "code": "MH0035",
+      "name": "Drought",
+      "clusterId": "1076",
+      "typeId": "1042"
+    },
+    {
+      "id": "78601",
+      "code": "MH0036",
+      "name": "Hail",
+      "clusterId": "1076",
+      "typeId": "1042"
+    },
+    {
+      "id": "78602",
+      "code": "MH0037",
+      "name": "Ice Storm",
+      "clusterId": "1076",
+      "typeId": "1042"
+    },
+    {
+      "id": "78603",
+      "code": "MH0038",
+      "name": "Snow",
+      "clusterId": "1076",
+      "typeId": "1042"
+    },
+    {
+      "id": "78604",
+      "code": "MH0039",
+      "name": "Snow Storm",
+      "clusterId": "1076",
+      "typeId": "1042"
+    },
+    {
+      "id": "78605",
+      "code": "MH0040",
+      "name": "Cold Wave",
+      "clusterId": "1077",
+      "typeId": "1042"
+    },
+    {
+      "id": "78606",
+      "code": "MH0041",
+      "name": "Dzud",
+      "clusterId": "1077",
+      "typeId": "1042"
+    },
+    {
+      "id": "78607",
+      "code": "MH0042",
+      "name": "Freeze",
+      "clusterId": "1077",
+      "typeId": "1042"
+    },
+    {
+      "id": "78608",
+      "code": "MH0043",
+      "name": "Frost (Hoar Frost)",
+      "clusterId": "1077",
+      "typeId": "1042"
+    },
+    {
+      "id": "78609",
+      "code": "MH0044",
+      "name": "Freezing Rain (Supercooled Rain)",
+      "clusterId": "1077",
+      "typeId": "1042"
+    },
+    {
+      "id": "78610",
+      "code": "MH0045",
+      "name": "Glaze",
+      "clusterId": "1077",
+      "typeId": "1042"
+    },
+    {
+      "id": "78611",
+      "code": "MH0046",
+      "name": "Ground Frost",
+      "clusterId": "1077",
+      "typeId": "1042"
+    },
+    {
+      "id": "78612",
+      "code": "MH0047",
+      "name": "Heatwave",
+      "clusterId": "1077",
+      "typeId": "1042"
+    },
+    {
+      "id": "78613",
+      "code": "MH0048",
+      "name": "Icing (Including Ice)",
+      "clusterId": "1077",
+      "typeId": "1042"
+    },
+    {
+      "id": "78614",
+      "code": "MH0049",
+      "name": "Thaw",
+      "clusterId": "1077",
+      "typeId": "1042"
+    },
+    {
+      "id": "78615",
+      "code": "MH0050",
+      "name": "Avalanche",
+      "clusterId": "1078",
+      "typeId": "1042"
+    },
+    {
+      "id": "78616",
+      "code": "MH0051",
+      "name": "Mud Flow",
+      "clusterId": "1078",
+      "typeId": "1042"
+    },
+    {
+      "id": "78617",
+      "code": "MH0052",
+      "name": "Rock slide",
+      "clusterId": "1078",
+      "typeId": "1042"
+    },
+    {
+      "id": "78618",
+      "code": "MH0053",
+      "name": "Derecho",
+      "clusterId": "1079",
+      "typeId": "1042"
+    },
+    {
+      "id": "78619",
+      "code": "MH0054",
+      "name": "Gale (Strong Gale)",
+      "clusterId": "1079",
+      "typeId": "1042"
+    },
+    {
+      "id": "78620",
+      "code": "MH0055",
+      "name": "Squall",
+      "clusterId": "1079",
+      "typeId": "1042"
+    },
+    {
+      "id": "78621",
+      "code": "MH0056",
+      "name": "Subtropical Storm",
+      "clusterId": "1079",
+      "typeId": "1042"
+    },
+    {
+      "id": "78622",
+      "code": "MH0057",
+      "name": "Tropical Cyclone (Cyclonic Wind, Rain [Storm] Surge)",
+      "clusterId": "1079",
+      "typeId": "1042"
+    },
+    {
+      "id": "78641",
+      "code": "TL0007",
+      "name": "Structural Failure",
+      "clusterId": "1086",
+      "typeId": "1044"
+    },
+    {
+      "id": "78623",
+      "code": "MH0058",
+      "name": "Tropical Storm",
+      "clusterId": "1079",
+      "typeId": "1042"
+    },
+    {
+      "id": "78624",
+      "code": "MH0059",
+      "name": "Tornado",
+      "clusterId": "1079",
+      "typeId": "1042"
+    },
+    {
+      "id": "78625",
+      "code": "MH0060",
+      "name": "Wind",
+      "clusterId": "1079",
+      "typeId": "1042"
+    },
+    {
+      "id": "78626",
+      "code": "SO0001",
+      "name": "International Armed Conflict (IAC)",
+      "clusterId": "1080",
+      "typeId": "1043"
+    },
+    {
+      "id": "78627",
+      "code": "SO0002",
+      "name": "Non-International Armed Conflict (NIAC)",
+      "clusterId": "1080",
+      "typeId": "1043"
+    },
+    {
+      "id": "78628",
+      "code": "SO0003",
+      "name": "Civil Unrest",
+      "clusterId": "1080",
+      "typeId": "1043"
+    },
+    {
+      "id": "78629",
+      "code": "SO0004",
+      "name": "Explosive Remnants of War",
+      "clusterId": "1081",
+      "typeId": "1043"
+    },
+    {
+      "id": "78630",
+      "code": "SO0005",
+      "name": "Environmental Degradation from Conflict",
+      "clusterId": "1081",
+      "typeId": "1043"
+    },
+    {
+      "id": "78631",
+      "code": "SO0006",
+      "name": "Violence",
+      "clusterId": "1082",
+      "typeId": "1043"
+    },
+    {
+      "id": "78632",
+      "code": "SO0007",
+      "name": "Stampede or Crushing (Human)",
+      "clusterId": "1082",
+      "typeId": "1043"
+    },
+    {
+      "id": "78633",
+      "code": "SO0008",
+      "name": "Financial shock",
+      "clusterId": "1083",
+      "typeId": "1043"
+    },
+    {
+      "id": "78634",
+      "code": "TL0001",
+      "name": "Radioactive Waste",
+      "clusterId": "1084",
+      "typeId": "1044"
+    },
+    {
+      "id": "78635",
+      "code": "TL0002",
+      "name": "Radioactive Material",
+      "clusterId": "1084",
+      "typeId": "1044"
+    },
+    {
+      "id": "78636",
+      "code": "TL0003",
+      "name": "Radiation Agents",
+      "clusterId": "1085",
+      "typeId": "1044"
+    },
+    {
+      "id": "78637",
+      "code": "TL0004",
+      "name": "Nuclear agents",
+      "clusterId": "1085",
+      "typeId": "1044"
+    },
+    {
+      "id": "78638",
+      "code": "TL0053",
+      "name": "Explosive agents",
+      "clusterId": "1085",
+      "typeId": "1044"
+    },
+    {
+      "id": "78639",
+      "code": "TL0005",
+      "name": "Building Collapse",
+      "clusterId": "1086",
+      "typeId": "1044"
+    },
+    {
+      "id": "78640",
+      "code": "TL0006",
+      "name": "Building, highrise, cladding",
+      "clusterId": "1086",
+      "typeId": "1044"
+    },
+    {
+      "id": "78642",
+      "code": "TL0008",
+      "name": "Bridge Failure",
+      "clusterId": "1086",
+      "typeId": "1044"
+    },
+    {
+      "id": "78643",
+      "code": "TL0009",
+      "name": "Dam Failure",
+      "clusterId": "1086",
+      "typeId": "1044"
+    },
+    {
+      "id": "78644",
+      "code": "TL0010",
+      "name": "Supply Chain Failure",
+      "clusterId": "1086",
+      "typeId": "1044"
+    },
+    {
+      "id": "78645",
+      "code": "TL0011",
+      "name": "Critical Infrastructure Failure",
+      "clusterId": "1086",
+      "typeId": "1044"
+    },
+    {
+      "id": "78646",
+      "code": "TL0012",
+      "name": "Nuclear Plant Failure",
+      "clusterId": "1087",
+      "typeId": "1044"
+    },
+    {
+      "id": "78647",
+      "code": "TL0013",
+      "name": "Power Outage/ or Blackout",
+      "clusterId": "1087",
+      "typeId": "1044"
+    },
+    {
+      "id": "78648",
+      "code": "TL0014",
+      "name": "Emergency Telecommunications Failure",
+      "clusterId": "1087",
+      "typeId": "1044"
+    },
+    {
+      "id": "78649",
+      "code": "TL0015",
+      "name": "Water Supply Failure",
+      "clusterId": "1087",
+      "typeId": "1044"
+    },
+    {
+      "id": "78650",
+      "code": "TL0016",
+      "name": "Radio and Other Telecommunication Failures",
+      "clusterId": "1087",
+      "typeId": "1044"
+    },
+    {
+      "id": "78651",
+      "code": "TL0017",
+      "name": "Misconfiguration of Software and Hardware",
+      "clusterId": "1088",
+      "typeId": "1044"
+    },
+    {
+      "id": "78652",
+      "code": "TL0018",
+      "name": "Non-Conformity and Interoperability",
+      "clusterId": "1088",
+      "typeId": "1044"
+    },
+    {
+      "id": "78653",
+      "code": "TL0019",
+      "name": "Malware",
+      "clusterId": "1088",
+      "typeId": "1044"
+    },
+    {
+      "id": "78654",
+      "code": "TL0020",
+      "name": "Data Breach",
+      "clusterId": "1088",
+      "typeId": "1044"
+    },
+    {
+      "id": "78655",
+      "code": "TL0021",
+      "name": "Data Security-Related Hazards",
+      "clusterId": "1088",
+      "typeId": "1044"
+    },
+    {
+      "id": "78656",
+      "code": "TL0023",
+      "name": "Outage",
+      "clusterId": "1088",
+      "typeId": "1044"
+    },
+    {
+      "id": "78657",
+      "code": "TL0024",
+      "name": "Personally Identifiable Information (PII) Breach",
+      "clusterId": "1088",
+      "typeId": "1044"
+    },
+    {
+      "id": "78658",
+      "code": "TL0025",
+      "name": "Internet of Things (IOT)-Related Hazards",
+      "clusterId": "1088",
+      "typeId": "1044"
+    },
+    {
+      "id": "78659",
+      "code": "TL0026",
+      "name": "Cyberbullying",
+      "clusterId": "1088",
+      "typeId": "1044"
+    },
+    {
+      "id": "78660",
+      "code": "TL0027",
+      "name": "Natech",
+      "clusterId": "1089",
+      "typeId": "1044"
+    },
+    {
+      "id": "78661",
+      "code": "TL0028",
+      "name": "Pollution",
+      "clusterId": "1089",
+      "typeId": "1044"
+    },
+    {
+      "id": "78662",
+      "code": "TL0029",
+      "name": "Explosion",
+      "clusterId": "1089",
+      "typeId": "1044"
+    },
+    {
+      "id": "78663",
+      "code": "TL0030",
+      "name": "Leaks and Spills",
+      "clusterId": "1089",
+      "typeId": "1044"
+    },
+    {
+      "id": "78664",
+      "code": "TL0031",
+      "name": "Soil Pollution",
+      "clusterId": "1089",
+      "typeId": "1044"
+    },
+    {
+      "id": "78665",
+      "code": "TL0032",
+      "name": "Fire",
+      "clusterId": "1089",
+      "typeId": "1044"
+    },
+    {
+      "id": "78666",
+      "code": "TL0033",
+      "name": "Mining Hazards",
+      "clusterId": "1089",
+      "typeId": "1044"
+    },
+    {
+      "id": "78667",
+      "code": "TL0034",
+      "name": "Safety Hazards Associated with Oil and Gas",
+      "clusterId": "1089",
+      "typeId": "1044"
+    },
+    {
+      "id": "78668",
+      "code": "TL0035",
+      "name": "Disaster Waste",
+      "clusterId": "1090",
+      "typeId": "1044"
+    },
+    {
+      "id": "78669",
+      "code": "TL0036",
+      "name": "Solid Waste",
+      "clusterId": "1090",
+      "typeId": "1044"
+    },
+    {
+      "id": "78670",
+      "code": "TL0037",
+      "name": "Wastewater",
+      "clusterId": "1090",
+      "typeId": "1044"
+    },
+    {
+      "id": "78671",
+      "code": "TL0038",
+      "name": "Hazardous Waste",
+      "clusterId": "1090",
+      "typeId": "1044"
+    },
+    {
+      "id": "78672",
+      "code": "TL0039",
+      "name": "Plastic Waste",
+      "clusterId": "1090",
+      "typeId": "1044"
+    },
+    {
+      "id": "78673",
+      "code": "TL0041",
+      "name": "Electronic Waste (E-Waste)",
+      "clusterId": "1090",
+      "typeId": "1044"
+    },
+    {
+      "id": "78674",
+      "code": "TL0042",
+      "name": "Healthcare Risk Waste",
+      "clusterId": "1090",
+      "typeId": "1044"
+    },
+    {
+      "id": "78675",
+      "code": "TL0043",
+      "name": "Landfilling",
+      "clusterId": "1090",
+      "typeId": "1044"
+    },
+    {
+      "id": "78676",
+      "code": "TL0044",
+      "name": "Tailings",
+      "clusterId": "1090",
+      "typeId": "1044"
+    },
+    {
+      "id": "78677",
+      "code": "TL0045",
+      "name": "Waste Treatment Lagoons",
+      "clusterId": "1090",
+      "typeId": "1044"
+    },
+    {
+      "id": "78678",
+      "code": "TL0040",
+      "name": "Marine Debris",
+      "clusterId": "1091",
+      "typeId": "1044"
+    },
+    {
+      "id": "78679",
+      "code": "TL0046",
+      "name": "Drain and Sewer Flooding",
+      "clusterId": "1092",
+      "typeId": "1044"
+    },
+    {
+      "id": "78680",
+      "code": "TL0047",
+      "name": "Reservoir Flooding",
+      "clusterId": "1092",
+      "typeId": "1044"
+    },
+    {
+      "id": "78681",
+      "code": "TL0048",
+      "name": "Air Transportation Accident",
+      "clusterId": "1093",
+      "typeId": "1044"
+    },
+    {
+      "id": "78682",
+      "code": "TL0049",
+      "name": "Inland Water Ways",
+      "clusterId": "1093",
+      "typeId": "1044"
+    },
+    {
+      "id": "78683",
+      "code": "TL0050",
+      "name": "Marine Accident",
+      "clusterId": "1093",
+      "typeId": "1044"
+    },
+    {
+      "id": "78684",
+      "code": "TL0051",
+      "name": "Rail Accident",
+      "clusterId": "1093",
+      "typeId": "1044"
+    },
+    {
+      "id": "78685",
+      "code": "TL0052",
+      "name": "Road Traffic Accident",
+      "clusterId": "1093",
+      "typeId": "1044"
+    },
+    {
+      "id": "81041",
+      "code": "TL0022",
+      "name": "Disrupt",
+      "clusterId": "1088",
+      "typeId": "1044"
+    }
+  ]
+}

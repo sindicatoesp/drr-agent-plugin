@@ -7,6 +7,11 @@ const {
 	fetchDeltaDocs,
 	fetchDeltaHazards,
 	fetchDeltaDimensions,
+	lookupHip,
+	findHipHazards,
+	getAllHipTypes,
+	getAllHipClusters,
+	getAllHipHazards,
 } = require("../lib/delta");
 
 console.log("Testing Advanced DELTA Relational Bundle & Ingestion Logic...");
@@ -147,6 +152,37 @@ async function testPush() {
 	const dims = await fetchDeltaDimensions("hazards", { mock: true });
 	assert.strictEqual(dims.hazards.length, 1);
 	assert.strictEqual(dims.hazards[0].id, "78531");
+
+	// 9. Test In-Code UNDRR/ISC HIP Taxonomy Database (All 8 Types, 49 Clusters, 301 Hazards)
+	assert.strictEqual(getAllHipTypes().length, 8, "Expected 8 canonical HIP Types");
+	assert.strictEqual(getAllHipClusters().length, 49, "Expected 49 canonical HIP Clusters");
+	assert.strictEqual(getAllHipHazards().length, 301, "Expected 301 canonical HIP Hazards");
+
+	// Test lookups across ID, Code, natural keyword, and aliases
+	const eqById = lookupHip("78531");
+	assert.strictEqual(eqById.code, "GH0001");
+	assert.strictEqual(eqById.hipClusterId, "1068");
+	assert.strictEqual(eqById.hipTypeId, "1041");
+
+	const flByCode = lookupHip("MH0007");
+	assert.strictEqual(flByCode.name, "Fluvial (Riverine) Flood");
+	assert.strictEqual(flByCode.hipHazardId, "78572");
+
+	const cyByAlias = lookupHip("tropical_cyclone");
+	assert.strictEqual(cyByAlias.code, "MH0057");
+	assert.strictEqual(cyByAlias.hipHazardId, "78622");
+
+	const lsByKeyword = lookupHip("landslide");
+	assert.strictEqual(lsByKeyword.code, "GH0007");
+	assert.strictEqual(lsByKeyword.hipHazardId, "78537");
+
+	// 10. Test In-Code Taxonomy Filter & Local Search
+	const floodSearch = findHipHazards({ search: "flood" });
+	assert(floodSearch.length >= 10, "Should find at least 10 flood hazards");
+
+	const localHazardsRes = await fetchDeltaHazards({ local: true, search: "earthquake" });
+	assert.strictEqual(localHazardsRes.source, "in_code_taxonomy");
+	assert(localHazardsRes.items.length >= 7);
 
 	console.log("✅ Advanced DELTA Relational tests passed!");
 }
