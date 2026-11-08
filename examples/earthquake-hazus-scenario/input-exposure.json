@@ -1,0 +1,85 @@
+{
+  "type": "FeatureCollection",
+  "features": [
+    {
+      "type": "Feature",
+      "id": "hosp_central_01",
+      "properties": {
+        "name": "Central Teaching Hospital",
+        "category": "healthcare",
+        "taxonomy": "C1_PRE_CODE",
+        "valueUsd": 28000000,
+        "population": 1200,
+        "isCriticalInfrastructure": true
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [85.32, 27.71]
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "school_district_04",
+      "properties": {
+        "name": "Public Secondary High School",
+        "category": "education",
+        "taxonomy": "URM",
+        "valueUsd": 4500000,
+        "population": 850,
+        "isCriticalInfrastructure": true
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [85.34, 27.73]
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "res_subdivision_09",
+      "properties": {
+        "name": "Urban Residential Block A",
+        "category": "residential",
+        "taxonomy": "URM",
+        "valueUsd": 65000000,
+        "population": 9400,
+        "isCriticalInfrastructure": false
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [85.33, 27.69]
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "power_substation_north",
+      "properties": {
+        "name": "Northern Grid Power Substation",
+        "category": "power_station",
+        "taxonomy": "C2",
+        "valueUsd": 14000000,
+        "population": 45,
+        "isCriticalInfrastructure": true
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [85.38, 27.75]
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "rural_outpost_far",
+      "properties": {
+        "name": "Eastern Rural Clinic",
+        "category": "healthcare",
+        "taxonomy": "URM",
+        "valueUsd": 800000,
+        "population": 60,
+        "isCriticalInfrastructure": true
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [85.95, 27.90]
+      }
+    }
+  ]
+}

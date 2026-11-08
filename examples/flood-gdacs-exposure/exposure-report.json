@@ -1,0 +1,140 @@
+{
+  "summary": {
+    "totalAssetsEvaluated": 4,
+    "totalExposedAssets": 3,
+    "totalUnexposedAssets": 1,
+    "exposureRatePercentage": 75,
+    "totalExposedPopulation": 2180,
+    "totalExposedAssetValueUsd": 22600000,
+    "hazardBoundingBox": [
+      90.1,
+      23.5,
+      90.7,
+      24.1
+    ]
+  },
+  "categoryBreakdown": {
+    "healthcare": {
+      "count": 1,
+      "totalValueUsd": 12000000,
+      "totalPopulation": 650
+    },
+    "water_treatment": {
+      "count": 1,
+      "totalValueUsd": 8500000,
+      "totalPopulation": 30
+    },
+    "education": {
+      "count": 1,
+      "totalValueUsd": 2100000,
+      "totalPopulation": 1500
+    }
+  },
+  "exposedAssets": [
+    {
+      "id": "fac_hospital_delta_01",
+      "name": "District General Hospital",
+      "category": "healthcare",
+      "coordinates": [
+        90.35,
+        23.75
+      ],
+      "distanceToEpicenterKm": null,
+      "properties": {
+        "name": "District General Hospital",
+        "category": "healthcare",
+        "valueUsd": 12000000,
+        "population": 650,
+        "occupancy": "commercial",
+        "isCriticalInfrastructure": true
+      },
+      "hazardZone": {
+        "eventid": 1002341,
+        "episodeid": 1,
+        "eventname": "Monsoon Riverine Basin Flash Flood",
+        "eventtype": "FL",
+        "alertlevel": "Orange",
+        "alertscore": 2.1,
+        "country": "Bangladesh",
+        "fromdate": "2026-08-10T00:00:00",
+        "todate": "2026-08-15T00:00:00",
+        "population": {
+          "value": 450000
+        },
+        "severitydata": {
+          "severitytext": "Inundation extent estimated up to 2.2 meters depth in low-lying river delta."
+        }
+      }
+    },
+    {
+      "id": "fac_water_treatment_01",
+      "name": "Municipal Water Treatment Facility",
+      "category": "water_treatment",
+      "coordinates": [
+        90.4,
+        23.8
+      ],
+      "distanceToEpicenterKm": null,
+      "properties": {
+        "name": "Municipal Water Treatment Facility",
+        "category": "water_treatment",
+        "valueUsd": 8500000,
+        "population": 30,
+        "occupancy": "commercial",
+        "isCriticalInfrastructure": true
+      },
+      "hazardZone": {
+        "eventid": 1002341,
+        "episodeid": 1,
+        "eventname": "Monsoon Riverine Basin Flash Flood",
+        "eventtype": "FL",
+        "alertlevel": "Orange",
+        "alertscore": 2.1,
+        "country": "Bangladesh",
+        "fromdate": "2026-08-10T00:00:00",
+        "todate": "2026-08-15T00:00:00",
+        "population": {
+          "value": 450000
+        },
+        "severitydata": {
+          "severitytext": "Inundation extent estimated up to 2.2 meters depth in low-lying river delta."
+        }
+      }
+    },
+    {
+      "id": "fac_shelter_school_02",
+      "name": "Upazila Cyclone & Flood Relief Shelter (School)",
+      "category": "education",
+      "coordinates": [
+        90.28,
+        23.65
+      ],
+      "distanceToEpicenterKm": null,
+      "properties": {
+        "name": "Upazila Cyclone & Flood Relief Shelter (School)",
+        "category": "education",
+        "valueUsd": 2100000,
+        "population": 1500,
+        "occupancy": "residential_2story",
+        "isCriticalInfrastructure": true
+      },
+      "hazardZone": {
+        "eventid": 1002341,
+        "episodeid": 1,
+        "eventname": "Monsoon Riverine Basin Flash Flood",
+        "eventtype": "FL",
+        "alertlevel": "Orange",
+        "alertscore": 2.1,
+        "country": "Bangladesh",
+        "fromdate": "2026-08-10T00:00:00",
+        "todate": "2026-08-15T00:00:00",
+        "population": {
+          "value": 450000
+        },
+        "severitydata": {
+          "severitytext": "Inundation extent estimated up to 2.2 meters depth in low-lying river delta."
+        }
+      }
+    }
+  ]
+}

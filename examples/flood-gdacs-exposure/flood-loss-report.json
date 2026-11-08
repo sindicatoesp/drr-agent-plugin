@@ -1,0 +1,86 @@
+{
+  "hazardAssessment": {
+    "hazardType": "flood",
+    "hazardIntensity": 1.8,
+    "intensityUnit": "Inundation Depth (meters)"
+  },
+  "sendaiFrameworkMetrics": {
+    "targetB_AffectedPeople": {
+      "totalExposedPopulation": 2180,
+      "estimatedDisplacedPopulation": 1962,
+      "displacementRatePercentage": 90
+    },
+    "targetC_DirectEconomicLoss": {
+      "totalExposedAssetValueUsd": 22600000,
+      "estimatedDirectEconomicLossUsd": 13243600,
+      "aggregateLossRatioPercentage": 58.6
+    },
+    "targetD_CriticalInfrastructure": {
+      "totalDamagedFacilities": 3
+    }
+  },
+  "damageStateDistribution": {
+    "none": 0,
+    "slight": 0,
+    "moderate": 0,
+    "extensive": 3,
+    "complete": 0
+  },
+  "evaluatedAssetsCount": 3,
+  "topDamagedAssets": [
+    {
+      "id": "fac_hospital_delta_01",
+      "name": "District General Hospital",
+      "category": "healthcare",
+      "isCriticalInfrastructure": true,
+      "assetValueUsd": 12000000,
+      "meanDamageRatio": 0.586,
+      "estimatedEconomicLossUsd": 7032000,
+      "exposedPopulation": 650,
+      "estimatedDisplacedPopulation": 585,
+      "fragilityDetails": {
+        "occupancy": "commercial",
+        "inundationDepthMeters": 1.8,
+        "structuralDamageRatio": 0.4833,
+        "contentDamageRatio": 0.74,
+        "combinedMeanDamageRatio": 0.586
+      }
+    },
+    {
+      "id": "fac_water_treatment_01",
+      "name": "Municipal Water Treatment Facility",
+      "category": "water_treatment",
+      "isCriticalInfrastructure": true,
+      "assetValueUsd": 8500000,
+      "meanDamageRatio": 0.586,
+      "estimatedEconomicLossUsd": 4981000,
+      "exposedPopulation": 30,
+      "estimatedDisplacedPopulation": 27,
+      "fragilityDetails": {
+        "occupancy": "commercial",
+        "inundationDepthMeters": 1.8,
+        "structuralDamageRatio": 0.4833,
+        "contentDamageRatio": 0.74,
+        "combinedMeanDamageRatio": 0.586
+      }
+    },
+    {
+      "id": "fac_shelter_school_02",
+      "name": "Upazila Cyclone & Flood Relief Shelter (School)",
+      "category": "education",
+      "isCriticalInfrastructure": true,
+      "assetValueUsd": 2100000,
+      "meanDamageRatio": 0.586,
+      "estimatedEconomicLossUsd": 1230600,
+      "exposedPopulation": 1500,
+      "estimatedDisplacedPopulation": 1350,
+      "fragilityDetails": {
+        "occupancy": "residential_2story",
+        "inundationDepthMeters": 1.8,
+        "structuralDamageRatio": 0.4833,
+        "contentDamageRatio": 0.74,
+        "combinedMeanDamageRatio": 0.586
+      }
+    }
+  ]
+}

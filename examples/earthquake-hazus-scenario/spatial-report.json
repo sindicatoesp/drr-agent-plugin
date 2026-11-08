@@ -1,0 +1,140 @@
+{
+  "summary": {
+    "totalAssetsEvaluated": 5,
+    "totalExposedAssets": 4,
+    "totalUnexposedAssets": 1,
+    "exposureRatePercentage": 80,
+    "totalExposedPopulation": 11495,
+    "totalExposedAssetValueUsd": 111500000,
+    "hazardBoundingBox": [
+      85.25,
+      27.65,
+      85.45,
+      27.8
+    ]
+  },
+  "categoryBreakdown": {
+    "healthcare": {
+      "count": 1,
+      "totalValueUsd": 28000000,
+      "totalPopulation": 1200
+    },
+    "education": {
+      "count": 1,
+      "totalValueUsd": 4500000,
+      "totalPopulation": 850
+    },
+    "residential": {
+      "count": 1,
+      "totalValueUsd": 65000000,
+      "totalPopulation": 9400
+    },
+    "power_station": {
+      "count": 1,
+      "totalValueUsd": 14000000,
+      "totalPopulation": 45
+    }
+  },
+  "exposedAssets": [
+    {
+      "id": "hosp_central_01",
+      "name": "Central Teaching Hospital",
+      "category": "healthcare",
+      "coordinates": [
+        85.32,
+        27.71
+      ],
+      "distanceToEpicenterKm": null,
+      "properties": {
+        "name": "Central Teaching Hospital",
+        "category": "healthcare",
+        "taxonomy": "C1_PRE_CODE",
+        "valueUsd": 28000000,
+        "population": 1200,
+        "isCriticalInfrastructure": true
+      },
+      "hazardZone": {
+        "hazardType": "earthquake",
+        "name": "Mw 7.2 Mainshock Epicentral Shaking Zone",
+        "pga": 0.42,
+        "intensityUnit": "g",
+        "mmi": "VIII"
+      }
+    },
+    {
+      "id": "school_district_04",
+      "name": "Public Secondary High School",
+      "category": "education",
+      "coordinates": [
+        85.34,
+        27.73
+      ],
+      "distanceToEpicenterKm": null,
+      "properties": {
+        "name": "Public Secondary High School",
+        "category": "education",
+        "taxonomy": "URM",
+        "valueUsd": 4500000,
+        "population": 850,
+        "isCriticalInfrastructure": true
+      },
+      "hazardZone": {
+        "hazardType": "earthquake",
+        "name": "Mw 7.2 Mainshock Epicentral Shaking Zone",
+        "pga": 0.42,
+        "intensityUnit": "g",
+        "mmi": "VIII"
+      }
+    },
+    {
+      "id": "res_subdivision_09",
+      "name": "Urban Residential Block A",
+      "category": "residential",
+      "coordinates": [
+        85.33,
+        27.69
+      ],
+      "distanceToEpicenterKm": null,
+      "properties": {
+        "name": "Urban Residential Block A",
+        "category": "residential",
+        "taxonomy": "URM",
+        "valueUsd": 65000000,
+        "population": 9400,
+        "isCriticalInfrastructure": false
+      },
+      "hazardZone": {
+        "hazardType": "earthquake",
+        "name": "Mw 7.2 Mainshock Epicentral Shaking Zone",
+        "pga": 0.42,
+        "intensityUnit": "g",
+        "mmi": "VIII"
+      }
+    },
+    {
+      "id": "power_substation_north",
+      "name": "Northern Grid Power Substation",
+      "category": "power_station",
+      "coordinates": [
+        85.38,
+        27.75
+      ],
+      "distanceToEpicenterKm": null,
+      "properties": {
+        "name": "Northern Grid Power Substation",
+        "category": "power_station",
+        "taxonomy": "C2",
+        "valueUsd": 14000000,
+        "population": 45,
+        "isCriticalInfrastructure": true
+      },
+      "hazardZone": {
+        "hazardType": "earthquake",
+        "name": "Mw 7.2 Mainshock Epicentral Shaking Zone",
+        "pga": 0.42,
+        "intensityUnit": "g",
+        "mmi": "VIII"
+      }
+    }
+  ]
+}

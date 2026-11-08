@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<alert xmlns="urn:oasis:names:tc:emergency:cap:1.2">
+  <identifier>DELTA-CAP-1794162324970</identifier>
+  <sender>alerts@delta.preventionweb.net</sender>
+  <sent>2026-11-08T18:25:24.970Z</sent>
+  <status>Actual</status>
+  <msgType>Alert</msgType>
+  <scope>Public</scope>
+  <info>
+    <category>Geo</category>
+    <event>Major Earthquake Emergency Alert</event>
+    <urgency>Immediate</urgency>
+    <severity>Extreme</severity>
+    <certainty>Observed</certainty>
+    <headline>EARTHQUAKE WARNING: Mw 7.2 Mainshock in Kathmandu Valley</headline>
+    <description>Disaster alert issued for affected region.</description>
+    <instruction>Follow national civil protection evacuation directives immediately.</instruction>
+      <area>
+        <areaDesc>Kathmandu Valley, Bagmati Province</areaDesc>
+      </area>
+  </info>
+</alert>

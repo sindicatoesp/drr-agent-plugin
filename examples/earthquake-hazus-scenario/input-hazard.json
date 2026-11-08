@@ -1,0 +1,22 @@
+{
+  "type": "Feature",
+  "properties": {
+    "hazardType": "earthquake",
+    "name": "Mw 7.2 Mainshock Epicentral Shaking Zone",
+    "pga": 0.42,
+    "intensityUnit": "g",
+    "mmi": "VIII"
+  },
+  "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+      [
+        [85.25, 27.65],
+        [85.45, 27.65],
+        [85.45, 27.80],
+        [85.25, 27.80],
+        [85.25, 27.65]
+      ]
+    ]
+  }
+}

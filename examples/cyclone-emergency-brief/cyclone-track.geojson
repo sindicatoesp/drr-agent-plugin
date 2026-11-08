@@ -1,0 +1,26 @@
+{
+  "type": "FeatureCollection",
+  "features": [
+    {
+      "type": "Feature",
+      "properties": {
+        "eventname": "Tropical Cyclone PAMELA",
+        "category": "Category 4 Catastrophic Hurricane",
+        "maxWindKmh": 225,
+        "hazardType": "cyclone"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [167.5, -15.8],
+            [169.2, -15.8],
+            [169.2, -17.5],
+            [167.5, -17.5],
+            [167.5, -15.8]
+          ]
+        ]
+      }
+    }
+  ]
+}

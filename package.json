@@ -1,0 +1,30 @@
+{
+  "name": "@undrr/drr-agent-plugin",
+  "version": "1.0.0",
+  "description": "Standalone Agent Plugin for Disaster Risk Reduction (DRR) analytics, hazard exposure, GEM/HAZUS fragility modeling, and OASIS CAP alerts.",
+  "main": "lib/index.js",
+  "bin": {
+    "drr-tool": "./bin/cli.js",
+    "drr-mcp": "./bin/mcp-server.js"
+  },
+  "scripts": {
+    "test": "bash tests/run-all-tests.sh",
+    "mcp": "node bin/mcp-server.js"
+  },
+  "keywords": [
+    "agent-plugin",
+    "mcp",
+    "drr",
+    "undrr",
+    "disaster-risk-reduction",
+    "hazus",
+    "gem",
+    "sendai-framework",
+    "cap"
+  ],
+  "author": "UNDRR DELTA Resilience",
+  "license": "Apache-2.0",
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}

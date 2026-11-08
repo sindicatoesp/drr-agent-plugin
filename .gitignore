@@ -1,0 +1,17 @@
+# Environment variables & secrets
+.env
+.env.*
+!.env.example
+
+# Dependencies
+node_modules/
+package-lock.json
+
+# Logs & temp files
+*.log
+*.tmp
+.DS_Store
+
+# Test reports
+test-report.xml
+coverage/

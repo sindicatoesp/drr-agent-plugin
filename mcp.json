@@ -1,0 +1,10 @@
+{
+  "$schema": "https://agent-plugins.org/schemas/1.0.0/mcp.schema.json",
+  "mcpServers": {
+    "drr-analytics": {
+      "command": "node",
+      "args": ["bin/mcp-server.js"],
+      "description": "Deterministic Disaster Risk Reduction spatial joins, GEM/HAZUS fragility modeling, multi-source telemetry (GDACS, USGS, Open-Meteo), OASIS CAP validation, and two-way UNDRR DELTA synchronization."
+    }
+  }
+}

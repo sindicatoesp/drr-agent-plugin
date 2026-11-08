@@ -1,0 +1,35 @@
+{
+  "type": "FeatureCollection",
+  "features": [
+    {
+      "type": "Feature",
+      "properties": {
+        "eventid": 1002341,
+        "episodeid": 1,
+        "eventname": "Monsoon Riverine Basin Flash Flood",
+        "eventtype": "FL",
+        "alertlevel": "Orange",
+        "alertscore": 2.1,
+        "country": "Bangladesh",
+        "fromdate": "2026-08-10T00:00:00",
+        "todate": "2026-08-15T00:00:00",
+        "population": { "value": 450000 },
+        "severitydata": {
+          "severitytext": "Inundation extent estimated up to 2.2 meters depth in low-lying river delta."
+        }
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [90.10, 23.50],
+            [90.70, 23.50],
+            [90.70, 24.10],
+            [90.10, 24.10],
+            [90.10, 23.50]
+          ]
+        ]
+      }
+    }
+  ]
+}
