@@ -1,6 +1,6 @@
 const assert = require("assert");
 const { pointInPolygonRing, isPointInGeometry, haversineDistance } = require("../lib/utils");
-const { spatialExposureJoin } = require("../lib/spatial");
+const { spatialExposureJoin, isEventInCountry } = require("../lib/spatial");
 
 console.log("Testing Spatial Utilities & Exposure Joins...");
 
@@ -50,5 +50,23 @@ assert.strictEqual(joinResult.summary.totalExposedAssets, 1);
 assert.strictEqual(joinResult.exposedAssets[0].name, "Hospital Inside");
 assert.strictEqual(joinResult.summary.totalExposedPopulation, 500);
 assert.strictEqual(joinResult.summary.totalExposedAssetValueUsd, 1000000);
+
+// 4. Country Filter & Geographic Scoping
+const eqIndonesia = { place: "15 km SW of Palu, Indonesia", coordinates: [119.8, -0.9] };
+const eqChile = { place: "Offshore Maule, Chile", coordinates: [-73.5, -35.8] };
+const floodBangladesh = { country: "Bangladesh", title: "Monsoon Basin Flood" };
+
+// Match by country name / place string
+assert.strictEqual(isEventInCountry(eqIndonesia, ["Indonesia", "ID"]), true, "Indonesia quake must match target");
+assert.strictEqual(isEventInCountry(eqChile, ["Indonesia", "ID"]), false, "Chile quake must not match Indonesia target");
+assert.strictEqual(isEventInCountry(floodBangladesh, ["Bangladesh"]), true, "Bangladesh flood must match");
+
+// Match by Bounding Box
+const indonesiaBBox = [95.0, -11.0, 141.0, 6.0];
+assert.strictEqual(isEventInCountry(eqIndonesia, ["Indonesia"], indonesiaBBox), true, "Palu coords must be inside Indonesia BBox");
+assert.strictEqual(isEventInCountry(eqChile, ["Indonesia"], indonesiaBBox), false, "Chile coords must be outside Indonesia BBox");
+
+// Wildcard matching
+assert.strictEqual(isEventInCountry(eqChile, ["*"]), true, "Wildcard must allow all countries");
 
 console.log("✅ Spatial tests passed!");

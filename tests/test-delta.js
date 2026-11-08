@@ -78,7 +78,22 @@ async function testPush() {
 	assert.strictEqual(result.entities.sectorRelations.length, 2);
 	assert(result.notes.includes("drr-agent-plugin"));
 
-	// 4. Test fetchExposureFromDelta in Mock Mode
+	// 4. Test Country Guard (DELTA is a country-level software)
+	const matchedCountryResult = await pushDraftDisasterRecord(
+		{ ...sampleAssessment, country: "Vanuatu" },
+		{ mock: true, targetCountries: ["Vanuatu", "VU"], strictCountryMatch: true },
+	);
+	assert.strictEqual(matchedCountryResult.success, true, "Matching country must succeed");
+
+	const mismatchedCountryResult = await pushDraftDisasterRecord(
+		{ ...sampleAssessment, country: "Chile" },
+		{ mock: true, targetCountries: ["Vanuatu", "VU"], strictCountryMatch: true },
+	);
+	assert.strictEqual(mismatchedCountryResult.success, false, "Mismatched country must not push to DELTA");
+	assert.strictEqual(mismatchedCountryResult.skipped, true);
+	assert.strictEqual(mismatchedCountryResult.reason, "country_mismatch");
+
+	// 5. Test fetchExposureFromDelta in Mock Mode
 	const exp = await fetchExposureFromDelta("division", {}, { mock: true });
 	assert.strictEqual(exp.items.length, 2);
 

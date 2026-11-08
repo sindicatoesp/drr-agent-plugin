@@ -6,6 +6,13 @@
   "webhookUrl": "${MONITOR_WEBHOOK_URL}",
   "defaultExposureFile": "./examples/earthquake-hazus-scenario/input-exposure.json",
   "autoPushToDelta": true,
+  "countryFilter": {
+    "enabled": true,
+    "targetCountries": ["*"],
+    "bbox": null,
+    "filterFeeds": false,
+    "strictDeltaPush": true
+  },
   "rules": {
     "earthquake": {
       "enabled": true,

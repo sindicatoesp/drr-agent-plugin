@@ -231,6 +231,7 @@ All API endpoints, network proxies, request timeouts, and operational modes are 
 
 * **Configuration Template**: See [`.env.example`](.env.example) to copy and customize.
 * **Full Settings Reference**: See **[docs/configuration.md](docs/configuration.md)** for detailed documentation on:
+  * **National Country Scoping & DELTA Push Guard**: Restricting automated DELTA ingestion to national borders (`TARGET_COUNTRIES`, `DELTA_COUNTRY`, `bbox`)
   * Overriding GDACS, USGS, and Open-Meteo API endpoints or mirrors
   * Configuring commercial Open-Meteo API keys
   * Setting up `HTTP_PROXY` / `HTTPS_PROXY` for UN / enterprise firewalls

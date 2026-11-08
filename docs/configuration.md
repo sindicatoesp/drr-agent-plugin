@@ -30,6 +30,9 @@ A template configuration is provided in [`drr-agent-plugin/.env.example`](../.en
 | **`OPENMETEO_API_KEY`** | *None (empty)* | Optional commercial API key for high-frequency or SLA-backed Open-Meteo queries. |
 | **`DELTA_API_URL`** | `http://localhost:3000/en/api/mcp` | Target endpoint for connecting to DELTA Resilience core application MCP server. |
 | **`DELTA_MCP_API_KEY`** | *None (empty)* | Secret API token passed in `X-Auth` header to authenticate against DELTA's database. |
+| **`TARGET_COUNTRIES`** | `*` (all) | Comma-separated list of target country names or ISO-2/3 codes (e.g. `Indonesia,ID,IDN`). Foreign events are excluded from DELTA push. |
+| **`DELTA_COUNTRY`** | *None* | Explicit single country name for the national DELTA instance (e.g. `Vanuatu`). |
+| **`DELTA_COUNTRY_STRICT`**| `true` | When true, strictly gates all DELTA disaster record pushes so only events matching `TARGET_COUNTRIES` or `DELTA_COUNTRY` are saved. |
 | **`MONITOR_WEBHOOK_URL`**| *None (empty)* | Universal incoming webhook URL (Slack, Microsoft Teams, Discord, Mattermost) to dispatch alert payloads when thresholds trigger. |
 | **`ALERTS_CONFIG_PATH`** | `alerts-config.json` | Path to declarative JSON monitoring rules file. |
 | **`MONITOR_INTERVAL_SEC`** | `60` | Polling interval in seconds when running `drr-tool monitor` daemon. |
@@ -201,3 +204,52 @@ Run continuous feed polling against custom threshold rules:
 | `make config-show` | Displays current active configuration while masking confidential secrets. |
 | `make alerts-validate` | Verifies declarative threshold rule count and structure. |
 | `make clean-alerts` | Removes temporary generated CAP XMLs and alert artifacts from `alerts/`. |
+
+---
+
+## 5. National Country Scoping & DELTA Push Guard
+
+DELTA Resilience is designed for national and sub-national disaster loss recording instances (e.g. BNPB Indonesia, NDRRMC Philippines, Vanuatu NDMO). By default, feeding global disaster alerts directly into DELTA could pollute a national database with foreign events.
+
+The DRR Agent Plugin solves this with a **Two-Tier Country Scoping System**:
+
+### Tier 1: Declarative Rules in `alerts-config.json`
+Configure the `countryFilter` block at the root of `alerts-config.json`:
+
+```json
+{
+  "countryFilter": {
+    "enabled": true,
+    "targetCountries": ["Indonesia", "ID", "IDN"],
+    "bbox": [95.0, -11.0, 141.0, 6.0],
+    "filterFeeds": false,
+    "strictDeltaPush": true
+  }
+}
+```
+
+* **`targetCountries`**: Array of country names, ISO-2, or ISO-3 codes. Matches `event.country`, USGS `event.place` (e.g. `"12 km SW of Palu, Indonesia"`), and GDACS properties.
+* **`bbox`** *(Optional)*: `[minLon, minLat, maxLon, maxLat]`. If an event has coordinates falling inside this bounding box, it qualifies regardless of country name variations.
+* **`filterFeeds`**:
+  * `false` *(Default)*: Allows global feeds (USGS, GDACS) to generate emergency CAP XMLs and webhook notifications, but **blocks foreign events from being saved to DELTA**.
+  * `true`: Filters the entire monitoring feed at the source so only events inside the target country trigger any alert.
+* **`strictDeltaPush`**:
+  * `true` *(Default)*: Enforces that `pushDraftDisasterRecord` will **skip foreign events** with `reason: "country_mismatch"`.
+
+### Tier 2: Environment Variables (`.env`)
+You can configure country scoping in `.env` without modifying JSON files:
+
+```bash
+# Scope to single or multiple national territories:
+TARGET_COUNTRIES="Indonesia,ID,IDN"
+DELTA_COUNTRY="Indonesia"
+
+# Strictly prevent foreign events from pushing into DELTA:
+DELTA_COUNTRY_STRICT=true
+```
+
+When an event from outside the target country is evaluated, the plugin logs:
+```text
+[DELTA Country Filter] Skipped pushing event "Offshore Maule, Chile":
+Country "Chile" does not match national DELTA instance ["Indonesia", "ID", "IDN"].
+```

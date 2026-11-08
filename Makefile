@@ -81,6 +81,8 @@ config-check: ## Validate syntax and integrity of .env and alerts-config.json
 		console.log('  \x1b[32m✓\x1b[0m GDACS Feed: ' + CONFIG.GDACS_FEED_URL); \
 		console.log('  \x1b[32m✓\x1b[0m Open-Meteo: ' + CONFIG.OPENMETEO_API_URL); \
 		console.log('  \x1b[32m✓\x1b[0m DELTA MCP API: ' + CONFIG.DELTA_API_URL); \
+		console.log('  \x1b[32m✓\x1b[0m Target Country Scope: ' + (CONFIG.TARGET_COUNTRIES.join(', '))); \
+		console.log('  \x1b[32m✓\x1b[0m Strict DELTA Country Push: ' + CONFIG.DELTA_COUNTRY_STRICT); \
 		console.log('  \x1b[32m✓\x1b[0m Offline Mode: ' + CONFIG.DRR_OFFLINE_MODE); \
 	"
 	@if [ -f alerts-config.json ]; then \
@@ -101,6 +103,9 @@ config-show: ## Display active configuration settings (masking secrets)
 	@node -e "\
 		const { CONFIG } = require('./lib/config.js'); \
 		console.log('\x1b[1mActive Configuration Settings:\x1b[0m'); \
+		console.log('  TARGET_COUNTRIES:       ' + CONFIG.TARGET_COUNTRIES.join(', ')); \
+		console.log('  DELTA_COUNTRY:          ' + (CONFIG.DELTA_COUNTRY || '[NONE]')); \
+		console.log('  DELTA_COUNTRY_STRICT:   ' + CONFIG.DELTA_COUNTRY_STRICT); \
 		console.log('  USGS_MIN_MAGNITUDE:     ' + CONFIG.USGS_MIN_MAGNITUDE); \
 		console.log('  DRR_REQUEST_TIMEOUT_MS: ' + CONFIG.REQUEST_TIMEOUT_MS); \
 		console.log('  DRR_OFFLINE_MODE:       ' + CONFIG.DRR_OFFLINE_MODE); \
