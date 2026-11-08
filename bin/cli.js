@@ -257,6 +257,9 @@ async function main() {
 							hazardType,
 							hazardIntensity: intensity,
 						},
+						hipHazardId: options["hip-hazard-id"] || options.hipHazardId || null,
+						hipClusterId: options["hip-cluster-id"] || options.hipClusterId || null,
+						hipTypeId: options["hip-type-id"] || options.hipTypeId || null,
 						sendaiFrameworkMetrics: {
 							targetB_AffectedPeople: {
 								totalExposedPopulation: parseInt(options.exposed || options.population || 5000, 10),
