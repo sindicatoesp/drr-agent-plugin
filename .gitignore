@@ -3,6 +3,10 @@
 .env.*
 !.env.example
 
+# Local custom configurations
+alerts-config.json
+!alerts-config.example.json
+
 # Dependencies
 node_modules/
 package-lock.json
