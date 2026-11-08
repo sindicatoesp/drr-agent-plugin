@@ -52,6 +52,29 @@ assert.strictEqual(bundle.disasterRecord.approvalStatus, "draft");
 assert.strictEqual(bundle.disasterRecord.originatorRecorderInst, "UNDRR DRR Agent Plugin");
 assert.strictEqual(bundle.disasterRecord.primaryDataSource, "USGS");
 
+// Test UNDRR/ISC HIP Hazard Mapping on both record and event
+assert.strictEqual(bundle.disasterRecord.hipHazardId, "78531", "Earthquake hipHazardId must be 78531 (GH0001)");
+assert.strictEqual(bundle.disasterRecord.hipClusterId, "1068", "Earthquake hipClusterId must be 1068 (Seismogenic)");
+assert.strictEqual(bundle.disasterRecord.hipTypeId, "1041", "Earthquake hipTypeId must be 1041 (Geological)");
+assert.strictEqual(bundle.parentEvent.hipHazardId, "78531", "Parent event hipHazardId must be 78531");
+assert.strictEqual(bundle.parentEvent.hipClusterId, "1068", "Parent event hipClusterId must be 1068");
+assert.strictEqual(bundle.parentEvent.hipTypeId, "1041", "Parent event hipTypeId must be 1041");
+
+// Test Additional HIP Mappings (Flood, Cyclone, Wildfire)
+const floodBundle = buildRelationalRecordBundle({
+	hazardAssessment: { hazardType: "flood" },
+});
+assert.strictEqual(floodBundle.disasterRecord.hipHazardId, "78572");
+assert.strictEqual(floodBundle.disasterRecord.hipClusterId, "1072");
+assert.strictEqual(floodBundle.disasterRecord.hipTypeId, "1042");
+
+const cycloneBundle = buildRelationalRecordBundle({
+	hazardAssessment: { hazardType: "cyclone" },
+});
+assert.strictEqual(cycloneBundle.disasterRecord.hipHazardId, "78622");
+assert.strictEqual(cycloneBundle.disasterRecord.hipClusterId, "1079");
+assert.strictEqual(cycloneBundle.disasterRecord.hipTypeId, "1042");
+
 // Test Human Effects
 assert.strictEqual(bundle.humanEffects.length, 2);
 const displacedHe = bundle.humanEffects.find((h) => h.table === "Displaced");
