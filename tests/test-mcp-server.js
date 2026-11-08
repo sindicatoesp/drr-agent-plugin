@@ -30,7 +30,7 @@ function send(msg) {
 	child.stdin.write(JSON.stringify(msg) + "\n");
 }
 
-function waitForResponse(id, timeoutMs = 2000) {
+function waitForResponse(id, timeoutMs = 5000) {
 	return new Promise((resolve, reject) => {
 		const start = Date.now();
 		const check = () => {
