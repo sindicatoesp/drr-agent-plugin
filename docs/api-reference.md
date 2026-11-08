@@ -1,10 +1,10 @@
-# MCP Tools & API Reference
+# MCP Tools & CLI Technical Reference
 
-Complete technical specification of all 7 tools provided by the `drr-analytics` MCP server (`bin/mcp-server.js`).
+Complete technical specification of all 10 MCP tools provided by `bin/mcp-server.js` and the standalone Command-Line Interface (`bin/cli.js`).
 
 ---
 
-## 1. `drr_gdacs_fetch`
+# Part 1: Model Context Protocol (MCP) Tools (10 Tools)
 Ingests and filters active GDACS alerts by severity, hazard type, or country.
 
 ### Input Schema
@@ -233,4 +233,145 @@ Executes an automated monitoring cycle against multi-source telemetry feeds usin
     }
   ]
 }
+```
+
+---
+
+# Part 2: Command-Line Interface (CLI) Reference
+
+The CLI binary is located at `bin/cli.js` (aliased as `drr-tool`). It operates with zero external dependencies and provides direct access to scientific models, live feed ingestion, and DELTA integration.
+
+```text
+Usage:
+  node bin/cli.js <command> [options]
+```
+
+### 1. `usgs` — Query Real-Time USGS Earthquakes
+Queries the live USGS FDSN-WS feed and computes Wald et al. (1999) Peak Ground Acceleration (PGA in $g$) from MMI:
+
+```bash
+# Query live M5.0+ earthquakes:
+node bin/cli.js usgs --min-mag 5.0 --limit 10
+
+# Options:
+#   --min-mag <val>   Minimum magnitude threshold (default: 4.5)
+#   --limit <num>     Maximum number of events (default: 20)
+#   --file <path>     Offline GeoJSON fixture instead of live fetch
+```
+
+### 2. `forecast` — Open-Meteo Flood & Weather Risk
+Queries global numerical weather models (ECMWF, GFS, ICON) and evaluates Anticipatory Action cumulative rainfall triggers:
+
+```bash
+# Fetch 5-day precipitation forecast for Jakarta, Indonesia (-6.2, 106.8):
+node bin/cli.js forecast --lat -6.2 --lon 106.8 --days 5
+
+# Options:
+#   --lat <num>       Target latitude (default: 23.8)
+#   --lon <num>       Target longitude (default: 90.4)
+#   --days <num>      Forecast duration in days (default: 5)
+#   --file <path>     Offline forecast JSON fixture
+```
+
+### 3. `gdacs` — UN OCHA / DG ECHO Disaster Alerts
+Fetches active global disaster alerts for earthquakes (`EQ`), cyclones (`TC`), floods (`FL`), or volcanoes (`VO`):
+
+```bash
+# Query active Orange and Red disaster alerts:
+node bin/cli.js gdacs --min-level Orange
+
+# Query active tropical cyclones:
+node bin/cli.js gdacs --type TC --min-level Orange
+
+# Options:
+#   --min-level <lvl> Minimum alert score (Green, Orange, Red)
+#   --type <code>     Hazard type (EQ, TC, FL, VO)
+#   --file <path>     Offline GeoJSON fixture
+```
+
+### 4. `monitor` — Autonomous Early Warning Engine
+Evaluates live telemetry feeds against declarative threshold rules in `alerts-config.json`, running spatial exposure joins, fragility modeling, CAP XML generation, universal webhook dispatching, and DELTA draft record ingestion:
+
+```bash
+# Run a one-shot scan across all live feeds:
+node bin/cli.js monitor --once
+
+# Run continuous 24/7 background monitoring daemon:
+node bin/cli.js monitor --interval 60 --config alerts-config.json
+
+# Options:
+#   --once            Execute a single scan and exit
+#   --interval <sec>  Daemon polling interval in seconds (default: 60)
+#   --config <path>   Custom path to declarative rules file
+```
+
+### 5. `delta-push` — Ingest Disaster Records into DELTA
+Pushes an evaluated hazard assessment directly into a running DELTA Resilience instance (`http://localhost:3000/en/api/mcp`):
+
+```bash
+# Push an earthquake draft record with PGA intensity:
+node bin/cli.js delta-push \
+  --hazard earthquake \
+  --event-id "usgs_us7000m8v7" \
+  --intensity "0.32" \
+  --notes "Live USGS Telemetry: M6.8 in Vanuatu"
+
+# Options:
+#   --hazard <type>   earthquake, flood, or wind (default: earthquake)
+#   --event-id <id>   External event identifier (used for idempotent apiImportId)
+#   --intensity <val> Hazard intensity (PGA in g, flood depth in m, wind in km/h)
+#   --notes <text>    Audit notes attached to the draft disaster record
+```
+
+### 6. `fragility` — GEM & HAZUS Physical Fragility Curves
+Calculates exceedance and discrete damage state probabilities (Slight, Moderate, Extensive, Complete) and Mean Damage Ratio (MDR):
+
+```bash
+# Evaluate Unreinforced Masonry (URM) at 0.40g PGA:
+node bin/cli.js fragility --hazard earthquake --intensity 0.40 --taxonomy URM
+
+# Evaluate Non-Ductile Pre-Code Concrete (C1_PRE_CODE) at 0.35g PGA:
+node bin/cli.js fragility --hazard earthquake --intensity 0.35 --taxonomy C1_PRE_CODE
+
+# Evaluate Flood Depth-Damage at 1.8m inundation:
+node bin/cli.js fragility --hazard flood --intensity 1.8
+
+# Options:
+#   --hazard <type>   earthquake, flood, or wind
+#   --intensity <val> Numerical hazard intensity
+#   --taxonomy <code> Building class (URM, C1_PRE_CODE, C1_MODERATE_CODE, C2, S1, W1)
+```
+
+### 7. `spatial-join` — Deterministic Spatial Exposure Join
+Performs ray-casting point-in-polygon queries intersecting hazard impact boundaries with exposed population, health clinics, and schools:
+
+```bash
+node bin/cli.js spatial-join \
+  --hazard examples/earthquake-hazus-scenario/input-hazard.json \
+  --exposure examples/earthquake-hazus-scenario/input-exposure.json
+```
+
+### 8. `vulnerability` — Sendai Framework Loss Accounting
+Calculates Sendai Targets B (displaced), Target C (direct economic loss in USD), and Target D (critical infrastructure disruption):
+
+```bash
+node bin/cli.js vulnerability \
+  --spatial spatial-report.json \
+  --hazard earthquake \
+  --intensity 0.42
+```
+
+### 9. `cap-generate` & `cap-validate` — OASIS CAP Alerting
+Generates and validates ITU-T Recommendation X.1303 / OASIS CAP v1.2 XML emergency alerts:
+
+```bash
+# Generate CAP alert XML:
+node bin/cli.js cap-generate \
+  --headline "EARTHQUAKE WARNING: Mw 7.2 Mainshock" \
+  --severity Extreme \
+  --urgency Immediate \
+  --event "Major Earthquake Emergency Alert"
+
+# Validate CAP XML against specification:
+node bin/cli.js cap-validate alerts/alert.cap.xml
 ```

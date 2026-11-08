@@ -95,22 +95,41 @@ This playbook outlines real-world operational scenarios, emergency management ti
 ## 3. Quick Operator Prompt Cheatsheet
 
 ### For EOC Watchstanders (USGS Earthquake & CAP Alert)
-```text
-Query the USGS feed for any M6.0+ earthquakes in the region over the last 2 hours.
-Extract the estimated PGA for the epicenter, evaluate fragility on URM and C1 buildings,
-and generate an OASIS CAP v1.2 XML emergency warning for the provincial cell broadcast.
-```
+* **Agent Prompt**:
+  ```text
+  Query the USGS feed for any M6.0+ earthquakes in the region over the last 2 hours.
+  Extract the estimated PGA for the epicenter, evaluate fragility on URM and C1 buildings,
+  and generate an OASIS CAP v1.2 XML emergency warning for the provincial cell broadcast.
+  ```
+* **Direct CLI Equivalent**:
+  ```bash
+  # Query live earthquakes:
+  node bin/cli.js usgs --min-mag 6.0 --limit 5
+
+  # Generate CAP XML alert:
+  node bin/cli.js cap-generate --headline "EARTHQUAKE WARNING: Mw 6.8 Mainshock" --severity Extreme --urgency Immediate
+  ```
 
 ### For Anticipatory Action Leads (Open-Meteo Flood Trigger)
-```text
-Fetch the 5-day precipitation forecast for coordinates lat 23.8, lon 90.4 using Open-Meteo.
-Check if the Anticipatory Action flood trigger threshold is exceeded.
-If Red Alert, intersect with our critical facilities GeoJSON and estimate damaged infrastructure.
-```
+* **Agent Prompt**:
+  ```text
+  Fetch the 5-day precipitation forecast for coordinates lat 23.8, lon 90.4 using Open-Meteo.
+  Check if the Anticipatory Action flood trigger threshold is exceeded.
+  If Red Alert, intersect with our critical facilities GeoJSON and estimate damaged infrastructure.
+  ```
+* **Direct CLI Equivalent**:
+  ```bash
+  node bin/cli.js forecast --lat 23.8 --lon 90.4 --days 5
+  ```
 
 ### For UN OCHA Officers (GDACS & Situation Brief)
-```text
-Ingest the latest GDACS Orange and Red alerts for the South Pacific.
-Perform a spatial join against our health clinics and shelter coordinates,
-and synthesize a 24-hour Emergency Situation Brief in Markdown.
-```
+* **Agent Prompt**:
+  ```text
+  Ingest the latest GDACS Orange and Red alerts for the South Pacific.
+  Perform a spatial join against our health clinics and shelter coordinates,
+  and synthesize a 24-hour Emergency Situation Brief in Markdown.
+  ```
+* **Direct CLI Equivalent**:
+  ```bash
+  node bin/cli.js gdacs --min-level Orange --type TC
+  ```

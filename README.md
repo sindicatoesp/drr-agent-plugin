@@ -174,17 +174,52 @@ make docker-down
 From the root project workspace, you can also run shortcuts directly via `make drr-help`, `make drr-test`, `make drr-monitor`, etc.
 
 ### 4. Direct Command-Line Interface (CLI) Usage
-```bash
-# Query USGS Earthquakes (M5.5+):
-node bin/cli.js usgs --min-mag 5.5
 
-# Query Open-Meteo Forecast & Anticipatory Action Flood Risk:
-node bin/cli.js forecast --lat 23.8 --lon 90.4 --days 5
+For the complete technical flag guide, see **[docs/api-reference.md](docs/api-reference.md)**.
+
+```bash
+# ---------------------------------------------------------
+# Live Real-Time Telemetry Queries
+# ---------------------------------------------------------
+
+# Query live USGS Earthquakes (M5.0+):
+node bin/cli.js usgs --min-mag 5.0 --limit 10
+
+# Query live Open-Meteo Anticipatory Action flood triggers:
+node bin/cli.js forecast --lat -6.2 --lon 106.8 --days 5
+
+# Query live GDACS disaster alerts (Orange and Red alerts):
+node bin/cli.js gdacs --min-level Orange
+
+# ---------------------------------------------------------
+# Autonomous Monitoring Engine
+# ---------------------------------------------------------
+
+# Run a one-shot scan across all live feeds:
+node bin/cli.js monitor --once
+
+# Run the continuous 24/7 monitoring daemon:
+node bin/cli.js monitor --interval 60 --config alerts-config.json
+
+# ---------------------------------------------------------
+# Two-Way DELTA Resilience Push
+# ---------------------------------------------------------
+
+# Push an evaluated assessment directly into DELTA:
+node bin/cli.js delta-push \
+  --hazard earthquake \
+  --event-id "usgs_live_001" \
+  --intensity "0.35" \
+  --notes "Live USGS Telemetry Event"
+
+# ---------------------------------------------------------
+# Deterministic Modeling & Alert Generation
+# ---------------------------------------------------------
 
 # Calculate earthquake fragility for Unreinforced Masonry (URM) at 0.40g PGA:
 node bin/cli.js fragility --hazard earthquake --intensity 0.40 --taxonomy URM
 
-# Run a complete spatial exposure join:
+# Run a deterministic spatial exposure join:
 node bin/cli.js spatial-join \
   --hazard examples/earthquake-hazus-scenario/input-hazard.json \
   --exposure examples/earthquake-hazus-scenario/input-exposure.json
@@ -198,12 +233,6 @@ node bin/cli.js cap-generate \
 
 # Validate a CAP XML file:
 node bin/cli.js cap-validate examples/earthquake-hazus-scenario/output-cap-alert.xml
-
-# Run an autonomous early-warning monitoring scan (one-shot check):
-node bin/cli.js monitor --once
-
-# Run the autonomous monitoring daemon with 60-second polling interval:
-node bin/cli.js monitor --interval 60 --config alerts-config.example.json
 ```
 
 ---
