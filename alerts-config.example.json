@@ -1,0 +1,33 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "DRR Agent Plugin - Automated Monitoring & Early Warning Rules",
+  "pollingIntervalMinutes": 15,
+  "outputDirectory": "./alerts",
+  "webhookUrl": "${MONITOR_WEBHOOK_URL}",
+  "defaultExposureFile": "./examples/earthquake-hazus-scenario/input-exposure.json",
+  "autoPushToDelta": true,
+  "rules": {
+    "earthquake": {
+      "enabled": true,
+      "minMagnitude": 5.5,
+      "minEstimatedPgaG": 0.15,
+      "targetCountries": ["*"],
+      "bbox": [-180, -90, 180, 90]
+    },
+    "flood": {
+      "enabled": true,
+      "minCumulativePrecipitationMm": 120.0,
+      "minAlertColor": "Orange"
+    },
+    "cyclone": {
+      "enabled": true,
+      "minSaffirSimpsonCategory": 2,
+      "minWindSpeedKmh": 154
+    },
+    "gdacs": {
+      "enabled": true,
+      "minAlertLevel": "Orange",
+      "eventTypes": ["EQ", "TC", "FL", "VO"]
+    }
+  }
+}

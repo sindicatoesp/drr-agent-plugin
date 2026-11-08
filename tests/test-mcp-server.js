@@ -56,7 +56,7 @@ async function run() {
 	send({ jsonrpc: "2.0", id: 2, method: "tools/list", params: {} });
 	const listRes = await waitForResponse(2);
 	assert(listRes, "Expected tools/list response");
-	assert.strictEqual(listRes.result.tools.length, 9);
+	assert.strictEqual(listRes.result.tools.length, 10);
 
 	// 3. tools/call: drr_fragility_eval
 	send({
@@ -179,6 +179,23 @@ async function run() {
 	assert(capRes, "Expected CAP generation response");
 	const capParsed = JSON.parse(capRes.result.content[0].text);
 	assert(capParsed.validation.isValid, "Generated CAP alert must be valid");
+
+	// 8. tools/call: drr_monitor_check
+	send({
+		jsonrpc: "2.0",
+		id: 8,
+		method: "tools/call",
+		params: {
+			name: "drr_monitor_check",
+			arguments: {
+				mock: true,
+			},
+		},
+	});
+	const monRes = await waitForResponse(8);
+	assert(monRes, "Expected monitor response");
+	const monParsed = JSON.parse(monRes.result.content[0].text);
+	assert(monParsed.timestamp, "Timestamp must be present in monitor output");
 
 	child.kill();
 	console.log("✅ MCP Server Stdio tests passed!");

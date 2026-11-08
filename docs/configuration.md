@@ -30,11 +30,14 @@ A template configuration is provided in [`drr-agent-plugin/.env.example`](../.en
 | **`OPENMETEO_API_KEY`** | *None (empty)* | Optional commercial API key for high-frequency or SLA-backed Open-Meteo queries. |
 | **`DELTA_API_URL`** | `http://localhost:3000/en/api/mcp` | Target endpoint for connecting to DELTA Resilience core application MCP server. |
 | **`DELTA_MCP_API_KEY`** | *None (empty)* | Secret API token passed in `X-Auth` header to authenticate against DELTA's database. |
+| **`MONITOR_WEBHOOK_URL`**| *None (empty)* | Universal incoming webhook URL (Slack, Microsoft Teams, Discord, Mattermost) to dispatch alert payloads when thresholds trigger. |
+| **`ALERTS_CONFIG_PATH`** | `alerts-config.json` | Path to declarative JSON monitoring rules file. |
+| **`MONITOR_INTERVAL_SEC`** | `60` | Polling interval in seconds when running `drr-tool monitor` daemon. |
 | **`HTTP_PROXY`** | *None* | HTTP proxy URL for enterprise, government, or UN agency firewalls (e.g. `http://proxy.agency.org:8080`). |
 | **`HTTPS_PROXY`** | *None* | HTTPS proxy URL for secure outbound connections. |
 | **`NO_PROXY`** | *None* | Comma-separated list of hostnames/IPs to bypass the proxy (e.g. `localhost,127.0.0.1`). |
 | **`DRR_REQUEST_TIMEOUT_MS`** | `8000` | Network request timeout in milliseconds. |
-| **`DRR_USER_AGENT`** | `UNDRR-DRR-Agent-Plugin/1.1` | User-Agent string sent with outgoing scientific data requests. |
+| **`DRR_USER_AGENT`** | `UNDRR-DRR-Agent-Plugin/1.3` | User-Agent string sent with outgoing scientific data requests. |
 | **`DRR_OFFLINE_MODE`** | `false` | When set to `true`, blocks all outgoing network calls and requires offline sample payloads (ideal for air-gapped EOCs and secure sandboxes). |
 
 ---
@@ -141,4 +144,41 @@ To connect the plugin with a running DELTA instance:
    ```bash
    DELTA_API_URL="http://localhost:3000/en/api/mcp"
    DELTA_MCP_API_KEY="your-secret-api-key-here"
+   ```
+
+### Pattern D: Autonomous Early Warning Monitoring Daemon
+Run continuous feed polling against custom threshold rules:
+
+1. Copy and adapt the declarative alert rules:
+   ```bash
+   cp alerts-config.example.json alerts-config.json
+   ```
+2. Configure webhook and DELTA push targets:
+   ```json
+   {
+     "rules": [
+       {
+         "id": "seismic-eoc-threshold",
+         "type": "earthquake",
+         "enabled": true,
+         "minMagnitude": 5.5,
+         "minEstimatedPgaG": 0.15,
+         "exposureFile": "examples/earthquake-hazus-scenario/input-exposure.json",
+         "fragilityTaxonomies": ["URM", "C1_PRE_CODE"],
+         "actions": {
+           "generateCapXml": true,
+           "pushDeltaDraft": true,
+           "dispatchWebhook": true
+         }
+       }
+     ],
+     "outputs": {
+       "alertsDir": "alerts",
+       "webhookUrl": "https://hooks.slack.com/services/T00/B00/XXXXX"
+     }
+   }
+   ```
+3. Run the daemon:
+   ```bash
+   node bin/cli.js monitor --interval 60 --config alerts-config.json
    ```

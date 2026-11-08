@@ -44,21 +44,23 @@ For the detailed operational guide, see **[docs/operational-playbook.md](docs/op
 
 ```text
 drr-agent-plugin/
-├── plugin.json                 # agent-plugins.org v1.0.0 manifest (v1.2.0)
+├── plugin.json                 # agent-plugins.org v1.0.0 manifest (v1.3.0)
 ├── mcp.json                    # Model Context Protocol stdio server declaration
 ├── package.json                # Standalone Node package definition
 ├── .env.example                # Configuration template
+├── alerts-config.example.json  # Declarative early warning threshold rules
 ├── README.md                   # Master documentation
 ├── LICENSE                     # Apache 2.0
 ├── bin/
-│   ├── mcp-server.js           # Zero-dependency Node.js MCP server (9 active tools)
+│   ├── mcp-server.js           # Zero-dependency Node.js MCP server (10 active tools)
 │   └── cli.js                  # Direct command-line interface for shell & CI/CD
 ├── lib/                        # Deterministic computational engines
 │   ├── config.js               # Centralized configuration & lightweight .env loader
+│   ├── monitor.js              # Autonomous early warning monitoring & webhook dispatcher
 │   ├── gdacs.js                # GDACS feed parser & ingestor
 │   ├── usgs.js                 # USGS earthquake feed & MMI-to-PGA estimator
 │   ├── openmeteo.js            # Open-Meteo precipitation & flood risk engine
-│   ├── delta.js                # DELTA Resilience two-way draft record writer
+│   ├── delta.js                # DELTA Resilience relational draft record writer
 │   ├── spatial.js              # Ray-casting point-in-polygon & spatial exposure joins
 │   ├── fragility.js            # GEM & HAZUS lognormal fragility curves
 │   ├── vulnerability.js        # Vulnerability matrix & Sendai Target B/C/D calculators
@@ -86,7 +88,7 @@ drr-agent-plugin/
 │       ├── claude-code.md
 │       ├── github-copilot.md
 │       └── opencode-cli.md
-└── tests/                      # Full automated test suite (9 test suites)
+└── tests/                      # Full automated test suite (10 test suites)
     ├── test-config.js
     ├── test-spatial.js
     ├── test-fragility.js
@@ -95,6 +97,7 @@ drr-agent-plugin/
     ├── test-usgs.js
     ├── test-openmeteo.js
     ├── test-delta.js
+    ├── test-monitor.js
     ├── test-mcp-server.js
     └── run-all-tests.sh
 ```
@@ -136,11 +139,17 @@ node bin/cli.js cap-generate \
 
 # Validate a CAP XML file:
 node bin/cli.js cap-validate examples/earthquake-hazus-scenario/output-cap-alert.xml
+
+# Run an autonomous early-warning monitoring scan (one-shot check):
+node bin/cli.js monitor --once
+
+# Run the autonomous monitoring daemon with 60-second polling interval:
+node bin/cli.js monitor --interval 60 --config alerts-config.example.json
 ```
 
 ---
 
-## MCP Server Tools (9 Tools)
+## MCP Server Tools (10 Tools)
 
 | Tool Name | Description | Source / Methodology |
 | :--- | :--- | :--- |
@@ -153,6 +162,7 @@ node bin/cli.js cap-validate examples/earthquake-hazus-scenario/output-cap-alert
 | `drr_cap_alert_generate_validate`| Generate & validate ITU-T X.1303 CAP XML / briefs | OASIS CAP v1.2 Specification |
 | `drr_delta_push_draft_record` | Push validated assessment to DELTA as a Draft record | DELTA Resilience API / MCP |
 | `drr_delta_fetch_exposure` | Query administrative divisions & exposure from DELTA | DELTA Resilience Data Layer |
+| `drr_monitor_check` | Evaluate active feeds against declarative rules | Autonomous Alert Daemon Engine |
 
 ---
 

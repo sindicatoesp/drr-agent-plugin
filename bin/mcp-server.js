@@ -13,9 +13,10 @@ const { generateCapXml, validateCapXml, generateEmergencyBrief } = require("../l
 const { ingestUsgsEarthquakes } = require("../lib/usgs");
 const { fetchWeatherForecast } = require("../lib/openmeteo");
 const { pushDraftDisasterRecord, fetchExposureFromDelta } = require("../lib/delta");
+const { runMonitoringCycle } = require("../lib/monitor");
 
 const SERVER_NAME = "drr-analytics-mcp";
-const SERVER_VERSION = "1.2.0";
+const SERVER_VERSION = "1.3.0";
 const PROTOCOL_VERSION = "2024-11-05";
 
 const TOOLS = [
@@ -255,6 +256,24 @@ const TOOLS = [
 			},
 		},
 	},
+	{
+		name: "drr_monitor_check",
+		description:
+			"Execute an automated monitoring cycle against multi-source disaster feeds (USGS, GDACS, Open-Meteo) using alerts-config.json rules, and trigger spatial/DELTA alerts.",
+		inputSchema: {
+			type: "object",
+			properties: {
+				configPath: {
+					type: "string",
+					description: "Optional custom path to alerts-config.json",
+				},
+				mock: {
+					type: "boolean",
+					description: "Set to true to run in dry-run mode",
+				},
+			},
+		},
+	},
 ];
 
 async function handleToolCall(name, args) {
@@ -336,6 +355,13 @@ async function handleToolCall(name, args) {
 
 		case "drr_delta_fetch_exposure": {
 			return fetchExposureFromDelta(args.entity || "division", args.filter || {}, {
+				mock: args.mock !== undefined ? args.mock : false,
+			});
+		}
+
+		case "drr_monitor_check": {
+			return runMonitoringCycle({
+				configPath: args.configPath,
 				mock: args.mock !== undefined ? args.mock : false,
 			});
 		}

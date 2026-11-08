@@ -4,7 +4,7 @@
     "drr-analytics": {
       "command": "node",
       "args": ["bin/mcp-server.js"],
-      "description": "Deterministic Disaster Risk Reduction spatial joins, GEM/HAZUS fragility modeling, multi-source telemetry (GDACS, USGS, Open-Meteo), OASIS CAP validation, and two-way UNDRR DELTA synchronization."
+      "description": "Deterministic Disaster Risk Reduction spatial joins, GEM/HAZUS fragility modeling, multi-source telemetry, automated early warning monitoring, OASIS CAP validation, and two-way UNDRR DELTA synchronization."
     }
   }
 }

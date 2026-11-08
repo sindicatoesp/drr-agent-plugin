@@ -13,11 +13,12 @@ const { generateCapXml, validateCapXml, generateEmergencyBrief } = require("../l
 const { ingestUsgsEarthquakes } = require("../lib/usgs");
 const { fetchWeatherForecast } = require("../lib/openmeteo");
 const { pushDraftDisasterRecord, fetchExposureFromDelta } = require("../lib/delta");
+const { runMonitoringCycle, startMonitoringDaemon } = require("../lib/monitor");
 
 function printHelp() {
 	console.log(`
-DRR Analytics & Agent Plugin CLI v1.2.0
-Disaster Risk Reduction Tools: GDACS, USGS, Open-Meteo, Spatial Joins, Fragility, CAP Alerts & DELTA Integration
+DRR Analytics & Agent Plugin CLI v1.3.0
+Disaster Risk Reduction Tools: GDACS, USGS, Open-Meteo, Spatial Joins, Fragility, CAP Alerts, DELTA & Monitoring
 
 Usage:
   drr-tool <command> [options]
@@ -70,8 +71,16 @@ Commands:
     --name <string>       Optional event title
     --mock                Dry-run simulation without making network requests
 
+  monitor              Automated multi-source hazard telemetry monitor
+    --rules <path>        Path to alerts-config.json
+    --once                Run a single monitoring cycle and exit
+    --interval <min>      Daemon polling interval in minutes (default: 15)
+    --mock                Dry-run mode (does not write to live DELTA or webhook)
+
 Examples:
   drr-tool usgs --min-mag 5.5
+  drr-tool monitor --once --mock
+  drr-tool monitor --rules alerts-config.example.json --interval 15
   drr-tool delta-push --file vulnerability-report.json --mock
   drr-tool fragility --hazard earthquake --intensity 0.40 --taxonomy URM
   drr-tool cap-validate examples/earthquake-hazus-scenario/output-cap-alert.xml
@@ -237,6 +246,26 @@ async function main() {
 					mock: options.mock === true,
 				});
 				console.log(JSON.stringify(result, null, 2));
+				break;
+			}
+
+			case "monitor": {
+				const configPath = options.rules || options.file;
+				const isMock = options.mock === true;
+				if (options.once) {
+					const summary = await runMonitoringCycle({
+						configPath,
+						mock: isMock,
+					});
+					console.log(JSON.stringify(summary, null, 2));
+				} else {
+					const intervalMinutes = options.interval ? parseInt(options.interval, 10) : undefined;
+					startMonitoringDaemon({
+						configPath,
+						intervalMinutes,
+						mock: isMock,
+					});
+				}
 				break;
 			}
 

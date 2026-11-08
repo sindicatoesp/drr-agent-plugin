@@ -195,3 +195,42 @@ Queries baseline administrative divisions, sector assets, or historical disaster
   "mock": false
 }
 ```
+
+---
+
+## 10. `drr_monitor_check`
+Executes an automated monitoring cycle against multi-source telemetry feeds using thresholds defined in `alerts-config.json`, triggering spatial joins, DELTA draft records, and CAP warnings.
+
+### Input Schema
+```json
+{
+  "configPath": "alerts-config.json", // Optional custom path
+  "mock": false                       // Set true for dry-run simulation
+}
+```
+
+### Output Example
+```json
+{
+  "timestamp": "2026-11-09T00:00:00.000Z",
+  "eventsChecked": 12,
+  "qualifyingEventsTriggered": 1,
+  "alerts": [
+    {
+      "eventId": "usgs_us7000m8v7",
+      "processed": true,
+      "filesCreated": {
+        "capXml": "alerts/usgs_us7000m8v7.cap.xml",
+        "brief": "alerts/usgs_us7000m8v7.brief.md",
+        "assessment": "alerts/usgs_us7000m8v7.assessment.json"
+      },
+      "deltaRecord": {
+        "success": true,
+        "action": "created_new_relational_draft",
+        "recordId": "rec_1730000000000"
+      },
+      "webhook": { "dispatched": true }
+    }
+  ]
+}
+```

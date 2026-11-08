@@ -66,6 +66,22 @@ This playbook outlines real-world operational scenarios, emergency management ti
      * **Sendai Target D**: Disrupted basic service facilities (schools and hospitals).
   3. **DELTA Ingestion**: Results are committed directly into DELTA's database for official submission to the UN General Assembly.
 
+### Scenario 5: Autonomous 24/7 Early Warning Monitoring Daemon
+* **Trigger Event**: Continuous automated polling (every 60–300s) across global feeds (USGS, GDACS, Open-Meteo).
+* **Primary Operator**: EOC Duty System / Infrastructure Sidecar Daemon.
+* **Operational Workflow**:
+  1. **Telemetry Ingestion**: The daemon pulls active seismic events, cyclone wind swaths, and precipitation forecasts.
+  2. **Declarative Threshold Evaluation**: Checks events against `alerts-config.json` (e.g. Magnitude $\ge 5.5$, estimated PGA $\ge 0.15g$, or rainfall $\ge 200\text{mm}$).
+  3. **Automated Impact Modeling**: Automatically runs the spatial exposure join against local critical facilities GeoJSON and evaluates GEM/HAZUS fragility curves.
+  4. **Tri-Output Dispatching**:
+     * **OASIS CAP v1.2 XML**: Written to `alerts/` folder.
+     * **Universal Webhook**: Dispatches rich emergency alert cards to Slack, Microsoft Teams, Discord, or Mattermost.
+     * **DELTA Draft Record**: Idempotently inserts a pending review draft into the national DELTA Resilience database.
+* **Execution Command**:
+  ```bash
+  node bin/cli.js monitor --interval 60 --config alerts-config.json
+  ```
+
 ---
 
 ## 3. Quick Operator Prompt Cheatsheet
