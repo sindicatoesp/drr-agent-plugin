@@ -47,6 +47,10 @@ drr-agent-plugin/
 ├── plugin.json                 # agent-plugins.org v1.0.0 manifest (v1.3.0)
 ├── mcp.json                    # Model Context Protocol stdio server declaration
 ├── package.json                # Standalone Node package definition
+├── Makefile                    # Operational & configuration shortcuts
+├── Dockerfile                  # Production Alpine container (~130MB, zero deps)
+├── docker-compose.yml          # Autonomous daemon stack & volume persistence
+├── docker-entrypoint.sh        # Flexible container entrypoint dispatcher
 ├── .env.example                # Configuration template
 ├── alerts-config.example.json  # Declarative early warning threshold rules
 ├── README.md                   # Master documentation
@@ -114,7 +118,62 @@ drr-agent-plugin/
 bash tests/run-all-tests.sh
 ```
 
-### 2. Command-Line Interface (CLI) Usage
+### 2. Operational & Configuration Shortcuts (Makefile)
+The plugin includes a dedicated `Makefile` providing shortcuts for day-to-day operations and configurations:
+
+```bash
+# Display help and available commands:
+make help
+
+# Initialize configuration files (.env and alerts-config.json):
+make config-init
+
+# Validate environment and configuration syntax:
+make config-check
+make config-show
+make alerts-validate
+
+# Run all 10 unit and MCP test suites:
+make test
+
+# Launch autonomous early warning monitoring daemon (local or one-shot scan):
+make monitor INTERVAL=60
+make monitor-once
+
+# Run disaster scenario pipelines:
+make scenario-earthquake
+make scenario-flood
+make scenario-cyclone
+make scenarios
+```
+
+### 3. Lightweight Docker & Docker Compose Operations
+The plugin provides a secure, minimal container image based on `node:22-alpine` (~130MB total footprint, zero external npm dependencies, non-root user):
+
+```bash
+# Build the production Docker image:
+make docker-build
+
+# Start the autonomous monitoring daemon in the background:
+make docker-up
+
+# Check container status and follow logs:
+make docker-status
+make docker-logs
+
+# Run the 10-suite test suite inside the Alpine container:
+make docker-test
+
+# Run a one-shot feed scan inside the container:
+make docker-once
+
+# Stop the container:
+make docker-down
+```
+
+From the root project workspace, you can also run shortcuts directly via `make drr-help`, `make drr-test`, `make drr-monitor`, etc.
+
+### 4. Direct Command-Line Interface (CLI) Usage
 ```bash
 # Query USGS Earthquakes (M5.5+):
 node bin/cli.js usgs --min-mag 5.5

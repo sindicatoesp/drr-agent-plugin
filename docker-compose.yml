@@ -1,0 +1,69 @@
+# ==============================================================================
+# Disaster Risk Reduction (DRR) Agent Plugin - Standalone Docker Compose Stack
+# ==============================================================================
+
+services:
+  # ----------------------------------------------------------------------------
+  # Autonomous Early Warning Monitoring Daemon
+  # Evaluates live seismic, weather, and disaster feeds every 60s against
+  # declarative rules (alerts-config.json) and outputs CAP XML + Webhooks + DELTA.
+  # ----------------------------------------------------------------------------
+  drr-monitor:
+    container_name: drr-monitor-daemon
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: undrr/drr-agent-plugin:latest
+    restart: unless-stopped
+    environment:
+      - NODE_ENV=production
+      - MONITOR_INTERVAL_SEC=${MONITOR_INTERVAL_SEC:-60}
+      - ALERTS_CONFIG_PATH=/app/alerts-config.json
+      - MONITOR_WEBHOOK_URL=${MONITOR_WEBHOOK_URL:-}
+      - DELTA_API_URL=${DELTA_API_URL:-http://host.docker.internal:3000/en/api/mcp}
+      - DELTA_MCP_API_KEY=${DELTA_MCP_API_KEY:-}
+      - GDACS_FEED_URL=${GDACS_FEED_URL:-}
+      - USGS_API_URL=${USGS_API_URL:-}
+      - USGS_MIN_MAGNITUDE=${USGS_MIN_MAGNITUDE:-4.5}
+      - OPENMETEO_API_URL=${OPENMETEO_API_URL:-}
+      - OPENMETEO_API_KEY=${OPENMETEO_API_KEY:-}
+      - DRR_OFFLINE_MODE=${DRR_OFFLINE_MODE:-false}
+      - HTTP_PROXY=${HTTP_PROXY:-}
+      - HTTPS_PROXY=${HTTPS_PROXY:-}
+      - NO_PROXY=${NO_PROXY:-}
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    volumes:
+      # Mount declarative rules (falls back to container example if local file doesn't exist)
+      - ${ALERTS_CONFIG_FILE:-./alerts-config.example.json}:/app/alerts-config.json:ro
+      # Persist generated CAP XMLs, situation briefs, and alert logs on host
+      - ./alerts:/app/alerts
+      # Optional local environment file override
+      - ./.env:/app/.env:ro
+    command: ["monitor", "--interval", "${MONITOR_INTERVAL_SEC:-60}"]
+    networks:
+      - drr-net
+
+  # ----------------------------------------------------------------------------
+  # Interactive / One-Shot CLI & Test Runner Profile
+  # Usage:
+  #   docker compose run --rm drr-cli test
+  #   docker compose run --rm drr-cli monitor --once
+  #   docker compose run --rm drr-cli usgs --min-mag 6.0
+  # ----------------------------------------------------------------------------
+  drr-cli:
+    image: undrr/drr-agent-plugin:latest
+    profiles: ["cli"]
+    environment:
+      - NODE_ENV=production
+      - ALERTS_CONFIG_PATH=/app/alerts-config.json
+      - DRR_OFFLINE_MODE=${DRR_OFFLINE_MODE:-false}
+    volumes:
+      - ./alerts:/app/alerts
+    networks:
+      - drr-net
+
+networks:
+  drr-net:
+    name: drr-agent-network
+    driver: bridge

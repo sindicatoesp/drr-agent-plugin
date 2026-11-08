@@ -79,6 +79,14 @@ This playbook outlines real-world operational scenarios, emergency management ti
      * **DELTA Draft Record**: Idempotently inserts a pending review draft into the national DELTA Resilience database.
 * **Execution Command**:
   ```bash
+  # Option 1: Native Node.js background process via Makefile
+  make monitor INTERVAL=60
+
+  # Option 2: Lightweight Alpine Docker daemon (auto-restarting container)
+  make docker-up
+  make docker-logs
+
+  # Option 3: Direct CLI execution
   node bin/cli.js monitor --interval 60 --config alerts-config.json
   ```
 

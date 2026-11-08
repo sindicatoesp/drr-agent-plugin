@@ -149,7 +149,11 @@ To connect the plugin with a running DELTA instance:
 ### Pattern D: Autonomous Early Warning Monitoring Daemon
 Run continuous feed polling against custom threshold rules:
 
-1. Copy and adapt the declarative alert rules:
+1. Quick configuration initialization via Makefile:
+   ```bash
+   make config-init
+   ```
+   Or manually copy and adapt the declarative alert rules:
    ```bash
    cp alerts-config.example.json alerts-config.json
    ```
@@ -178,7 +182,22 @@ Run continuous feed polling against custom threshold rules:
      }
    }
    ```
-3. Run the daemon:
+3. Run the daemon locally:
    ```bash
-   node bin/cli.js monitor --interval 60 --config alerts-config.json
+   make monitor INTERVAL=60
    ```
+   Or run as a lightweight Docker Compose background daemon:
+   ```bash
+   make docker-up
+   make docker-logs
+   ```
+
+### Pattern E: Makefile Configuration Shortcuts Reference
+
+| Command | Action |
+| :--- | :--- |
+| `make config-init` | Generates `.env` and `alerts-config.json` from templates if not present. |
+| `make config-check` | Validates environment variables, active API URLs, and JSON rules syntax. |
+| `make config-show` | Displays current active configuration while masking confidential secrets. |
+| `make alerts-validate` | Verifies declarative threshold rule count and structure. |
+| `make clean-alerts` | Removes temporary generated CAP XMLs and alert artifacts from `alerts/`. |
