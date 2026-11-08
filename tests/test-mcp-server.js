@@ -56,7 +56,7 @@ async function run() {
 	send({ jsonrpc: "2.0", id: 2, method: "tools/list", params: {} });
 	const listRes = await waitForResponse(2);
 	assert(listRes, "Expected tools/list response");
-	assert.strictEqual(listRes.result.tools.length, 10);
+	assert.strictEqual(listRes.result.tools.length, 11);
 
 	// 3. tools/call: drr_fragility_eval
 	send({
@@ -155,6 +155,21 @@ async function run() {
 	assert.strictEqual(deltaParsed.success, true);
 	assert.strictEqual(deltaParsed.record.status, "draft");
 	assert.strictEqual(deltaParsed.record.source, "drr-agent-plugin");
+
+	// 6b. tools/call: drr_delta_docs
+	send({
+		jsonrpc: "2.0",
+		id: 62,
+		method: "tools/call",
+		params: {
+			name: "drr_delta_docs",
+			arguments: { mock: true },
+		},
+	});
+	const docsRes = await waitForResponse(62);
+	assert(docsRes, "Expected DELTA docs response");
+	const docsParsed = JSON.parse(docsRes.result.content[0].text);
+	assert(docsParsed.text.includes("DTS Data Model"), "Docs text must contain DTS Data Model");
 
 	// 7. tools/call: drr_cap_alert_generate_validate
 	send({

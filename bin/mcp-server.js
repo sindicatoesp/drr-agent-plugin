@@ -12,7 +12,7 @@ const { evaluateVulnerabilityMatrix } = require("../lib/vulnerability");
 const { generateCapXml, validateCapXml, generateEmergencyBrief } = require("../lib/cap");
 const { ingestUsgsEarthquakes } = require("../lib/usgs");
 const { fetchWeatherForecast } = require("../lib/openmeteo");
-const { pushDraftDisasterRecord, fetchExposureFromDelta } = require("../lib/delta");
+const { pushDraftDisasterRecord, fetchExposureFromDelta, fetchDeltaDocs } = require("../lib/delta");
 const { runMonitoringCycle } = require("../lib/monitor");
 
 const SERVER_NAME = "drr-analytics-mcp";
@@ -242,13 +242,35 @@ const TOOLS = [
 			properties: {
 				entity: {
 					type: "string",
-					enum: ["division", "disaster-record", "organization"],
+					enum: [
+						"division",
+						"disaster-record",
+						"organization",
+						"hip-hazard",
+						"hip-cluster",
+						"hip-type",
+						"sector",
+					],
 					description: "Entity type to fetch (default: division)",
 				},
 				filter: {
 					type: "object",
 					description: "Filter parameters (e.g. page, pageSize)",
 				},
+				mock: {
+					type: "boolean",
+					description: "Set to true for mock response without making network calls",
+				},
+			},
+		},
+	},
+	{
+		name: "drr_delta_docs",
+		description:
+			"Query DELTA Resilience MCP 'docs' tool to retrieve DTS system documentation, entity relationships, workflows, and HIP taxonomy reference.",
+		inputSchema: {
+			type: "object",
+			properties: {
 				mock: {
 					type: "boolean",
 					description: "Set to true for mock response without making network calls",
@@ -355,6 +377,12 @@ async function handleToolCall(name, args) {
 
 		case "drr_delta_fetch_exposure": {
 			return fetchExposureFromDelta(args.entity || "division", args.filter || {}, {
+				mock: args.mock !== undefined ? args.mock : false,
+			});
+		}
+
+		case "drr_delta_docs": {
+			return fetchDeltaDocs({
 				mock: args.mock !== undefined ? args.mock : false,
 			});
 		}

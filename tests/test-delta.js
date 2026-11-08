@@ -1,5 +1,13 @@
 const assert = require("assert");
-const { buildRelationalRecordBundle, pushDraftDisasterRecord, fetchExposureFromDelta, mapAssetCategoryToSector } = require("../lib/delta");
+const {
+	buildRelationalRecordBundle,
+	pushDraftDisasterRecord,
+	fetchExposureFromDelta,
+	mapAssetCategoryToSector,
+	fetchDeltaDocs,
+	fetchDeltaHazards,
+	fetchDeltaDimensions,
+} = require("../lib/delta");
 
 console.log("Testing Advanced DELTA Relational Bundle & Ingestion Logic...");
 
@@ -119,6 +127,26 @@ async function testPush() {
 	// 5. Test fetchExposureFromDelta in Mock Mode
 	const exp = await fetchExposureFromDelta("division", {}, { mock: true });
 	assert.strictEqual(exp.items.length, 2);
+
+	const hipExp = await fetchExposureFromDelta("hip-hazard", {}, { mock: true });
+	assert.strictEqual(hipExp.items.length, 3);
+	assert.strictEqual(hipExp.items[0].code, "GH0001");
+
+	// 6. Test fetchDeltaDocs in Mock Mode
+	const docs = await fetchDeltaDocs({ mock: true });
+	assert(docs.text.includes("DTS Data Model"), "DTS Data Model docs must be returned");
+	assert(docs.text.includes("hip-hazard_list"), "Docs must reference hip-hazard_list tool");
+
+	// 7. Test fetchDeltaHazards in Mock Mode
+	const hazards = await fetchDeltaHazards({}, { mock: true });
+	assert.strictEqual(hazards.items.length, 5);
+	assert.strictEqual(hazards.items[0].id, "78531");
+	assert.strictEqual(hazards.items[0].name, "Earthquake");
+
+	// 8. Test fetchDeltaDimensions in Mock Mode
+	const dims = await fetchDeltaDimensions("hazards", { mock: true });
+	assert.strictEqual(dims.hazards.length, 1);
+	assert.strictEqual(dims.hazards[0].id, "78531");
 
 	console.log("✅ Advanced DELTA Relational tests passed!");
 }

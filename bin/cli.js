@@ -12,7 +12,7 @@ const { evaluateVulnerabilityMatrix } = require("../lib/vulnerability");
 const { generateCapXml, validateCapXml, generateEmergencyBrief } = require("../lib/cap");
 const { ingestUsgsEarthquakes } = require("../lib/usgs");
 const { fetchWeatherForecast } = require("../lib/openmeteo");
-const { pushDraftDisasterRecord, fetchExposureFromDelta } = require("../lib/delta");
+const { pushDraftDisasterRecord, fetchExposureFromDelta, fetchDeltaDocs, fetchDeltaHazards } = require("../lib/delta");
 const { runMonitoringCycle, startMonitoringDaemon } = require("../lib/monitor");
 
 function printHelp() {
@@ -70,6 +70,15 @@ Commands:
     --file <path>         Path to vulnerability report JSON
     --name <string>       Optional event title
     --mock                Dry-run simulation without making network requests
+
+  delta-docs           Query DELTA MCP 'docs' tool for data model & workflow reference
+    --mock                Dry-run simulation mode
+
+  delta-hazards        Retrieve live UNDRR/ISC HIP hazards list from DELTA MCP
+    --page <num>          Page number (default: 1)
+    --limit <num>         Page size / limit (default: 50)
+    --dimensions          Use analytics_dimensions instead of hip-hazard_list
+    --mock                Dry-run simulation mode
 
   monitor              Automated multi-source hazard telemetry monitor
     --rules <path>        Path to alerts-config.json
@@ -276,6 +285,30 @@ async function main() {
 					mock: options.mock === true,
 				});
 				console.log(JSON.stringify(result, null, 2));
+				break;
+			}
+
+			case "delta-docs": {
+				const docs = await fetchDeltaDocs({ mock: options.mock === true });
+				if (typeof docs === "string") {
+					console.log(docs);
+				} else if (docs.text) {
+					console.log(docs.text);
+				} else {
+					console.log(JSON.stringify(docs, null, 2));
+				}
+				break;
+			}
+
+			case "delta-hazards": {
+				const page = options.page ? parseInt(options.page, 10) : 1;
+				const limit = options.limit ? parseInt(options.limit, 10) : 50;
+				const mode = options.dimensions ? "dimensions" : "list";
+				const hazards = await fetchDeltaHazards(
+					{ page, pageSize: limit, mode },
+					{ mock: options.mock === true },
+				);
+				console.log(JSON.stringify(hazards, null, 2));
 				break;
 			}
 
