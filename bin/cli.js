@@ -237,11 +237,38 @@ async function main() {
 			}
 
 			case "delta-push": {
-				if (!options.file) {
-					console.error("Error: --file <vulnerability-report.json> is required.");
-					process.exit(1);
+				let assessment;
+				if (options.file) {
+					assessment = JSON.parse(fs.readFileSync(options.file, "utf8"));
+				} else {
+					// Dynamically construct assessment bundle from CLI flags
+					const hazardType = options.hazard || "earthquake";
+					const eventId = options["event-id"] || options.eventId || `cli_${Date.now()}`;
+					const intensity = parseFloat(options.intensity || 0.35);
+					const country = options.country || options.place || null;
+
+					assessment = {
+						eventId,
+						name: options.name || `${hazardType.toUpperCase()} Telemetry Assessment (${eventId})`,
+						country,
+						locationDesc: options.place || options.location || country || "Assessment Geographic Zone",
+						notes: options.notes || `Live ${hazardType} assessment ingested via drr CLI`,
+						hazardAssessment: {
+							hazardType,
+							hazardIntensity: intensity,
+						},
+						sendaiFrameworkMetrics: {
+							targetB_AffectedPeople: {
+								totalExposedPopulation: parseInt(options.exposed || options.population || 5000, 10),
+								estimatedDisplacedPopulation: parseInt(options.displaced || 1200, 10),
+							},
+							targetC_DirectEconomicLoss: {
+								estimatedDirectEconomicLossUsd: parseFloat(options.loss || options.lossUsd || 2500000),
+							},
+						},
+					};
 				}
-				const assessment = JSON.parse(fs.readFileSync(options.file, "utf8"));
+
 				const result = await pushDraftDisasterRecord(assessment, {
 					mock: options.mock === true,
 				});
