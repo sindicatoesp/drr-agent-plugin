@@ -1,5 +1,5 @@
 # 🔴 Emergency Situation Brief: Southern Thailand Catastrophic Flood (Yala-Songkhla-Pattani-Narathiwat)
-**Alert Level:** `[RED]` | **Issued:** Mon, 09 Nov 2026 06:14:56 GMT  
+**Alert Level:** `[RED]` | **Issued:** Mon, 09 Nov 2026 06:27:36 GMT  
 **Target Region:** **Southern Thailand (Yala, Songkhla, Pattani, Narathiwat)** | **Certainty:** Observed  
 
 ---

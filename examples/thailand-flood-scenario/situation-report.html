@@ -5,11 +5,22 @@
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
 	<title>Emergency Situation Report: Southern Thailand Catastrophic Flood (Yala-Songkhla-Pattani-Narathiwat)</title>
 	<style>
-		@media print {
-			body { background: #ffffff !important; color: #0f172a !important; padding: 0 !important; }
-			.card { border: 1px solid #cbd5e1 !important; background: #ffffff !important; box-shadow: none !important; }
-			.no-print { display: none !important; }
+		/* Accessibility: Screen-reader only utility */
+		.sr-only {
+			position: absolute;
+			width: 1px;
+			height: 1px;
+			padding: 0;
+			margin: -1px;
+			overflow: hidden;
+			clip: rect(0, 0, 0, 0);
+			white-space: nowrap;
+			border-width: 0;
 		}
+		.print-only {
+			display: none;
+		}
+
 		body {
 			font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
 			background-color: #0b1120;
@@ -46,7 +57,7 @@
 		}
 		.grid-3 {
 			display: grid;
-			grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+			grid-template-columns: repeat(3, 1fr);
 			gap: 16px;
 			margin-bottom: 24px;
 		}
@@ -115,58 +126,275 @@
 			font-size: 12px;
 			cursor: pointer;
 		}
+
+		/* High-Contrast Print & PDF Optimization */
+		@media print {
+			@page {
+				size: A4 portrait;
+				margin: 10mm 12mm 10mm 12mm;
+			}
+			*, *:before, *:after {
+				-webkit-print-color-adjust: exact !important;
+				print-color-adjust: exact !important;
+				color-adjust: exact !important;
+			}
+			body {
+				background: #ffffff !important;
+				color: #0f172a !important;
+				padding: 0 !important;
+				font-size: 10.5pt !important;
+				line-height: 1.35 !important;
+			}
+			.container {
+				max-width: 100% !important;
+				width: 100% !important;
+				padding: 0 !important;
+				margin: 0 !important;
+			}
+			.no-print {
+				display: none !important;
+			}
+			.print-only {
+				display: inline-block !important;
+			}
+
+			/* Header Card */
+			.header {
+				background: #f8fafc !important;
+				border: 1.5px solid #cbd5e1 !important;
+				border-radius: 8px !important;
+				padding: 14px 18px !important;
+				margin-bottom: 12px !important;
+				page-break-inside: avoid !important;
+				break-inside: avoid !important;
+			}
+			.header h1 {
+				color: #0f172a !important;
+				font-size: 20px !important;
+				font-weight: 800 !important;
+				margin: 0 0 6px 0 !important;
+			}
+			.header-badge {
+				background: #fef2f2 !important;
+				color: #991b1b !important;
+				border: 1.5px solid #dc2626 !important;
+				font-weight: 800 !important;
+				font-size: 11px !important;
+				padding: 2px 10px !important;
+				margin-bottom: 6px !important;
+			}
+			.header-meta {
+				color: #334155 !important;
+				font-size: 11px !important;
+			}
+			.header-meta strong {
+				color: #0f172a !important;
+			}
+
+			/* Sendai Metrics Grid - 3 cards in 1 row */
+			.grid-3 {
+				display: grid !important;
+				grid-template-columns: repeat(3, 1fr) !important;
+				gap: 10px !important;
+				margin-bottom: 12px !important;
+				page-break-inside: avoid !important;
+				break-inside: avoid !important;
+			}
+			.card {
+				border: 1px solid #cbd5e1 !important;
+				background: #ffffff !important;
+				box-shadow: none !important;
+				border-radius: 8px !important;
+				padding: 12px 14px !important;
+				page-break-inside: avoid !important;
+				break-inside: avoid !important;
+			}
+			.card-title {
+				color: #475569 !important;
+				font-size: 10.5px !important;
+				font-weight: 700 !important;
+				margin: 0 0 4px 0 !important;
+			}
+			.card-value {
+				color: #0f172a !important;
+				font-size: 22px !important;
+				font-weight: 800 !important;
+			}
+			.card-subtext {
+				color: #334155 !important;
+				font-size: 10.5px !important;
+				margin-top: 4px !important;
+			}
+			.card-subtext strong {
+				color: #0f172a !important;
+			}
+
+			/* Map Card (Page 1) */
+			.map-card {
+				margin-bottom: 0 !important;
+				padding: 12px !important;
+				page-break-inside: avoid !important;
+				break-inside: avoid !important;
+			}
+			.map-card h2 {
+				color: #0f172a !important;
+				font-size: 14px !important;
+			}
+			#sitrepMapWrapper {
+				height: 330px !important;
+				border: 1.5px solid #cbd5e1 !important;
+				border-radius: 6px !important;
+			}
+			#sitrepMapCanvas {
+				height: 330px !important;
+			}
+			.map-status-pill {
+				background: #f1f5f9 !important;
+				color: #0f172a !important;
+				border: 1px solid #cbd5e1 !important;
+				font-weight: 600 !important;
+			}
+
+			/* Page 2: Table & Directives */
+			.page-break-section {
+				page-break-before: always !important;
+				break-before: page !important;
+				margin-top: 0 !important;
+				margin-bottom: 12px !important;
+				page-break-inside: avoid !important;
+				break-inside: avoid !important;
+			}
+			.page-break-section h2 {
+				color: #0f172a !important;
+				font-size: 15px !important;
+				margin: 0 0 10px 0 !important;
+			}
+			table {
+				width: 100% !important;
+				font-size: 11px !important;
+				border-collapse: collapse !important;
+			}
+			th {
+				background: #f1f5f9 !important;
+				color: #0f172a !important;
+				font-weight: 700 !important;
+				border-bottom: 2px solid #94a3b8 !important;
+				padding: 7px 10px !important;
+			}
+			td {
+				color: #0f172a !important;
+				border-bottom: 1px solid #e2e8f0 !important;
+				padding: 7px 10px !important;
+			}
+			.asset-name {
+				color: #0f172a !important;
+				font-weight: 700 !important;
+			}
+			.asset-category-pill {
+				background: #f8fafc !important;
+				color: #334155 !important;
+				border: 1px solid #cbd5e1 !important;
+				font-weight: 600 !important;
+			}
+			.mdr-val {
+				color: #0f172a !important;
+				font-weight: 700 !important;
+			}
+			.loss-value {
+				color: #0369a1 !important;
+				font-weight: 700 !important;
+			}
+			.mdr-bar-bg {
+				background: #e2e8f0 !important;
+			}
+
+			/* Directives Card (Page 2) */
+			.directives-card {
+				page-break-inside: avoid !important;
+				break-inside: avoid !important;
+				padding: 12px 16px !important;
+				margin-bottom: 12px !important;
+			}
+			.directives-card h2 {
+				color: #0f172a !important;
+				font-size: 15px !important;
+				margin: 0 0 10px 0 !important;
+			}
+			.checklist li {
+				border-bottom: 1px solid #e2e8f0 !important;
+				color: #0f172a !important;
+				padding: 6px 0 !important;
+				font-size: 11px !important;
+			}
+			.check-icon {
+				color: #0284c7 !important;
+				font-weight: 800 !important;
+			}
+			.checklist strong {
+				color: #0f172a !important;
+			}
+
+			/* Footer */
+			.doc-footer {
+				color: #475569 !important;
+				font-size: 10px !important;
+				margin-top: 10px !important;
+			}
+		}
 	</style>
 </head>
 <body>
-	<div class="container">
-		<div class="header">
+	<main class="container">
+		<header class="header">
 			<div style="display: flex; justify-content: space-between; align-items: flex-start;">
 				<div>
-					<span class="header-badge">RED ALERT</span>
+					<span class="header-badge" role="status">RED ALERT</span>
 					<h1 style="margin: 0 0 8px 0; font-size: 24px; font-weight: 800; color: #ffffff;">Southern Thailand Catastrophic Flood (Yala-Songkhla-Pattani-Narathiwat)</h1>
-					<div style="color: #94a3b8; font-size: 13px;">
+					<div class="header-meta" style="color: #94a3b8; font-size: 13px;">
 						<strong>Region:</strong> Southern Thailand (Yala, Songkhla, Pattani, Narathiwat) &nbsp;|&nbsp; 
 						<strong>Intensity:</strong> 2.2 Inundation Depth (meters) &nbsp;|&nbsp; 
-						<strong>Issued:</strong> Mon, 09 Nov 2026 06:14:56 GMT
+						<strong>Issued:</strong> Mon, 09 Nov 2026 06:27:36 GMT
 					</div>
 				</div>
-				<button class="btn no-print" onclick="window.print()">🖨️ Print / Save PDF</button>
+				<button class="btn no-print" onclick="window.print()" aria-label="Print or Save Situation Report as PDF">🖨️ Print / Save PDF</button>
 			</div>
-		</div>
+		</header>
 
 		<!-- Sendai Framework Priority Indicators -->
-		<div class="grid-3">
-			<div class="card" style="border-top: 4px solid #38bdf8;">
-				<h4 class="card-title">Sendai Target B (Affected)</h4>
-				<p class="card-value">18,610</p>
-				<p class="card-subtext">Exposed Population | <strong>16,749</strong> Est. Displaced</p>
+		<section aria-label="Sendai Framework Priority Metrics">
+			<div class="grid-3">
+				<div class="card" style="border-top: 4px solid #38bdf8;">
+					<h3 class="card-title">Sendai Target B (Affected)</h3>
+					<p class="card-value">18,610</p>
+					<p class="card-subtext">Exposed Population | <strong>16,749</strong> Est. Displaced</p>
+				</div>
+				<div class="card" style="border-top: 4px solid #fb923c;">
+					<h3 class="card-title">Sendai Target C (Direct Loss)</h3>
+					<p class="card-value">$127,025,600</p>
+					<p class="card-subtext">Direct Physical Loss USD | Loss Ratio: <strong>63.04%</strong></p>
+				</div>
+				<div class="card" style="border-top: 4px solid #f87171;">
+					<h3 class="card-title">Sendai Target D (Infrastructure)</h3>
+					<p class="card-value">7</p>
+					<p class="card-subtext">Damaged Essential Facilities (Hospitals, Substations, Transit)</p>
+				</div>
 			</div>
-			<div class="card" style="border-top: 4px solid #fb923c;">
-				<h4 class="card-title">Sendai Target C (Direct Loss)</h4>
-				<p class="card-value">$127,025,600</p>
-				<p class="card-subtext">Direct Physical Loss USD | Loss Ratio: <strong>63.04%</strong></p>
-			</div>
-			<div class="card" style="border-top: 4px solid #f87171;">
-				<h4 class="card-title">Sendai Target D (Infrastructure)</h4>
-				<p class="card-value">7</p>
-				<p class="card-subtext">Damaged Essential Facilities (Hospitals, Clinics, Schools)</p>
-			</div>
-		</div>
+		</section>
 
 		<!-- Spatial Exposure & Hazard Footprint (Interactive GIS Map) -->
-		<div class="card" style="margin-bottom: 24px; padding: 16px;">
+		<section class="card map-card" aria-label="Spatial Exposure and Hazard Footprint Map">
 			<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; flex-wrap: wrap; gap: 8px;">
 				<div style="display: flex; align-items: center; gap: 10px;">
-					<h3 style="margin: 0; font-size: 15px; font-weight: 700; color: #f8fafc;">
+					<h2 style="margin: 0; font-size: 15px; font-weight: 700; color: #f8fafc;">
 						🗺️ Spatial Exposure & Hazard Footprint
-					</h3>
-					<span id="sitrepBasemapBadge" style="font-size: 10px; font-family: monospace; padding: 2px 8px; border-radius: 4px; background: rgba(16, 185, 129, 0.15); color: #34d399; border: 1px solid rgba(16, 185, 129, 0.3);">
+					</h2>
+					<span id="sitrepBasemapBadge" class="map-status-pill" style="font-size: 10px; font-family: monospace; padding: 2px 8px; border-radius: 4px; background: rgba(16, 185, 129, 0.15); color: #34d399; border: 1px solid rgba(16, 185, 129, 0.3);">
 						100% OFFLINE
 					</span>
 				</div>
 				<div style="display: flex; align-items: center; gap: 12px; flex-wrap: wrap;">
 					<!-- Basemap Selector -->
-					<div style="display: flex; align-items: center; gap: 6px;">
+					<div class="no-print" style="display: flex; align-items: center; gap: 6px;">
 						<label for="sitrepBasemapSelect" style="font-size: 11px; font-weight: 600; color: #94a3b8; text-transform: uppercase;">Basemap:</label>
 						<select id="sitrepBasemapSelect" style="background: #0f172a; border: 1px solid #475569; color: #f8fafc; font-size: 11px; padding: 4px 8px; border-radius: 6px; cursor: pointer; outline: none;">
 							<option value="tactical-dark" selected>⬛ Tactical Dark Radar (100% Offline)</option>
@@ -189,12 +417,12 @@
 					</div>
 				</div>
 			</div>
-			<!-- Map Canvas Wrapper (Increased height to 520px with Pan & Zoom controls) -->
-			<div style="position: relative; background: #080d1a; border: 1px solid #334155; border-radius: 8px; overflow: hidden; height: 520px;">
-				<canvas id="sitrepMapCanvas" style="width: 100%; height: 100%; display: block; cursor: grab;"></canvas>
+			<!-- Map Canvas Wrapper (Screen: 520px, Print: 330px with Pan & Zoom controls) -->
+			<div id="sitrepMapWrapper" style="position: relative; background: #080d1a; border: 1px solid #334155; border-radius: 8px; overflow: hidden; height: 520px;">
+				<canvas id="sitrepMapCanvas" role="img" aria-label="Geospatial impact map displaying exposed facilities and inundation footprint in Southern Thailand" style="width: 100%; height: 100%; display: block; cursor: grab;"></canvas>
 				
 				<!-- Zoom & Pan Overlay Toolbar -->
-				<div style="position: absolute; top: 12px; left: 12px; display: flex; flex-direction: column; gap: 4px; z-index: 5;">
+				<div class="no-print" style="position: absolute; top: 12px; left: 12px; display: flex; flex-direction: column; gap: 4px; z-index: 5;">
 					<button id="btnZoomIn" title="Zoom In" style="width: 28px; height: 28px; background: rgba(15, 23, 42, 0.9); border: 1px solid #475569; color: #f8fafc; font-weight: bold; font-size: 14px; border-radius: 4px; cursor: pointer; display: flex; align-items: center; justify-content: center;">+</button>
 					<button id="btnZoomOut" title="Zoom Out" style="width: 28px; height: 28px; background: rgba(15, 23, 42, 0.9); border: 1px solid #475569; color: #f8fafc; font-weight: bold; font-size: 14px; border-radius: 4px; cursor: pointer; display: flex; align-items: center; justify-content: center;">&minus;</button>
 					<button id="btnResetView" title="Reset View" style="width: 28px; height: 28px; background: rgba(15, 23, 42, 0.9); border: 1px solid #475569; color: #94a3b8; font-size: 11px; border-radius: 4px; cursor: pointer; display: flex; align-items: center; justify-content: center;">↺</button>
@@ -207,151 +435,187 @@
 				</div>
 				
 				<!-- Map Subtitle Coordinates & Mode Info -->
-				<div style="position: absolute; bottom: 8px; left: 8px; font-size: 10px; color: #64748b; font-family: monospace; pointer-events: none; background: rgba(8, 13, 26, 0.7); padding: 2px 6px; border-radius: 3px;">
+				<div class="no-print" style="position: absolute; bottom: 8px; left: 8px; font-size: 10px; color: #64748b; font-family: monospace; pointer-events: none; background: rgba(8, 13, 26, 0.7); padding: 2px 6px; border-radius: 3px;">
 					WGS84 EPSG:4326 • Drag to Pan • Wheel to Zoom • Dynamic Auto-Fit
 				</div>
+				<div class="print-only" style="display: none; position: absolute; bottom: 8px; left: 8px; font-size: 9px; color: #cbd5e1; font-family: monospace; background: rgba(15, 23, 42, 0.85); padding: 2px 6px; border-radius: 3px;">
+					WGS84 EPSG:4326 • Spatial Exposure & Hazard Verification Footprint
+				</div>
 			</div>
-		</div>
+		</section>
 
-		<!-- High-Risk Critical Infrastructure Table -->
-		<div class="card" style="margin-bottom: 24px;">
-			<h3 style="margin: 0 0 16px 0; font-size: 16px; font-weight: 700; color: #f8fafc;">Priority Structural Damage & Impact Audit</h3>
+		<!-- High-Risk Critical Infrastructure Table (Page 2) -->
+		<section class="card page-break-section" aria-label="Critical Infrastructure Damage Audit">
+			<h2 style="margin: 0 0 14px 0; font-size: 16px; font-weight: 700; color: #f8fafc;">
+				Priority Structural Damage & Impact Audit
+			</h2>
 			<div style="overflow-x: auto;">
 				<table>
+					<caption class="sr-only">Detailed Structural Damage and Economic Losses by Critical Facility</caption>
 					<thead>
 						<tr>
-							<th>Critical Asset</th>
-							<th>Category</th>
-							<th style="text-align: right;">Mean Damage Ratio (MDR)</th>
-							<th style="text-align: right;">Estimated Loss (USD)</th>
+							<th scope="col">Critical Asset</th>
+							<th scope="col">Category</th>
+							<th scope="col" style="text-align: right;">Mean Damage Ratio (MDR)</th>
+							<th scope="col" style="text-align: right;">Estimated Loss (USD)</th>
 						</tr>
 					</thead>
 					<tbody>
 						
 			<tr style="border-bottom: 1px solid #334155;">
-				<td style="padding: 10px 12px; font-weight: 600; color: #f8fafc;">Mueang Yala Sateng Riverfront Community (ชุมชนสะเตง ริมแม่น้ำปัตตานี เทศบาลนครยะลา)</td>
-				<td style="padding: 10px 12px; text-transform: uppercase; font-size: 11px; color: #94a3b8;"><span style="background: #1e293b; padding: 2px 8px; border-radius: 4px; border: 1px solid #334155;">residential</span></td>
-				<td style="padding: 10px 12px; text-align: right; color: #f8fafc;">
+				<td class="asset-name" style="padding: 9px 12px; font-weight: 600; color: #f8fafc;">Mueang Yala Sateng Riverfront Community (ชุมชนสะเตง ริมแม่น้ำปัตตานี เทศบาลนครยะลา)</td>
+				<td style="padding: 9px 12px; text-transform: uppercase; font-size: 11px;"><span class="asset-category-pill" style="background: #1e293b; padding: 2px 8px; border-radius: 4px; border: 1px solid #334155; color: #94a3b8;">residential</span></td>
+				<td class="mdr-cell" style="padding: 9px 12px; text-align: right; color: #f8fafc;">
 					<div style="display: flex; align-items: center; justify-content: flex-end; gap: 8px;">
-						<span style="font-weight: 600;">63.0%</span>
-						<div style="width: 60px; height: 6px; background: #334155; border-radius: 3px; overflow: hidden;">
+						<span class="mdr-val" style="font-weight: 600;">63.0%</span>
+						<div class="mdr-bar-bg" style="width: 55px; height: 6px; background: #334155; border-radius: 3px; overflow: hidden;">
 							<div style="width: 63.0%; height: 100%; background: #ef4444;"></div>
 						</div>
 					</div>
 				</td>
-				<td style="padding: 10px 12px; text-align: right; font-weight: 600; color: #38bdf8;">$32,780,800</td>
+				<td class="loss-value" style="padding: 9px 12px; text-align: right; font-weight: 600; color: #38bdf8;">$32,780,800</td>
 			</tr>
 		
 			<tr style="border-bottom: 1px solid #334155;">
-				<td style="padding: 10px 12px; font-weight: 600; color: #f8fafc;">Yala Regional Hospital (โรงพยาบาลศูนย์ยะลา)</td>
-				<td style="padding: 10px 12px; text-transform: uppercase; font-size: 11px; color: #94a3b8;"><span style="background: #1e293b; padding: 2px 8px; border-radius: 4px; border: 1px solid #334155;">healthcare</span></td>
-				<td style="padding: 10px 12px; text-align: right; color: #f8fafc;">
+				<td class="asset-name" style="padding: 9px 12px; font-weight: 600; color: #f8fafc;">Yala Regional Hospital (โรงพยาบาลศูนย์ยะลา)</td>
+				<td style="padding: 9px 12px; text-transform: uppercase; font-size: 11px;"><span class="asset-category-pill" style="background: #1e293b; padding: 2px 8px; border-radius: 4px; border: 1px solid #334155; color: #94a3b8;">healthcare</span></td>
+				<td class="mdr-cell" style="padding: 9px 12px; text-align: right; color: #f8fafc;">
 					<div style="display: flex; align-items: center; justify-content: flex-end; gap: 8px;">
-						<span style="font-weight: 600;">63.0%</span>
-						<div style="width: 60px; height: 6px; background: #334155; border-radius: 3px; overflow: hidden;">
+						<span class="mdr-val" style="font-weight: 600;">63.0%</span>
+						<div class="mdr-bar-bg" style="width: 55px; height: 6px; background: #334155; border-radius: 3px; overflow: hidden;">
 							<div style="width: 63.0%; height: 100%; background: #ef4444;"></div>
 						</div>
 					</div>
 				</td>
-				<td style="padding: 10px 12px; text-align: right; font-weight: 600; color: #38bdf8;">$23,955,200</td>
+				<td class="loss-value" style="padding: 9px 12px; text-align: right; font-weight: 600; color: #38bdf8;">$23,955,200</td>
 			</tr>
 		
 			<tr style="border-bottom: 1px solid #334155;">
-				<td style="padding: 10px 12px; font-weight: 600; color: #f8fafc;">Pattani Hospital (โรงพยาบาลปัตตานี)</td>
-				<td style="padding: 10px 12px; text-transform: uppercase; font-size: 11px; color: #94a3b8;"><span style="background: #1e293b; padding: 2px 8px; border-radius: 4px; border: 1px solid #334155;">healthcare</span></td>
-				<td style="padding: 10px 12px; text-align: right; color: #f8fafc;">
+				<td class="asset-name" style="padding: 9px 12px; font-weight: 600; color: #f8fafc;">Pattani Hospital (โรงพยาบาลปัตตานี)</td>
+				<td style="padding: 9px 12px; text-transform: uppercase; font-size: 11px;"><span class="asset-category-pill" style="background: #1e293b; padding: 2px 8px; border-radius: 4px; border: 1px solid #334155; color: #94a3b8;">healthcare</span></td>
+				<td class="mdr-cell" style="padding: 9px 12px; text-align: right; color: #f8fafc;">
 					<div style="display: flex; align-items: center; justify-content: flex-end; gap: 8px;">
-						<span style="font-weight: 600;">63.0%</span>
-						<div style="width: 60px; height: 6px; background: #334155; border-radius: 3px; overflow: hidden;">
+						<span class="mdr-val" style="font-weight: 600;">63.0%</span>
+						<div class="mdr-bar-bg" style="width: 55px; height: 6px; background: #334155; border-radius: 3px; overflow: hidden;">
 							<div style="width: 63.0%; height: 100%; background: #ef4444;"></div>
 						</div>
 					</div>
 				</td>
-				<td style="padding: 10px 12px; text-align: right; font-weight: 600; color: #38bdf8;">$18,281,600</td>
+				<td class="loss-value" style="padding: 9px 12px; text-align: right; font-weight: 600; color: #38bdf8;">$18,281,600</td>
 			</tr>
 		
 			<tr style="border-bottom: 1px solid #334155;">
-				<td style="padding: 10px 12px; font-weight: 600; color: #f8fafc;">Narathiwat Ratchanakharin Hospital (โรงพยาบาลนราธิวาสราชนครินทร์)</td>
-				<td style="padding: 10px 12px; text-transform: uppercase; font-size: 11px; color: #94a3b8;"><span style="background: #1e293b; padding: 2px 8px; border-radius: 4px; border: 1px solid #334155;">healthcare</span></td>
-				<td style="padding: 10px 12px; text-align: right; color: #f8fafc;">
+				<td class="asset-name" style="padding: 9px 12px; font-weight: 600; color: #f8fafc;">Narathiwat Ratchanakharin Hospital (โรงพยาบาลนราธิวาสราชนครินทร์)</td>
+				<td style="padding: 9px 12px; text-transform: uppercase; font-size: 11px;"><span class="asset-category-pill" style="background: #1e293b; padding: 2px 8px; border-radius: 4px; border: 1px solid #334155; color: #94a3b8;">healthcare</span></td>
+				<td class="mdr-cell" style="padding: 9px 12px; text-align: right; color: #f8fafc;">
 					<div style="display: flex; align-items: center; justify-content: flex-end; gap: 8px;">
-						<span style="font-weight: 600;">63.0%</span>
-						<div style="width: 60px; height: 6px; background: #334155; border-radius: 3px; overflow: hidden;">
+						<span class="mdr-val" style="font-weight: 600;">63.0%</span>
+						<div class="mdr-bar-bg" style="width: 55px; height: 6px; background: #334155; border-radius: 3px; overflow: hidden;">
 							<div style="width: 63.0%; height: 100%; background: #ef4444;"></div>
 						</div>
 					</div>
 				</td>
-				<td style="padding: 10px 12px; text-align: right; font-weight: 600; color: #38bdf8;">$16,390,400</td>
+				<td class="loss-value" style="padding: 9px 12px; text-align: right; font-weight: 600; color: #38bdf8;">$16,390,400</td>
 			</tr>
 		
 			<tr style="border-bottom: 1px solid #334155;">
-				<td style="padding: 10px 12px; font-weight: 600; color: #f8fafc;">PEA Yala 1 High-Voltage Electrical Substation (สถานีไฟฟ้าแรงสูงยะลา 1 การไฟฟ้าส่วนภูมิภาค)</td>
-				<td style="padding: 10px 12px; text-transform: uppercase; font-size: 11px; color: #94a3b8;"><span style="background: #1e293b; padding: 2px 8px; border-radius: 4px; border: 1px solid #334155;">power_station</span></td>
-				<td style="padding: 10px 12px; text-align: right; color: #f8fafc;">
+				<td class="asset-name" style="padding: 9px 12px; font-weight: 600; color: #f8fafc;">PEA Yala 1 High-Voltage Electrical Substation (สถานีไฟฟ้าแรงสูงยะลา 1 การไฟฟ้าส่วนภูมิภาค)</td>
+				<td style="padding: 9px 12px; text-transform: uppercase; font-size: 11px;"><span class="asset-category-pill" style="background: #1e293b; padding: 2px 8px; border-radius: 4px; border: 1px solid #334155; color: #94a3b8;">power_station</span></td>
+				<td class="mdr-cell" style="padding: 9px 12px; text-align: right; color: #f8fafc;">
 					<div style="display: flex; align-items: center; justify-content: flex-end; gap: 8px;">
-						<span style="font-weight: 600;">63.0%</span>
-						<div style="width: 60px; height: 6px; background: #334155; border-radius: 3px; overflow: hidden;">
+						<span class="mdr-val" style="font-weight: 600;">63.0%</span>
+						<div class="mdr-bar-bg" style="width: 55px; height: 6px; background: #334155; border-radius: 3px; overflow: hidden;">
 							<div style="width: 63.0%; height: 100%; background: #ef4444;"></div>
 						</div>
 					</div>
 				</td>
-				<td style="padding: 10px 12px; text-align: right; font-weight: 600; color: #38bdf8;">$12,292,800</td>
+				<td class="loss-value" style="padding: 9px 12px; text-align: right; font-weight: 600; color: #38bdf8;">$12,292,800</td>
 			</tr>
 		
 			<tr style="border-bottom: 1px solid #334155;">
-				<td style="padding: 10px 12px; font-weight: 600; color: #f8fafc;">Highway 418 Pattani River Transit Bridge (สะพานข้ามแม่น้ำปัตตานี ทางหลวงหมายเลข 418)</td>
-				<td style="padding: 10px 12px; text-transform: uppercase; font-size: 11px; color: #94a3b8;"><span style="background: #1e293b; padding: 2px 8px; border-radius: 4px; border: 1px solid #334155;">transit</span></td>
-				<td style="padding: 10px 12px; text-align: right; color: #f8fafc;">
+				<td class="asset-name" style="padding: 9px 12px; font-weight: 600; color: #f8fafc;">Highway 418 Pattani River Transit Bridge (สะพานข้ามแม่น้ำปัตตานี ทางหลวงหมายเลข 418)</td>
+				<td style="padding: 9px 12px; text-transform: uppercase; font-size: 11px;"><span class="asset-category-pill" style="background: #1e293b; padding: 2px 8px; border-radius: 4px; border: 1px solid #334155; color: #94a3b8;">transit</span></td>
+				<td class="mdr-cell" style="padding: 9px 12px; text-align: right; color: #f8fafc;">
 					<div style="display: flex; align-items: center; justify-content: flex-end; gap: 8px;">
-						<span style="font-weight: 600;">63.0%</span>
-						<div style="width: 60px; height: 6px; background: #334155; border-radius: 3px; overflow: hidden;">
+						<span class="mdr-val" style="font-weight: 600;">63.0%</span>
+						<div class="mdr-bar-bg" style="width: 55px; height: 6px; background: #334155; border-radius: 3px; overflow: hidden;">
 							<div style="width: 63.0%; height: 100%; background: #ef4444;"></div>
 						</div>
 					</div>
 				</td>
-				<td style="padding: 10px 12px; text-align: right; font-weight: 600; color: #38bdf8;">$10,401,600</td>
+				<td class="loss-value" style="padding: 9px 12px; text-align: right; font-weight: 600; color: #38bdf8;">$10,401,600</td>
+			</tr>
+		
+			<tr style="border-bottom: 1px solid #334155;">
+				<td class="asset-name" style="padding: 9px 12px; font-weight: 600; color: #f8fafc;">Yala Railway Station & SRT Southern Line Depot (สถานีรถไฟยะลา การรถไฟแห่งประเทศไทย)</td>
+				<td style="padding: 9px 12px; text-transform: uppercase; font-size: 11px;"><span class="asset-category-pill" style="background: #1e293b; padding: 2px 8px; border-radius: 4px; border: 1px solid #334155; color: #94a3b8;">transit</span></td>
+				<td class="mdr-cell" style="padding: 9px 12px; text-align: right; color: #f8fafc;">
+					<div style="display: flex; align-items: center; justify-content: flex-end; gap: 8px;">
+						<span class="mdr-val" style="font-weight: 600;">63.0%</span>
+						<div class="mdr-bar-bg" style="width: 55px; height: 6px; background: #334155; border-radius: 3px; overflow: hidden;">
+							<div style="width: 63.0%; height: 100%; background: #ef4444;"></div>
+						</div>
+					</div>
+				</td>
+				<td class="loss-value" style="padding: 9px 12px; text-align: right; font-weight: 600; color: #38bdf8;">$6,934,400</td>
+			</tr>
+		
+			<tr style="border-bottom: 1px solid #334155;">
+				<td class="asset-name" style="padding: 9px 12px; font-weight: 600; color: #f8fafc;">Hat Yai Municipal Evacuation & Relief Center (ศูนย์ประสานงานช่วยเหลือผู้ประสบอุทกภัย เทศบาลนครหาดใหญ่)</td>
+				<td style="padding: 9px 12px; text-transform: uppercase; font-size: 11px;"><span class="asset-category-pill" style="background: #1e293b; padding: 2px 8px; border-radius: 4px; border: 1px solid #334155; color: #94a3b8;">education</span></td>
+				<td class="mdr-cell" style="padding: 9px 12px; text-align: right; color: #f8fafc;">
+					<div style="display: flex; align-items: center; justify-content: flex-end; gap: 8px;">
+						<span class="mdr-val" style="font-weight: 600;">63.0%</span>
+						<div class="mdr-bar-bg" style="width: 55px; height: 6px; background: #334155; border-radius: 3px; overflow: hidden;">
+							<div style="width: 63.0%; height: 100%; background: #ef4444;"></div>
+						</div>
+					</div>
+				</td>
+				<td class="loss-value" style="padding: 9px 12px; text-align: right; font-weight: 600; color: #38bdf8;">$5,988,800</td>
 			</tr>
 		
 					</tbody>
 				</table>
 			</div>
-		</div>
+		</section>
 
-		<!-- Action Checklist for EOC Watchstanders -->
-		<div class="card">
-			<h3 style="margin: 0 0 16px 0; font-size: 16px; font-weight: 700; color: #f8fafc;">EOC Operational Action Directives</h3>
+		<!-- Action Checklist for EOC Watchstanders (Page 2) -->
+		<section class="card directives-card" aria-label="EOC Operational Action Directives">
+			<h2 style="margin: 0 0 14px 0; font-size: 16px; font-weight: 700; color: #f8fafc;">
+				EOC Operational Action Directives
+			</h2>
 			<ul class="checklist">
 				<li>
-					<span class="check-icon">1.</span>
+					<span class="check-icon" aria-hidden="true">1.</span>
 					<div>
 						<strong>Life Safety & Shelter Mobilization:</strong> Activate municipal reception shelters for an estimated <strong>16,749</strong> displaced individuals. Preposition water purification kits and emergency medical tents.
 					</div>
 				</li>
 				<li>
-					<span class="check-icon">2.</span>
+					<span class="check-icon" aria-hidden="true">2.</span>
 					<div>
 						<strong>Critical Infrastructure Stabilization:</strong> Dispatch structural engineering survey teams and backup generator units to priority healthcare facilities with damage ratios exceeding 25%.
 					</div>
 				</li>
 				<li>
-					<span class="check-icon">3.</span>
+					<span class="check-icon" aria-hidden="true">3.</span>
 					<div>
 						<strong>OASIS CAP v1.2 Broadcast Verification:</strong> Ensure cell broadcast emergency alerts are disseminated across targeted telecom towers in <strong>Southern Thailand (Yala, Songkhla, Pattani, Narathiwat)</strong>.
 					</div>
 				</li>
 				<li>
-					<span class="check-icon">4.</span>
+					<span class="check-icon" aria-hidden="true">4.</span>
 					<div>
 						<strong>UNDRR DELTA Reporting:</strong> Submit validated loss assessment draft to the national DELTA Resilience repository for Sendai Monitor compliance.
 					</div>
 				</li>
 			</ul>
-		</div>
+		</section>
 
-		<div style="margin-top: 24px; text-align: center; color: #64748b; font-size: 11px;">
+		<footer class="doc-footer" style="margin-top: 24px; text-align: center; color: #64748b; font-size: 11px;">
 			Generated by Disaster Risk Reduction (DRR) Agent Plugin • Conforms to OASIS CAP v1.2 & UN Sendai Framework
-		</div>
-	</div>
+		</footer>
+	</main>
 
 	<script>
 		(function() {
@@ -497,9 +761,12 @@
 			}
 
 			function resize() {
+				const isPrinting = (window.matchMedia && window.matchMedia('print').matches);
 				const rect = canvas.getBoundingClientRect();
-				canvas.width = rect.width * (window.devicePixelRatio || 1);
-				canvas.height = rect.height * (window.devicePixelRatio || 1);
+				const w = rect.width || (canvas.parentElement ? canvas.parentElement.clientWidth : 800);
+				const h = isPrinting ? 330 : (rect.height || (canvas.parentElement ? canvas.parentElement.clientHeight : 520));
+				canvas.width = w * (window.devicePixelRatio || 1);
+				canvas.height = h * (window.devicePixelRatio || 1);
 				ctx.scale(window.devicePixelRatio || 1, window.devicePixelRatio || 1);
 				draw();
 			}
@@ -533,8 +800,9 @@
 				const spanLon = Math.max(maxLon - minLon, 0.025);
 				const spanLat = Math.max(maxLat - minLat, 0.02);
 
-				const padX = 180;
-				const padY = 70;
+				const isPrinting = (window.matchMedia && window.matchMedia('print').matches);
+				const padX = isPrinting ? 130 : 180;
+				const padY = isPrinting ? 45 : 70;
 				const cosLat = Math.cos(centerLat * Math.PI / 180);
 				const centerLatRad = (centerLat * Math.PI) / 180;
 				const centerMercY = Math.log(Math.tan(Math.PI / 4 + centerLatRad / 2));
@@ -809,6 +1077,16 @@
 			}
 
 			window.addEventListener('resize', resize);
+			window.addEventListener('beforeprint', resize);
+			window.addEventListener('afterprint', resize);
+			if (window.matchMedia) {
+				const mq = window.matchMedia('print');
+				try {
+					mq.addEventListener('change', resize);
+				} catch (_) {
+					try { mq.addListener(resize); } catch (__) {}
+				}
+			}
 			setTimeout(resize, 50);
 		})();
 	</script>
