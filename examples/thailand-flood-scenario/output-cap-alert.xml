@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <alert xmlns="urn:oasis:names:tc:emergency:cap:1.2">
-  <identifier>DELTA-CAP-1794205655762</identifier>
+  <identifier>DELTA-CAP-1794207905235</identifier>
   <sender>alerts@delta.preventionweb.net</sender>
-  <sent>2026-11-09T06:27:35.762Z</sent>
+  <sent>2026-11-09T07:05:05.235Z</sent>
   <status>Actual</status>
   <msgType>Alert</msgType>
   <scope>Public</scope>

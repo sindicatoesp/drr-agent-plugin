@@ -99,6 +99,14 @@
 			font-weight: 600;
 			border-bottom: 2px solid #334155;
 		}
+		.sitrep-asset-row {
+			cursor: pointer;
+			transition: background-color 0.15s ease, outline 0.15s ease;
+		}
+		.sitrep-asset-row:hover, .sitrep-asset-row.active {
+			background-color: rgba(56, 189, 248, 0.15) !important;
+			outline: 1px solid rgba(56, 189, 248, 0.4);
+		}
 		.checklist {
 			list-style: none;
 			padding: 0;
@@ -307,6 +315,10 @@
 			.mdr-bar-bg {
 				background: #e2e8f0 !important;
 			}
+			.sitrep-asset-row.active {
+				background: #f1f5f9 !important;
+				outline: none !important;
+			}
 
 			/* Directives Card (Page 2) */
 			.directives-card {
@@ -353,7 +365,7 @@
 					<div class="header-meta" style="color: #94a3b8; font-size: 13px;">
 						<strong>Region:</strong> Southern Thailand (Yala, Songkhla, Pattani, Narathiwat) &nbsp;|&nbsp; 
 						<strong>Intensity:</strong> 2.2 Inundation Depth (meters) &nbsp;|&nbsp; 
-						<strong>Issued:</strong> Mon, 09 Nov 2026 06:27:36 GMT
+						<strong>Issued:</strong> Mon, 09 Nov 2026 07:05:05 GMT
 					</div>
 				</div>
 				<button class="btn no-print" onclick="window.print()" aria-label="Print or Save Situation Report as PDF">🖨️ Print / Save PDF</button>
@@ -462,7 +474,7 @@
 					</thead>
 					<tbody>
 						
-			<tr style="border-bottom: 1px solid #334155;">
+			<tr id="asset-row-0" class="sitrep-asset-row" data-asset-index="0" style="border-bottom: 1px solid #334155;">
 				<td class="asset-name" style="padding: 9px 12px; font-weight: 600; color: #f8fafc;">Mueang Yala Sateng Riverfront Community (ชุมชนสะเตง ริมแม่น้ำปัตตานี เทศบาลนครยะลา)</td>
 				<td style="padding: 9px 12px; text-transform: uppercase; font-size: 11px;"><span class="asset-category-pill" style="background: #1e293b; padding: 2px 8px; border-radius: 4px; border: 1px solid #334155; color: #94a3b8;">residential</span></td>
 				<td class="mdr-cell" style="padding: 9px 12px; text-align: right; color: #f8fafc;">
@@ -476,7 +488,7 @@
 				<td class="loss-value" style="padding: 9px 12px; text-align: right; font-weight: 600; color: #38bdf8;">$32,780,800</td>
 			</tr>
 		
-			<tr style="border-bottom: 1px solid #334155;">
+			<tr id="asset-row-1" class="sitrep-asset-row" data-asset-index="1" style="border-bottom: 1px solid #334155;">
 				<td class="asset-name" style="padding: 9px 12px; font-weight: 600; color: #f8fafc;">Yala Regional Hospital (โรงพยาบาลศูนย์ยะลา)</td>
 				<td style="padding: 9px 12px; text-transform: uppercase; font-size: 11px;"><span class="asset-category-pill" style="background: #1e293b; padding: 2px 8px; border-radius: 4px; border: 1px solid #334155; color: #94a3b8;">healthcare</span></td>
 				<td class="mdr-cell" style="padding: 9px 12px; text-align: right; color: #f8fafc;">
@@ -490,7 +502,7 @@
 				<td class="loss-value" style="padding: 9px 12px; text-align: right; font-weight: 600; color: #38bdf8;">$23,955,200</td>
 			</tr>
 		
-			<tr style="border-bottom: 1px solid #334155;">
+			<tr id="asset-row-2" class="sitrep-asset-row" data-asset-index="2" style="border-bottom: 1px solid #334155;">
 				<td class="asset-name" style="padding: 9px 12px; font-weight: 600; color: #f8fafc;">Pattani Hospital (โรงพยาบาลปัตตานี)</td>
 				<td style="padding: 9px 12px; text-transform: uppercase; font-size: 11px;"><span class="asset-category-pill" style="background: #1e293b; padding: 2px 8px; border-radius: 4px; border: 1px solid #334155; color: #94a3b8;">healthcare</span></td>
 				<td class="mdr-cell" style="padding: 9px 12px; text-align: right; color: #f8fafc;">
@@ -504,7 +516,7 @@
 				<td class="loss-value" style="padding: 9px 12px; text-align: right; font-weight: 600; color: #38bdf8;">$18,281,600</td>
 			</tr>
 		
-			<tr style="border-bottom: 1px solid #334155;">
+			<tr id="asset-row-3" class="sitrep-asset-row" data-asset-index="3" style="border-bottom: 1px solid #334155;">
 				<td class="asset-name" style="padding: 9px 12px; font-weight: 600; color: #f8fafc;">Narathiwat Ratchanakharin Hospital (โรงพยาบาลนราธิวาสราชนครินทร์)</td>
 				<td style="padding: 9px 12px; text-transform: uppercase; font-size: 11px;"><span class="asset-category-pill" style="background: #1e293b; padding: 2px 8px; border-radius: 4px; border: 1px solid #334155; color: #94a3b8;">healthcare</span></td>
 				<td class="mdr-cell" style="padding: 9px 12px; text-align: right; color: #f8fafc;">
@@ -518,7 +530,7 @@
 				<td class="loss-value" style="padding: 9px 12px; text-align: right; font-weight: 600; color: #38bdf8;">$16,390,400</td>
 			</tr>
 		
-			<tr style="border-bottom: 1px solid #334155;">
+			<tr id="asset-row-4" class="sitrep-asset-row" data-asset-index="4" style="border-bottom: 1px solid #334155;">
 				<td class="asset-name" style="padding: 9px 12px; font-weight: 600; color: #f8fafc;">PEA Yala 1 High-Voltage Electrical Substation (สถานีไฟฟ้าแรงสูงยะลา 1 การไฟฟ้าส่วนภูมิภาค)</td>
 				<td style="padding: 9px 12px; text-transform: uppercase; font-size: 11px;"><span class="asset-category-pill" style="background: #1e293b; padding: 2px 8px; border-radius: 4px; border: 1px solid #334155; color: #94a3b8;">power_station</span></td>
 				<td class="mdr-cell" style="padding: 9px 12px; text-align: right; color: #f8fafc;">
@@ -532,7 +544,7 @@
 				<td class="loss-value" style="padding: 9px 12px; text-align: right; font-weight: 600; color: #38bdf8;">$12,292,800</td>
 			</tr>
 		
-			<tr style="border-bottom: 1px solid #334155;">
+			<tr id="asset-row-5" class="sitrep-asset-row" data-asset-index="5" style="border-bottom: 1px solid #334155;">
 				<td class="asset-name" style="padding: 9px 12px; font-weight: 600; color: #f8fafc;">Highway 418 Pattani River Transit Bridge (สะพานข้ามแม่น้ำปัตตานี ทางหลวงหมายเลข 418)</td>
 				<td style="padding: 9px 12px; text-transform: uppercase; font-size: 11px;"><span class="asset-category-pill" style="background: #1e293b; padding: 2px 8px; border-radius: 4px; border: 1px solid #334155; color: #94a3b8;">transit</span></td>
 				<td class="mdr-cell" style="padding: 9px 12px; text-align: right; color: #f8fafc;">
@@ -546,7 +558,7 @@
 				<td class="loss-value" style="padding: 9px 12px; text-align: right; font-weight: 600; color: #38bdf8;">$10,401,600</td>
 			</tr>
 		
-			<tr style="border-bottom: 1px solid #334155;">
+			<tr id="asset-row-6" class="sitrep-asset-row" data-asset-index="6" style="border-bottom: 1px solid #334155;">
 				<td class="asset-name" style="padding: 9px 12px; font-weight: 600; color: #f8fafc;">Yala Railway Station & SRT Southern Line Depot (สถานีรถไฟยะลา การรถไฟแห่งประเทศไทย)</td>
 				<td style="padding: 9px 12px; text-transform: uppercase; font-size: 11px;"><span class="asset-category-pill" style="background: #1e293b; padding: 2px 8px; border-radius: 4px; border: 1px solid #334155; color: #94a3b8;">transit</span></td>
 				<td class="mdr-cell" style="padding: 9px 12px; text-align: right; color: #f8fafc;">
@@ -560,7 +572,7 @@
 				<td class="loss-value" style="padding: 9px 12px; text-align: right; font-weight: 600; color: #38bdf8;">$6,934,400</td>
 			</tr>
 		
-			<tr style="border-bottom: 1px solid #334155;">
+			<tr id="asset-row-7" class="sitrep-asset-row" data-asset-index="7" style="border-bottom: 1px solid #334155;">
 				<td class="asset-name" style="padding: 9px 12px; font-weight: 600; color: #f8fafc;">Hat Yai Municipal Evacuation & Relief Center (ศูนย์ประสานงานช่วยเหลือผู้ประสบอุทกภัย เทศบาลนครหาดใหญ่)</td>
 				<td style="padding: 9px 12px; text-transform: uppercase; font-size: 11px;"><span class="asset-category-pill" style="background: #1e293b; padding: 2px 8px; border-radius: 4px; border: 1px solid #334155; color: #94a3b8;">education</span></td>
 				<td class="mdr-cell" style="padding: 9px 12px; text-align: right; color: #f8fafc;">
@@ -630,14 +642,29 @@
 			const btnZoomIn = document.getElementById('btnZoomIn');
 			const btnZoomOut = document.getElementById('btnZoomOut');
 			const btnResetView = document.getElementById('btnResetView');
-			const assets = [{"name":"Yala Regional Hospital (โรงพยาบาลศูนย์ยะลา)","category":"healthcare","coords":[101.2818,6.5416],"mdr":0.35,"lossUsd":0},{"name":"Pattani Hospital (โรงพยาบาลปัตตานี)","category":"healthcare","coords":[101.2505,6.868],"mdr":0.35,"lossUsd":0},{"name":"Narathiwat Ratchanakharin Hospital (โรงพยาบาลนราธิวาสราชนครินทร์)","category":"healthcare","coords":[101.8252,6.4258],"mdr":0.35,"lossUsd":0},{"name":"Hat Yai Municipal Evacuation & Relief Center (ศูนย์ประสานงานช่วยเหลือผู้ประสบอุทกภัย เทศบาลนครหาดใหญ่)","category":"education","coords":[100.4746,7.0082],"mdr":0.35,"lossUsd":0},{"name":"PEA Yala 1 High-Voltage Electrical Substation (สถานีไฟฟ้าแรงสูงยะลา 1 การไฟฟ้าส่วนภูมิภาค)","category":"power_station","coords":[101.2752,6.5388],"mdr":0.35,"lossUsd":0},{"name":"Highway 418 Pattani River Transit Bridge (สะพานข้ามแม่น้ำปัตตานี ทางหลวงหมายเลข 418)","category":"transit","coords":[101.2682,6.7154],"mdr":0.35,"lossUsd":0},{"name":"Yala Railway Station & SRT Southern Line Depot (สถานีรถไฟยะลา การรถไฟแห่งประเทศไทย)","category":"transit","coords":[101.2805,6.5401],"mdr":0.35,"lossUsd":0},{"name":"Mueang Yala Sateng Riverfront Community (ชุมชนสะเตง ริมแม่น้ำปัตตานี เทศบาลนครยะลา)","category":"residential","coords":[101.2855,6.5524],"mdr":0.35,"lossUsd":0}];
+			const assets = [{"id":"th_hosp_yala","name":"Yala Regional Hospital (โรงพยาบาลศูนย์ยะลา)","category":"healthcare","coords":[101.2818,6.5416],"mdr":0.35,"lossUsd":0,"population":1450,"facilityCode":"10672"},{"id":"th_hosp_pattani","name":"Pattani Hospital (โรงพยาบาลปัตตานี)","category":"healthcare","coords":[101.2505,6.868],"mdr":0.35,"lossUsd":0,"population":920,"facilityCode":"10673"},{"id":"th_hosp_narathiwat","name":"Narathiwat Ratchanakharin Hospital (โรงพยาบาลนราธิวาสราชนครินทร์)","category":"healthcare","coords":[101.8252,6.4258],"mdr":0.35,"lossUsd":0,"population":850,"facilityCode":"10674"},{"id":"th_shelter_hatyai","name":"Hat Yai Municipal Evacuation & Relief Center (ศูนย์ประสานงานช่วยเหลือผู้ประสบอุทกภัย เทศบาลนครหาดใหญ่)","category":"education","coords":[100.4746,7.0082],"mdr":0.35,"lossUsd":0,"population":3200,"facilityCode":"DDPM-SKL-001"},{"id":"th_substation_yala","name":"PEA Yala 1 High-Voltage Electrical Substation (สถานีไฟฟ้าแรงสูงยะลา 1 การไฟฟ้าส่วนภูมิภาค)","category":"power_station","coords":[101.2752,6.5388],"mdr":0.35,"lossUsd":0,"population":40,"facilityCode":"YLA-SUB-115KV"},{"id":"th_bridge_hwy418","name":"Highway 418 Pattani River Transit Bridge (สะพานข้ามแม่น้ำปัตตานี ทางหลวงหมายเลข 418)","category":"transit","coords":[101.2682,6.7154],"mdr":0.35,"lossUsd":0,"population":0,"facilityCode":"DOH-418-BR04"},{"id":"th_rail_southern","name":"Yala Railway Station & SRT Southern Line Depot (สถานีรถไฟยะลา การรถไฟแห่งประเทศไทย)","category":"transit","coords":[101.2805,6.5401],"mdr":0.35,"lossUsd":0,"population":350,"facilityCode":"th_rail_southern"},{"id":"th_res_yala_sateng","name":"Mueang Yala Sateng Riverfront Community (ชุมชนสะเตง ริมแม่น้ำปัตตานี เทศบาลนครยะลา)","category":"residential","coords":[101.2855,6.5524],"mdr":0.35,"lossUsd":0,"population":11800,"facilityCode":"th_res_yala_sateng"}];
 
 			let currentBasemap = "tactical-dark";
 			let userZoom = 1.0;
 			let panOffset = { x: 0, y: 0 };
 			let isDragging = false;
 			let dragStart = { x: 0, y: 0 };
+			let hoveredAsset = null;
 			const tileCache = {};
+
+			function cleanLabelName(fullName) {
+				if (!fullName) return "Asset";
+				let clean = fullName.split(/s*(|s*[/)[0].trim();
+				clean = clean
+					.replace(/^Highways+/i, 'Hwy ')
+					.replace(/High-Voltages+Electricals+Substation/i, 'Substation')
+					.replace(/Municipals+Evacuations+&s+Reliefs+Center/i, 'Evacuation Center')
+					.replace(/Ratchanakharins+Hospital/i, 'Hospital')
+					.replace(/&s+SRTs+Southerns+Lines+Depot/i, '')
+					.replace(/Mueangs+Yalas+/i, '');
+				if (clean.length > 25) clean = clean.substring(0, 23) + '…';
+				return clean;
+			}
 
 			if (basemapSelect) {
 				basemapSelect.addEventListener('change', function(e) {
@@ -714,19 +741,62 @@
 
 				let hit = null;
 				assets.forEach(a => {
-					if (a._px != null && Math.hypot(a._px - mx, a._py - my) <= 12) hit = a;
+					const px = a._visX != null ? a._visX : a._px;
+					const py = a._visY != null ? a._visY : a._py;
+					if (px != null && Math.hypot(px - mx, py - my) <= 14) hit = a;
 					else if (a._bbox != null && mx >= a._bbox.x && mx <= a._bbox.x + a._bbox.w && my >= a._bbox.y && my <= a._bbox.y + a._bbox.h) hit = a;
 				});
 
-				if (hit) {
-					tooltip.style.display = 'block';
-					tooltipName.textContent = hit.name;
-					tooltipDetails.textContent = hit.category.toUpperCase() + ' • MDR: ' + (hit.mdr * 100).toFixed(1) + '% • Est. Loss: $' + (hit.lossUsd || 0).toLocaleString();
-					canvas.style.cursor = 'pointer';
-				} else {
-					tooltip.style.display = 'none';
-					canvas.style.cursor = 'grab';
+				if (hit !== hoveredAsset) {
+					hoveredAsset = hit;
+					document.querySelectorAll('.sitrep-asset-row').forEach(r => r.classList.remove('active'));
+					if (hoveredAsset) {
+						const row = document.getElementById('asset-row-' + hoveredAsset._idx);
+						if (row) row.classList.add('active');
+						tooltip.style.display = 'block';
+						tooltipName.textContent = hoveredAsset.name;
+						tooltipDetails.innerHTML = '<strong>' + (hoveredAsset.category || 'ASSET').toUpperCase() + '</strong> • MDR: <strong>' + (hoveredAsset.mdr * 100).toFixed(1) + '%</strong> • Est. Loss: <strong>$' + (hoveredAsset.lossUsd || 0).toLocaleString() + '</strong>' +
+							(hoveredAsset.population ? '<br>Exposed Population: ' + hoveredAsset.population.toLocaleString() : '') +
+							(hoveredAsset.facilityCode ? '<br>Facility Code: ' + hoveredAsset.facilityCode : '');
+						canvas.style.cursor = 'pointer';
+					} else {
+						tooltip.style.display = 'none';
+						canvas.style.cursor = 'grab';
+					}
+					draw();
 				}
+			});
+
+			canvas.addEventListener('mouseleave', function() {
+				if (hoveredAsset !== null) {
+					hoveredAsset = null;
+					document.querySelectorAll('.sitrep-asset-row').forEach(r => r.classList.remove('active'));
+					tooltip.style.display = 'none';
+					draw();
+				}
+			});
+
+			// Bidirectional Table Row Hover Synchronization
+			document.querySelectorAll('.sitrep-asset-row').forEach(function(row) {
+				const idx = parseInt(row.getAttribute('data-asset-index'), 10);
+				row.addEventListener('mouseenter', function() {
+					if (assets[idx]) {
+						hoveredAsset = assets[idx];
+						row.classList.add('active');
+						tooltip.style.display = 'block';
+						tooltipName.textContent = hoveredAsset.name;
+						tooltipDetails.innerHTML = '<strong>' + (hoveredAsset.category || 'ASSET').toUpperCase() + '</strong> • MDR: <strong>' + (hoveredAsset.mdr * 100).toFixed(1) + '%</strong> • Est. Loss: <strong>$' + (hoveredAsset.lossUsd || 0).toLocaleString() + '</strong>' +
+							(hoveredAsset.population ? '<br>Exposed Population: ' + hoveredAsset.population.toLocaleString() : '') +
+							(hoveredAsset.facilityCode ? '<br>Facility Code: ' + hoveredAsset.facilityCode : '');
+						draw();
+					}
+				});
+				row.addEventListener('mouseleave', function() {
+					hoveredAsset = null;
+					row.classList.remove('active');
+					tooltip.style.display = 'none';
+					draw();
+				});
 			});
 
 			function getTileUrl(provider, x, y, z) {
@@ -801,8 +871,8 @@
 				const spanLat = Math.max(maxLat - minLat, 0.02);
 
 				const isPrinting = (window.matchMedia && window.matchMedia('print').matches);
-				const padX = isPrinting ? 130 : 180;
-				const padY = isPrinting ? 45 : 70;
+				const padX = isPrinting ? 110 : 130;
+				const padY = isPrinting ? 40 : 55;
 				const cosLat = Math.cos(centerLat * Math.PI / 180);
 				const centerLatRad = (centerLat * Math.PI) / 180;
 				const centerMercY = Math.log(Math.tan(Math.PI / 4 + centerLatRad / 2));
@@ -942,108 +1012,276 @@
 					ctx.closePath();
 				}
 
-				// 3. Draw Asset Markers & Collision-Free Badges
-				const labelBoxes = [];
-				assets.forEach((asset, idx) => {
+				// 3. Compute Coordinates, Clusters & Collision-Free Label Layout
+				assets.forEach(function(asset, idx) {
+					asset._idx = idx;
 					const pos = toCanvas(asset.coords[0], asset.coords[1]);
 					asset._px = pos.x;
 					asset._py = pos.y;
+					asset._displayName = cleanLabelName(asset.name);
+				});
+
+				// Cluster Detection (Pairwise distance < 26px)
+				const clusters = [];
+				const visited = new Set();
+				const clusterRadius = 26;
+
+				for (let i = 0; i < assets.length; i++) {
+					if (visited.has(i)) continue;
+					const cluster = [i];
+					visited.add(i);
+					for (let j = i + 1; j < assets.length; j++) {
+						if (!visited.has(j)) {
+							const d = Math.hypot(assets[i]._px - assets[j]._px, assets[i]._py - assets[j]._py);
+							if (d < clusterRadius) {
+								cluster.push(j);
+								visited.add(j);
+							}
+						}
+					}
+					clusters.push(cluster);
+				}
+
+				// Spiderfy Pin Distribution for Clustered Assets
+				clusters.forEach(function(cl) {
+					if (cl.length > 1) {
+						let cx = 0, cy = 0;
+						cl.forEach(function(idx) { cx += assets[idx]._px; cy += assets[idx]._py; });
+						cx /= cl.length;
+						cy /= cl.length;
+						const r = Math.min(20, 9 + cl.length * 2.5);
+						cl.forEach(function(idx, k) {
+							const angle = (2 * Math.PI * k / cl.length) - (Math.PI / 4);
+							assets[idx]._visX = cx + Math.cos(angle) * r;
+							assets[idx]._visY = cy + Math.sin(angle) * r;
+							assets[idx]._clusterCenter = { x: cx, y: cy };
+							assets[idx]._clusterAngle = angle;
+						});
+					} else {
+						assets[cl[0]]._visX = assets[cl[0]]._px;
+						assets[cl[0]]._visY = assets[cl[0]]._py;
+						assets[cl[0]]._clusterCenter = null;
+						assets[cl[0]]._clusterAngle = null;
+					}
+				});
+
+				// Multi-Candidate Smart Placement (Imhof Algorithm)
+				const placedBoxes = [];
+				const badgeH = 26;
+
+				assets.forEach(function(asset) {
+					const px = asset._visX;
+					const py = asset._visY;
+					ctx.font = 'bold 9.5px sans-serif';
+					const nameW = ctx.measureText(asset._displayName).width;
+					const badgeW = Math.min(160, Math.max(115, nameW + 18));
+
+					const distances = [22, 38, 56, 76];
+					const candidateDirs = [];
+
+					if (asset._clusterCenter) {
+						const ca = asset._clusterAngle;
+						const cos = Math.cos(ca);
+						const sin = Math.sin(ca);
+						candidateDirs.push({ dx: cos >= 0 ? 1 : -1, dy: sin >= 0 ? 1 : -1, bias: 0 });
+						candidateDirs.push({ dx: cos >= 0 ? 1 : -1, dy: sin >= 0 ? -1 : 1, bias: 200 });
+						candidateDirs.push({ dx: cos >= 0 ? -1 : 1, dy: sin >= 0 ? 1 : -1, bias: 400 });
+						candidateDirs.push({ dx: cos >= 0 ? -1 : 1, dy: sin >= 0 ? -1 : 1, bias: 600 });
+					} else {
+						candidateDirs.push({ dx: 1, dy: -1, bias: 0 });
+						candidateDirs.push({ dx: 1, dy: 1, bias: 50 });
+						candidateDirs.push({ dx: -1, dy: -1, bias: 50 });
+						candidateDirs.push({ dx: -1, dy: 1, bias: 100 });
+						candidateDirs.push({ dx: 1, dy: 0, bias: 150 });
+						candidateDirs.push({ dx: -1, dy: 0, bias: 150 });
+						candidateDirs.push({ dx: 0, dy: -1, bias: 200 });
+						candidateDirs.push({ dx: 0, dy: 1, bias: 200 });
+					}
+
+					let bestBox = null;
+					let minPenalty = Infinity;
+
+					for (let di = 0; di < distances.length; di++) {
+						const dist = distances[di];
+						for (let ci = 0; ci < candidateDirs.length; ci++) {
+							const dir = candidateDirs[ci];
+							let bx, by;
+							if (dir.dx > 0 && dir.dy < 0) {
+								bx = px + dist;
+								by = py - dist - badgeH / 2;
+							} else if (dir.dx > 0 && dir.dy > 0) {
+								bx = px + dist;
+								by = py + dist - badgeH / 2;
+							} else if (dir.dx < 0 && dir.dy < 0) {
+								bx = px - dist - badgeW;
+								by = py - dist - badgeH / 2;
+							} else if (dir.dx < 0 && dir.dy > 0) {
+								bx = px - dist - badgeW;
+								by = py + dist - badgeH / 2;
+							} else if (dir.dx > 0 && dir.dy === 0) {
+								bx = px + dist + 6;
+								by = py - badgeH / 2;
+							} else if (dir.dx < 0 && dir.dy === 0) {
+								bx = px - dist - badgeW - 6;
+								by = py - badgeH / 2;
+							} else if (dir.dx === 0 && dir.dy < 0) {
+								bx = px - badgeW / 2;
+								by = py - dist - badgeH;
+							} else {
+								bx = px - badgeW / 2;
+								by = py + dist;
+							}
+
+							let penalty = dir.bias + dist * 0.4;
+							const pad = 8;
+							if (bx < pad || bx + badgeW > w - pad || by < pad || by + badgeH > h - pad) {
+								penalty += 50000;
+							}
+
+							for (let pi = 0; pi < placedBoxes.length; pi++) {
+								const pb = placedBoxes[pi];
+								const overlapW = Math.max(0, Math.min(bx + badgeW, pb.x + pb.w) - Math.max(bx, pb.x));
+								const overlapH = Math.max(0, Math.min(by + badgeH, pb.y + pb.h) - Math.max(by, pb.y));
+								if (overlapW > 0 && overlapH > 0) {
+									penalty += 10000 + (overlapW * overlapH) * 50;
+								}
+							}
+
+							for (let oi = 0; oi < assets.length; oi++) {
+								const other = assets[oi];
+								const opx = other._visX || other._px;
+								const opy = other._visY || other._py;
+								if (opx >= bx - 3 && opx <= bx + badgeW + 3 && opy >= by - 3 && opy <= by + badgeH + 3) {
+									penalty += 8000;
+								}
+							}
+
+							if (penalty < minPenalty) {
+								minPenalty = penalty;
+								bestBox = { x: bx, y: by, w: badgeW, h: badgeH, penalty: penalty };
+							}
+						}
+						if (minPenalty < 1000) break;
+					}
+
+					asset._bbox = bestBox;
+					placedBoxes.push(bestBox);
+				});
+
+				// 4. Render Cluster Hubs & Spokes
+				clusters.forEach(function(cl) {
+					if (cl.length > 1) {
+						const center = assets[cl[0]]._clusterCenter;
+						if (center) {
+							ctx.beginPath();
+							ctx.arc(center.x, center.y, 4, 0, Math.PI * 2);
+							ctx.fillStyle = 'rgba(56, 189, 248, 0.4)';
+							ctx.fill();
+							ctx.strokeStyle = '#38bdf8';
+							ctx.lineWidth = 1;
+							ctx.stroke();
+
+							cl.forEach(function(idx) {
+								const a = assets[idx];
+								ctx.beginPath();
+								ctx.moveTo(center.x, center.y);
+								ctx.lineTo(a._visX, a._visY);
+								ctx.strokeStyle = 'rgba(56, 189, 248, 0.5)';
+								ctx.lineWidth = 1;
+								ctx.setLineDash([2, 2]);
+								ctx.stroke();
+								ctx.setLineDash([]);
+							});
+						}
+					}
+				});
+
+				// 5. Render Leader Lines
+				assets.forEach(function(asset) {
+					const b = asset._bbox;
+					if (!b) return;
+					const px = asset._visX;
+					const py = asset._visY;
+					const isHovered = (hoveredAsset === asset);
+
+					const ax = (b.x + b.w < px) ? b.x + b.w : (b.x > px ? b.x : b.x + b.w / 2);
+					const ay = (b.y + b.h < py) ? b.y + b.h : (b.y > py ? b.y : b.y + b.h / 2);
+
+					ctx.beginPath();
+					ctx.moveTo(px, py);
+					ctx.lineTo(ax, ay);
+					ctx.strokeStyle = isHovered ? '#38bdf8' : (isPrinting ? '#64748b' : 'rgba(148, 163, 184, 0.7)');
+					ctx.lineWidth = isHovered ? 2 : 1;
+					ctx.setLineDash(isHovered ? [] : [3, 3]);
+					ctx.stroke();
+					ctx.setLineDash([]);
+
+					ctx.beginPath();
+					ctx.arc(ax, ay, isHovered ? 2.5 : 1.5, 0, Math.PI * 2);
+					ctx.fillStyle = isHovered ? '#38bdf8' : '#94a3b8';
+					ctx.fill();
+				});
+
+				// 6. Render Marker Pins
+				assets.forEach(function(asset) {
+					const px = asset._visX;
+					const py = asset._visY;
+					const isHovered = (hoveredAsset === asset);
 					const isHigh = asset.mdr >= 0.5;
 					const isMod = asset.mdr >= 0.25 && asset.mdr < 0.5;
 					const color = isHigh ? '#ef4444' : isMod ? '#f97316' : '#22c55e';
 
-					// Outer pulsing halo for high-risk assets
-					if (isHigh) {
+					if (isHovered || isHigh) {
 						ctx.beginPath();
-						ctx.arc(pos.x, pos.y, 12, 0, Math.PI * 2);
-						ctx.fillStyle = 'rgba(239, 68, 68, 0.25)';
+						ctx.arc(px, py, isHovered ? 14 : 11, 0, Math.PI * 2);
+						ctx.fillStyle = isHovered ? 'rgba(56, 189, 248, 0.35)' : 'rgba(239, 68, 68, 0.25)';
 						ctx.fill();
 					}
 
-					// Pin body
 					ctx.beginPath();
-					ctx.arc(pos.x, pos.y, 6, 0, Math.PI * 2);
+					ctx.arc(px, py, isHovered ? 7 : 5.5, 0, Math.PI * 2);
 					ctx.fillStyle = color;
 					ctx.fill();
-					ctx.strokeStyle = '#ffffff';
-					ctx.lineWidth = 1.5;
+					ctx.strokeStyle = isHovered ? '#38bdf8' : '#ffffff';
+					ctx.lineWidth = isHovered ? 2 : 1.5;
 					ctx.stroke();
 
-					// Inner dot
 					ctx.beginPath();
-					ctx.arc(pos.x, pos.y, 2, 0, Math.PI * 2);
+					ctx.arc(px, py, 2, 0, Math.PI * 2);
 					ctx.fillStyle = '#ffffff';
 					ctx.fill();
+				});
 
-					// Measure label dimensions
-					ctx.font = 'bold 10px sans-serif';
-					const nameWidth = ctx.measureText(asset.name).width;
-					const badgeW = Math.max(nameWidth + 18, 140);
-					const badgeH = 26;
+				// 7. Render Tactical Label Badges
+				const renderBadgeOrder = assets.slice().sort(function(a, b) {
+					if (a === hoveredAsset) return 1;
+					if (b === hoveredAsset) return -1;
+					return 0;
+				});
 
-					// Alternating initial placement (above vs below pin)
-					let offX = 14;
-					let offY = (idx % 2 === 0) ? -34 : 12;
+				renderBadgeOrder.forEach(function(asset) {
+					const b = asset._bbox;
+					if (!b) return;
+					const isHovered = (hoveredAsset === asset);
+					const isHigh = asset.mdr >= 0.5;
+					const isMod = asset.mdr >= 0.25 && asset.mdr < 0.5;
+					const color = isHigh ? '#ef4444' : isMod ? '#f97316' : '#22c55e';
 
-					// Boundary check
-					if (pos.x + offX + badgeW > w - 12) offX = -badgeW - 14;
-					if (pos.y + offY < 8) offY = 8;
-					if (pos.y + offY + badgeH > h - 8) offY = -badgeH - 8;
-
-					let bx = pos.x + offX;
-					let by = pos.y + offY;
-
-					// Collision-avoidance nudge against previously placed badges
-					for (let step = 0; step < 8; step++) {
-						let collides = false;
-						for (const box of labelBoxes) {
-							if (bx < box.x + box.w + 6 && bx + badgeW + 6 > box.x &&
-							    by < box.y + box.h + 6 && by + badgeH + 6 > box.y) {
-								collides = true;
-								by += badgeH + 6;
-								if (by + badgeH > h - 10) {
-									by = box.y - badgeH - 6;
-								}
-								break;
-							}
-						}
-						if (!collides) break;
-					}
-
-					const bbox = { x: bx, y: by, w: badgeW, h: badgeH };
-					labelBoxes.push(bbox);
-					asset._bbox = bbox;
-
-					// Leader line connecting pin to badge
-					const anchorX = bx > pos.x ? bx : bx + badgeW;
-					const anchorY = by + badgeH / 2;
-					ctx.beginPath();
-					ctx.moveTo(pos.x, pos.y);
-					ctx.lineTo(anchorX, anchorY);
-					ctx.strokeStyle = 'rgba(148, 163, 184, 0.6)';
-					ctx.lineWidth = 1;
-					ctx.setLineDash([2, 2]);
-					ctx.stroke();
-					ctx.setLineDash([]);
-
-					// Badge Background
-					drawBadge(bx, by, badgeW, badgeH, 4);
-					ctx.fillStyle = 'rgba(15, 23, 42, 0.94)';
+					drawBadge(b.x, b.y, b.w, b.h, 4);
+					ctx.fillStyle = isPrinting ? '#ffffff' : (isHovered ? 'rgba(15, 23, 42, 0.98)' : 'rgba(15, 23, 42, 0.92)');
 					ctx.fill();
-					ctx.strokeStyle = isHigh ? 'rgba(239, 68, 68, 0.6)' : 'rgba(71, 85, 105, 0.9)';
-					ctx.lineWidth = 1;
+					ctx.strokeStyle = isHovered ? '#38bdf8' : (isPrinting ? (isHigh ? '#dc2626' : '#64748b') : (isHigh ? 'rgba(239, 68, 68, 0.8)' : 'rgba(71, 85, 105, 0.85)'));
+					ctx.lineWidth = isHovered ? 2 : 1;
 					ctx.stroke();
 
-					// Badge Text Line 1: Asset Name
-					ctx.fillStyle = '#f8fafc';
-					ctx.font = 'bold 10px sans-serif';
+					ctx.fillStyle = isPrinting ? '#0f172a' : (isHovered ? '#38bdf8' : '#f8fafc');
+					ctx.font = 'bold 9.5px sans-serif';
 					ctx.textAlign = 'left';
-					ctx.fillText(asset.name, bx + 7, by + 11);
+					ctx.fillText(asset._displayName, b.x + 7, b.y + 11);
 
-					// Badge Text Line 2: Category & MDR
 					ctx.fillStyle = color;
-					ctx.font = 'bold 9px monospace';
-					ctx.fillText((asset.category || 'ASSET').toUpperCase() + ' • MDR ' + (asset.mdr * 100).toFixed(0) + '%', bx + 7, by + 21);
+					ctx.font = 'bold 8.5px monospace';
+					ctx.fillText((asset.category || 'ASSET').toUpperCase() + ' • MDR ' + (asset.mdr * 100).toFixed(0) + '%', b.x + 7, b.y + 21);
 				});
 
 				// 4. Tactical Compass Rose (North Arrow)
