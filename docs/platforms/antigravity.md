@@ -35,7 +35,7 @@ cp -r /path/to/drr-agent-plugin ~/.gemini/config/plugins/drr-analytics
 
 1. Open your Antigravity conversation.
 2. Check connected tools by clicking **Additional Options (...) > MCP Servers**.
-3. You should see `drr-analytics` with 7 active tools:
+3. You should see `drr-analytics` with 11 active tools:
    - `drr_gdacs_fetch`
    - `drr_usgs_earthquake_fetch`
    - `drr_openmeteo_forecast`
@@ -43,6 +43,10 @@ cp -r /path/to/drr-agent-plugin ~/.gemini/config/plugins/drr-analytics
    - `drr_fragility_eval`
    - `drr_vulnerability_matrix_calc`
    - `drr_cap_alert_generate_validate`
+   - `drr_delta_push_draft_record`
+   - `drr_delta_fetch_exposure`
+   - `drr_delta_docs`
+   - `drr_monitor_check`
 
 ---
 
