@@ -128,7 +128,7 @@ alerts-validate: ## Validate declarative alert rules in alerts-config.json
 # 3. Local Operational Shortcuts
 # ------------------------------------------------------------------------------
 
-test: ## Run the complete 10-suite unit and MCP test suite
+test: ## Run the complete 11-suite unit and MCP test suite
 	@bash tests/run-all-tests.sh
 
 monitor: ## Run the autonomous early warning daemon (INTERVAL=60)
@@ -214,7 +214,7 @@ docker-ps: docker-status ## Alias for docker-status
 docker-logs: ## Follow live logs from the monitoring daemon container
 	docker compose logs -f drr-monitor
 
-docker-test: ## Run the full 10-suite test runner inside the Alpine container
+docker-test: ## Run the full 11-suite test runner inside the Alpine container
 	docker compose run --rm drr-cli test
 
 docker-once: ## Run a single monitor scan inside the Alpine container

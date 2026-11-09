@@ -48,7 +48,7 @@ For stakeholder briefings, executive donor reviews, and emergency operational tr
 * **[Offline GIS Mapping Presentation (HTML)](docs/presentation/gis-map-presentation.html)**: 100% offline Leaflet-compatible spatial console featuring real-time ray-casting buffer queries, multi-scenario overlays (Nepal EQ, Cyclone Pamela, Bangladesh Flood, Southern Thailand Flood), dynamic GEM/HAZUS damage pins, and Sendai scorecards.
 * **[Marp-Compliant Presentation Deck (Markdown)](docs/presentation/drr-agent-plugin-presentation.md)**: 13-slide structured presentation ready to export directly to **PowerPoint (`.pptx`)** or **PDF** via Marp CLI (`npx @marp-team/marp-cli docs/presentation/drr-agent-plugin-presentation.md -o presentation.pptx`) or the VS Code Marp extension.
 * **[Featured Use Case: Southern Thailand Flood (Nov 2026)](docs/use-cases/thailand-flood-2026-simulation.md)**: Post-disaster hindcast validation of the 6–7 November 2026 flood across Yala, Songkhla, Pattani, and Narathiwat (Yala 20-year flood event), with point-in-polygon exposure, HAZUS damage math, CAP v1.2 XML alert, visual HTML SitRep, and DELTA push (`make thailand-flood`).
-* **[Visual Situation Report (HTML SitRep)](examples/earthquake-hazus-scenario/situation-report.html)**: Printable executive disaster situation report with embedded offline vector GIS map generated directly from deterministic assessment data via `drr-tool sitrep --html` or `make sitrep-sample`.
+* **[Visual Situation Report (HTML SitRep)](examples/thailand-flood-scenario/situation-report.html)**: Executive disaster situation report with embedded interactive GIS map featuring 100% offline Tactical Dark radar + online Basemap Switcher (Esri Street, Esri Satellite, OSM Voyager), pan/zoom navigation, Imhof collision-free label placement with cluster spiderfying, bidirectional table hover sync, and WCAG-compliant high-contrast print layout via `drr-tool sitrep --html` or `make thailand-flood`.
 
 ---
 
@@ -109,7 +109,7 @@ drr-agent-plugin/
 ├── README.md                   # Master documentation
 ├── LICENSE                     # Apache 2.0
 ├── bin/
-│   ├── mcp-server.js           # Zero-dependency Node.js MCP server (10 active tools)
+│   ├── mcp-server.js           # Zero-dependency Node.js MCP server (11 active tools)
 │   └── cli.js                  # Direct command-line interface for shell & CI/CD
 ├── lib/                        # Deterministic computational engines
 │   ├── config.js               # Centralized configuration & lightweight .env loader
@@ -133,7 +133,8 @@ drr-agent-plugin/
 ├── examples/                   # Executable real-world scenarios & fixtures
 │   ├── earthquake-hazus-scenario/
 │   ├── flood-gdacs-exposure/
-│   └── cyclone-emergency-brief/
+│   ├── cyclone-emergency-brief/
+│   └── thailand-flood-scenario/# Real-world Nov 2026 Southern Thailand flood benchmark
 ├── docs/                       # Comprehensive documentation
 │   ├── presentation/           # Executive & technical slide decks
 │   │   ├── drr-agent-plugin-presentation.md # Marp-compliant deck for PPTX/PDF
@@ -148,7 +149,7 @@ drr-agent-plugin/
 │       ├── claude-code.md
 │       ├── github-copilot.md
 │       └── opencode-cli.md
-└── tests/                      # Full automated test suite (10 test suites)
+└── tests/                      # Full automated test suite (11 test suites)
     ├── test-config.js
     ├── test-spatial.js
     ├── test-fragility.js
@@ -159,6 +160,7 @@ drr-agent-plugin/
     ├── test-delta.js
     ├── test-monitor.js
     ├── test-mcp-server.js
+    ├── test-hindcast-regression.js
     └── run-all-tests.sh
 ```
 
@@ -189,7 +191,7 @@ make config-check
 make config-show
 make alerts-validate
 
-# Run all 10 unit and MCP test suites:
+# Run all 11 unit, MCP, and hindcast regression test suites:
 make test
 
 # Launch autonomous early warning monitoring daemon (local or one-shot scan):
@@ -200,6 +202,7 @@ make monitor-once
 make scenario-earthquake
 make scenario-flood
 make scenario-cyclone
+make thailand-flood
 make scenarios
 ```
 
@@ -217,7 +220,7 @@ make docker-up
 make docker-status
 make docker-logs
 
-# Run the 10-suite test suite inside the Alpine container:
+# Run the 11-suite test suite inside the Alpine container:
 make docker-test
 
 # Run a one-shot feed scan inside the container:
@@ -285,6 +288,22 @@ node bin/cli.js fragility --hazard earthquake --intensity 0.40 --taxonomy URM
 node bin/cli.js spatial-join \
   --hazard examples/earthquake-hazus-scenario/input-hazard.json \
   --exposure examples/earthquake-hazus-scenario/input-exposure.json
+
+# Compute vulnerability matrix and Sendai Target B, C, D losses:
+node bin/cli.js vulnerability \
+  --spatial examples/thailand-flood-scenario/spatial-report.json \
+  --hazard flood \
+  --intensity 2.2
+
+# Synthesize executive brief and interactive HTML SitRep with offline GIS map:
+node bin/cli.js sitrep \
+  --file examples/thailand-flood-scenario/vulnerability-report.json \
+  --spatial examples/thailand-flood-scenario/spatial-report.json \
+  --name "Southern Thailand Catastrophic Flood" \
+  --country "Southern Thailand" \
+  --severity Red \
+  --html \
+  --output examples/thailand-flood-scenario/situation-report.html
 
 # Generate an OASIS CAP v1.2 XML alert:
 node bin/cli.js cap-generate \
