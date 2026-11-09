@@ -127,7 +127,7 @@
 					<div style="color: #94a3b8; font-size: 13px;">
 						<strong>Region:</strong> Southern Thailand (Yala, Songkhla, Pattani, Narathiwat) &nbsp;|&nbsp; 
 						<strong>Intensity:</strong> 2.2 Inundation Depth (meters) &nbsp;|&nbsp; 
-						<strong>Issued:</strong> Mon, 09 Nov 2026 05:58:48 GMT
+						<strong>Issued:</strong> Mon, 09 Nov 2026 06:14:56 GMT
 					</div>
 				</div>
 				<button class="btn no-print" onclick="window.print()">🖨️ Print / Save PDF</button>
@@ -153,32 +153,62 @@
 			</div>
 		</div>
 
-		<!-- Offline Interactive GIS Map View -->
+		<!-- Spatial Exposure & Hazard Footprint (Interactive GIS Map) -->
 		<div class="card" style="margin-bottom: 24px; padding: 16px;">
 			<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; flex-wrap: wrap; gap: 8px;">
-				<h3 style="margin: 0; font-size: 15px; font-weight: 700; color: #f8fafc;">
-					🗺️ Spatial Exposure & Hazard Footprint (Offline GIS Map)
-				</h3>
-				<div style="display: flex; gap: 12px; font-size: 11px;">
-					<span style="display: flex; align-items: center; gap: 4px; color: #f87171;">
-						<span style="width: 8px; height: 8px; background: #ef4444; border-radius: 50%; display: inline-block;"></span> High Damage (MDR &ge; 50%)
+				<div style="display: flex; align-items: center; gap: 10px;">
+					<h3 style="margin: 0; font-size: 15px; font-weight: 700; color: #f8fafc;">
+						🗺️ Spatial Exposure & Hazard Footprint
+					</h3>
+					<span id="sitrepBasemapBadge" style="font-size: 10px; font-family: monospace; padding: 2px 8px; border-radius: 4px; background: rgba(16, 185, 129, 0.15); color: #34d399; border: 1px solid rgba(16, 185, 129, 0.3);">
+						100% OFFLINE
 					</span>
-					<span style="display: flex; align-items: center; gap: 4px; color: #fb923c;">
-						<span style="width: 8px; height: 8px; background: #f97316; border-radius: 50%; display: inline-block;"></span> Moderate (25-50%)
-					</span>
-					<span style="display: flex; align-items: center; gap: 4px; color: #4ade80;">
-						<span style="width: 8px; height: 8px; background: #22c55e; border-radius: 50%; display: inline-block;"></span> Low (&lt; 25%)
-					</span>
+				</div>
+				<div style="display: flex; align-items: center; gap: 12px; flex-wrap: wrap;">
+					<!-- Basemap Selector -->
+					<div style="display: flex; align-items: center; gap: 6px;">
+						<label for="sitrepBasemapSelect" style="font-size: 11px; font-weight: 600; color: #94a3b8; text-transform: uppercase;">Basemap:</label>
+						<select id="sitrepBasemapSelect" style="background: #0f172a; border: 1px solid #475569; color: #f8fafc; font-size: 11px; padding: 4px 8px; border-radius: 6px; cursor: pointer; outline: none;">
+							<option value="tactical-dark" selected>⬛ Tactical Dark Radar (100% Offline)</option>
+							<option value="esri-street">🗺️ Esri World Street Map (Online)</option>
+							<option value="esri-satellite">🛰️ Esri World Imagery (Satellite)</option>
+							<option value="osm-voyager">🌍 OpenStreetMap (Voyager)</option>
+						</select>
+					</div>
+					<!-- Damage Legend -->
+					<div style="display: flex; gap: 10px; font-size: 11px;">
+						<span style="display: flex; align-items: center; gap: 4px; color: #f87171;">
+							<span style="width: 8px; height: 8px; background: #ef4444; border-radius: 50%; display: inline-block;"></span> High (&ge;50%)
+						</span>
+						<span style="display: flex; align-items: center; gap: 4px; color: #fb923c;">
+							<span style="width: 8px; height: 8px; background: #f97316; border-radius: 50%; display: inline-block;"></span> Moderate (25-50%)
+						</span>
+						<span style="display: flex; align-items: center; gap: 4px; color: #4ade80;">
+							<span style="width: 8px; height: 8px; background: #22c55e; border-radius: 50%; display: inline-block;"></span> Low (&lt;25%)
+						</span>
+					</div>
 				</div>
 			</div>
-			<div style="position: relative; background: #090d16; border: 1px solid #334155; border-radius: 8px; overflow: hidden; height: 280px;">
-				<canvas id="sitrepMapCanvas" style="width: 100%; height: 100%; display: block;"></canvas>
-				<div id="sitrepMapTooltip" style="display: none; position: absolute; top: 10px; right: 10px; background: rgba(15, 23, 42, 0.95); border: 1px solid #475569; border-radius: 6px; padding: 8px 12px; font-size: 11px; color: #f8fafc; pointer-events: none; z-index: 10; max-width: 240px;">
-					<div id="tooltipName" style="font-weight: 700;">Facility</div>
-					<div id="tooltipDetails" style="color: #94a3b8; font-size: 10px; margin-top: 2px;">Details</div>
+			<!-- Map Canvas Wrapper (Increased height to 520px with Pan & Zoom controls) -->
+			<div style="position: relative; background: #080d1a; border: 1px solid #334155; border-radius: 8px; overflow: hidden; height: 520px;">
+				<canvas id="sitrepMapCanvas" style="width: 100%; height: 100%; display: block; cursor: grab;"></canvas>
+				
+				<!-- Zoom & Pan Overlay Toolbar -->
+				<div style="position: absolute; top: 12px; left: 12px; display: flex; flex-direction: column; gap: 4px; z-index: 5;">
+					<button id="btnZoomIn" title="Zoom In" style="width: 28px; height: 28px; background: rgba(15, 23, 42, 0.9); border: 1px solid #475569; color: #f8fafc; font-weight: bold; font-size: 14px; border-radius: 4px; cursor: pointer; display: flex; align-items: center; justify-content: center;">+</button>
+					<button id="btnZoomOut" title="Zoom Out" style="width: 28px; height: 28px; background: rgba(15, 23, 42, 0.9); border: 1px solid #475569; color: #f8fafc; font-weight: bold; font-size: 14px; border-radius: 4px; cursor: pointer; display: flex; align-items: center; justify-content: center;">&minus;</button>
+					<button id="btnResetView" title="Reset View" style="width: 28px; height: 28px; background: rgba(15, 23, 42, 0.9); border: 1px solid #475569; color: #94a3b8; font-size: 11px; border-radius: 4px; cursor: pointer; display: flex; align-items: center; justify-content: center;">↺</button>
 				</div>
-				<div style="position: absolute; bottom: 8px; left: 8px; font-size: 10px; color: #64748b; font-family: monospace; pointer-events: none;">
-					WGS84 EPSG:4326 • 100% Offline Vector Layer
+
+				<!-- Tooltip -->
+				<div id="sitrepMapTooltip" style="display: none; position: absolute; top: 10px; right: 10px; background: rgba(15, 23, 42, 0.95); border: 1px solid #475569; border-radius: 6px; padding: 8px 12px; font-size: 11px; color: #f8fafc; pointer-events: none; z-index: 10; max-width: 260px; box-shadow: 0 4px 12px rgba(0,0,0,0.5);">
+					<div id="tooltipName" style="font-weight: 700; color: #38bdf8;">Facility</div>
+					<div id="tooltipDetails" style="color: #cbd5e1; font-size: 11px; margin-top: 3px; line-height: 1.4;">Details</div>
+				</div>
+				
+				<!-- Map Subtitle Coordinates & Mode Info -->
+				<div style="position: absolute; bottom: 8px; left: 8px; font-size: 10px; color: #64748b; font-family: monospace; pointer-events: none; background: rgba(8, 13, 26, 0.7); padding: 2px 6px; border-radius: 3px;">
+					WGS84 EPSG:4326 • Drag to Pan • Wheel to Zoom • Dynamic Auto-Fit
 				</div>
 			</div>
 		</div>
@@ -331,7 +361,140 @@
 			const tooltip = document.getElementById('sitrepMapTooltip');
 			const tooltipName = document.getElementById('tooltipName');
 			const tooltipDetails = document.getElementById('tooltipDetails');
+			const basemapSelect = document.getElementById('sitrepBasemapSelect');
+			const basemapBadge = document.getElementById('sitrepBasemapBadge');
+			const btnZoomIn = document.getElementById('btnZoomIn');
+			const btnZoomOut = document.getElementById('btnZoomOut');
+			const btnResetView = document.getElementById('btnResetView');
 			const assets = [{"name":"Yala Regional Hospital (โรงพยาบาลศูนย์ยะลา)","category":"healthcare","coords":[101.2818,6.5416],"mdr":0.35,"lossUsd":0},{"name":"Pattani Hospital (โรงพยาบาลปัตตานี)","category":"healthcare","coords":[101.2505,6.868],"mdr":0.35,"lossUsd":0},{"name":"Narathiwat Ratchanakharin Hospital (โรงพยาบาลนราธิวาสราชนครินทร์)","category":"healthcare","coords":[101.8252,6.4258],"mdr":0.35,"lossUsd":0},{"name":"Hat Yai Municipal Evacuation & Relief Center (ศูนย์ประสานงานช่วยเหลือผู้ประสบอุทกภัย เทศบาลนครหาดใหญ่)","category":"education","coords":[100.4746,7.0082],"mdr":0.35,"lossUsd":0},{"name":"PEA Yala 1 High-Voltage Electrical Substation (สถานีไฟฟ้าแรงสูงยะลา 1 การไฟฟ้าส่วนภูมิภาค)","category":"power_station","coords":[101.2752,6.5388],"mdr":0.35,"lossUsd":0},{"name":"Highway 418 Pattani River Transit Bridge (สะพานข้ามแม่น้ำปัตตานี ทางหลวงหมายเลข 418)","category":"transit","coords":[101.2682,6.7154],"mdr":0.35,"lossUsd":0},{"name":"Yala Railway Station & SRT Southern Line Depot (สถานีรถไฟยะลา การรถไฟแห่งประเทศไทย)","category":"transit","coords":[101.2805,6.5401],"mdr":0.35,"lossUsd":0},{"name":"Mueang Yala Sateng Riverfront Community (ชุมชนสะเตง ริมแม่น้ำปัตตานี เทศบาลนครยะลา)","category":"residential","coords":[101.2855,6.5524],"mdr":0.35,"lossUsd":0}];
+
+			let currentBasemap = "tactical-dark";
+			let userZoom = 1.0;
+			let panOffset = { x: 0, y: 0 };
+			let isDragging = false;
+			let dragStart = { x: 0, y: 0 };
+			const tileCache = {};
+
+			if (basemapSelect) {
+				basemapSelect.addEventListener('change', function(e) {
+					currentBasemap = e.target.value;
+					if (currentBasemap === "tactical-dark") {
+						basemapBadge.textContent = "100% OFFLINE";
+						basemapBadge.style.color = "#34d399";
+						basemapBadge.style.background = "rgba(16, 185, 129, 0.15)";
+						basemapBadge.style.borderColor = "rgba(16, 185, 129, 0.3)";
+					} else {
+						basemapBadge.textContent = "ONLINE TILES";
+						basemapBadge.style.color = "#38bdf8";
+						basemapBadge.style.background = "rgba(56, 189, 248, 0.15)";
+						basemapBadge.style.borderColor = "rgba(56, 189, 248, 0.3)";
+					}
+					draw();
+				});
+			}
+
+			if (btnZoomIn) {
+				btnZoomIn.addEventListener('click', function() {
+					userZoom = Math.min(5.0, userZoom * 1.25);
+					draw();
+				});
+			}
+			if (btnZoomOut) {
+				btnZoomOut.addEventListener('click', function() {
+					userZoom = Math.max(0.5, userZoom * 0.8);
+					draw();
+				});
+			}
+			if (btnResetView) {
+				btnResetView.addEventListener('click', function() {
+					userZoom = 1.0;
+					panOffset = { x: 0, y: 0 };
+					draw();
+				});
+			}
+
+			canvas.addEventListener('wheel', function(e) {
+				e.preventDefault();
+				const factor = e.deltaY < 0 ? 1.15 : 0.87;
+				userZoom = Math.max(0.4, Math.min(6.0, userZoom * factor));
+				draw();
+			}, { passive: false });
+
+			canvas.addEventListener('mousedown', function(e) {
+				if (e.button === 0) {
+					isDragging = true;
+					dragStart = { x: e.clientX, y: e.clientY };
+					canvas.style.cursor = 'grabbing';
+				}
+			});
+
+			window.addEventListener('mouseup', function() {
+				if (isDragging) {
+					isDragging = false;
+					canvas.style.cursor = 'grab';
+				}
+			});
+
+			canvas.addEventListener('mousemove', function(e) {
+				const rect = canvas.getBoundingClientRect();
+				const mx = e.clientX - rect.left;
+				const my = e.clientY - rect.top;
+
+				if (isDragging) {
+					panOffset.x += (e.clientX - dragStart.x);
+					panOffset.y += (e.clientY - dragStart.y);
+					dragStart = { x: e.clientX, y: e.clientY };
+					draw();
+					return;
+				}
+
+				let hit = null;
+				assets.forEach(a => {
+					if (a._px != null && Math.hypot(a._px - mx, a._py - my) <= 12) hit = a;
+					else if (a._bbox != null && mx >= a._bbox.x && mx <= a._bbox.x + a._bbox.w && my >= a._bbox.y && my <= a._bbox.y + a._bbox.h) hit = a;
+				});
+
+				if (hit) {
+					tooltip.style.display = 'block';
+					tooltipName.textContent = hit.name;
+					tooltipDetails.textContent = hit.category.toUpperCase() + ' • MDR: ' + (hit.mdr * 100).toFixed(1) + '% • Est. Loss: $' + (hit.lossUsd || 0).toLocaleString();
+					canvas.style.cursor = 'pointer';
+				} else {
+					tooltip.style.display = 'none';
+					canvas.style.cursor = 'grab';
+				}
+			});
+
+			function getTileUrl(provider, x, y, z) {
+				if (provider === "esri-street") {
+					return "https://server.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer/tile/" + z + "/" + y + "/" + x;
+				}
+				if (provider === "esri-satellite") {
+					return "https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/" + z + "/" + y + "/" + x;
+				}
+				if (provider === "osm-voyager") {
+					return "https://basemaps.cartocdn.com/rastertiles/voyager/" + z + "/" + x + "/" + y + ".png";
+				}
+				return null;
+			}
+
+			function lonToTileX(lon, z) {
+				return Math.floor(((lon + 180) / 360) * Math.pow(2, z));
+			}
+
+			function latToTileY(lat, z) {
+				const latRad = (lat * Math.PI) / 180;
+				return Math.floor((1 - Math.log(Math.tan(latRad) + 1 / Math.cos(latRad)) / Math.PI) / 2 * Math.pow(2, z));
+			}
+
+			function tileXToLon(tx, z) {
+				return (tx / Math.pow(2, z)) * 360 - 180;
+			}
+
+			function tileYToLat(ty, z) {
+				const n = Math.PI - (2 * Math.PI * ty) / Math.pow(2, z);
+				return (180 / Math.PI) * Math.atan(0.5 * (Math.exp(n) - Math.exp(-n)));
+			}
 
 			function resize() {
 				const rect = canvas.getBoundingClientRect();
@@ -346,19 +509,9 @@
 				const h = canvas.height / (window.devicePixelRatio || 1);
 				ctx.clearRect(0, 0, w, h);
 
-				// Dark Tactical GIS Background
+				// Tactical Dark background
 				ctx.fillStyle = '#080d1a';
 				ctx.fillRect(0, 0, w, h);
-
-				// Graticule grid
-				ctx.strokeStyle = '#152033';
-				ctx.lineWidth = 1;
-				for (let x = 40; x < w; x += 55) {
-					ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, h); ctx.stroke();
-				}
-				for (let y = 30; y < h; y += 40) {
-					ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(w, y); ctx.stroke();
-				}
 
 				if (!assets || assets.length === 0) return;
 
@@ -380,56 +533,122 @@
 				const spanLon = Math.max(maxLon - minLon, 0.025);
 				const spanLat = Math.max(maxLat - minLat, 0.02);
 
-				const padX = 160;
-				const padY = 45;
+				const padX = 180;
+				const padY = 70;
 				const cosLat = Math.cos(centerLat * Math.PI / 180);
+				const centerLatRad = (centerLat * Math.PI) / 180;
+				const centerMercY = Math.log(Math.tan(Math.PI / 4 + centerLatRad / 2));
+
 				const scaleX = (w - padX * 2) / (spanLon * (Math.PI / 180) * cosLat);
 				const scaleY = (h - padY * 2) / (spanLat * (Math.PI / 180));
-				const scale = Math.min(scaleX, scaleY);
+				const baseScale = Math.min(scaleX, scaleY);
+				const effectiveScale = baseScale * userZoom;
 
 				function toCanvas(lon, lat) {
-					const cx = w / 2 + (lon - centerLon) * (Math.PI / 180) * cosLat * scale;
-					const cy = h / 2 - (lat - centerLat) * (Math.PI / 180) * scale;
+					const latRad = (lat * Math.PI) / 180;
+					const mercY = Math.log(Math.tan(Math.PI / 4 + latRad / 2));
+					const cx = w / 2 + panOffset.x + (lon - centerLon) * (Math.PI / 180) * cosLat * effectiveScale;
+					const cy = h / 2 + panOffset.y - (mercY - centerMercY) * effectiveScale;
 					return { x: cx, y: cy };
 				}
 
-				// Regional vector landmass contour
-				ctx.fillStyle = '#101a2b';
-				ctx.strokeStyle = '#273852';
-				ctx.lineWidth = 1.5;
-				ctx.beginPath();
-				const rx = spanLon * 1.5;
-				const ry = spanLat * 1.5;
-				const landPts = [
-					toCanvas(centerLon - rx, centerLat - ry),
-					toCanvas(centerLon + rx * 0.9, centerLat - ry * 0.8),
-					toCanvas(centerLon + rx * 1.1, centerLat + ry * 0.9),
-					toCanvas(centerLon - rx * 0.8, centerLat + ry)
-				];
-				landPts.forEach((p, idx) => idx === 0 ? ctx.moveTo(p.x, p.y) : ctx.lineTo(p.x, p.y));
-				ctx.closePath();
-				ctx.fill();
-				ctx.stroke();
+				function toGeo(px, py) {
+					const mercY = centerMercY - (py - h / 2 - panOffset.y) / effectiveScale;
+					const latRad = 2 * Math.atan(Math.exp(mercY)) - Math.PI / 2;
+					const lon = centerLon + ((px - w / 2 - panOffset.x) / (effectiveScale * (Math.PI / 180) * cosLat));
+					return { lon: lon, lat: (latRad * 180) / Math.PI };
+				}
 
-				// River waterway corridor
-				ctx.save();
-				ctx.shadowColor = 'rgba(56, 189, 248, 0.5)';
-				ctx.shadowBlur = 5;
-				ctx.strokeStyle = '#0284c7';
-				ctx.lineWidth = 2.5;
-				ctx.beginPath();
-				const rivPts = [
-					toCanvas(centerLon + rx * 0.7, centerLat + ry * 0.8),
-					toCanvas(centerLon + rx * 0.1, centerLat + ry * 0.1),
-					toCanvas(centerLon - rx * 0.6, centerLat - ry * 0.7)
-				];
-				rivPts.forEach((p, idx) => idx === 0 ? ctx.moveTo(p.x, p.y) : ctx.lineTo(p.x, p.y));
-				ctx.stroke();
-				ctx.restore();
+				// 1. Basemap Rendering
+				if (currentBasemap !== "tactical-dark") {
+					const zFloat = Math.log2((2 * Math.PI * effectiveScale * cosLat) / 256);
+					const z = Math.max(1, Math.min(18, Math.round(zFloat)));
 
-				// Hazard impact buffer zone
+					const minGeo = toGeo(0, h);
+					const maxGeo = toGeo(w, 0);
+					const minTx = Math.max(0, lonToTileX(Math.min(minGeo.lon, maxGeo.lon), z) - 1);
+					const maxTx = Math.min(Math.pow(2, z) - 1, lonToTileX(Math.max(minGeo.lon, maxGeo.lon), z) + 1);
+					const minTy = Math.max(0, latToTileY(Math.max(minGeo.lat, maxGeo.lat), z) - 1);
+					const maxTy = Math.min(Math.pow(2, z) - 1, latToTileY(Math.min(minGeo.lat, maxGeo.lat), z) + 1);
+
+					for (let tx = minTx; tx <= maxTx; tx++) {
+						for (let ty = minTy; ty <= maxTy; ty++) {
+							const tileKey = currentBasemap + "_" + z + "_" + tx + "_" + ty;
+							const url = getTileUrl(currentBasemap, tx, ty, z);
+							const lonL = tileXToLon(tx, z);
+							const lonR = tileXToLon(tx + 1, z);
+							const latT = tileYToLat(ty, z);
+							const latB = tileYToLat(ty + 1, z);
+							const p1 = toCanvas(lonL, latT);
+							const p2 = toCanvas(lonR, latB);
+
+							if (tileCache[tileKey]) {
+								if (tileCache[tileKey].complete && tileCache[tileKey].naturalWidth > 0) {
+									ctx.drawImage(tileCache[tileKey], p1.x, p1.y, p2.x - p1.x + 0.5, p2.y - p1.y + 0.5);
+								}
+							} else {
+								const img = new Image();
+								img.crossOrigin = "anonymous";
+								img.src = url;
+								img.onload = () => draw();
+								img.onerror = () => { /* gracefully handle offline or network block */ };
+								tileCache[tileKey] = img;
+							}
+						}
+					}
+
+					// High-contrast translucent overlay so badges and hazard graphics remain legible
+					ctx.fillStyle = (currentBasemap === "esri-satellite") ? "rgba(10, 15, 30, 0.35)" : "rgba(10, 15, 30, 0.55)";
+					ctx.fillRect(0, 0, w, h);
+				} else {
+					// Offline Graticule Grid
+					ctx.strokeStyle = '#152033';
+					ctx.lineWidth = 1;
+					for (let x = 40; x < w; x += 55) {
+						ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, h); ctx.stroke();
+					}
+					for (let y = 30; y < h; y += 40) {
+						ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(w, y); ctx.stroke();
+					}
+
+					// Regional offline vector landmass contour
+					ctx.fillStyle = '#101a2b';
+					ctx.strokeStyle = '#273852';
+					ctx.lineWidth = 1.5;
+					ctx.beginPath();
+					const rx = spanLon * 1.5;
+					const ry = spanLat * 1.5;
+					const landPts = [
+						toCanvas(centerLon - rx, centerLat - ry),
+						toCanvas(centerLon + rx * 0.9, centerLat - ry * 0.8),
+						toCanvas(centerLon + rx * 1.1, centerLat + ry * 0.9),
+						toCanvas(centerLon - rx * 0.8, centerLat + ry)
+					];
+					landPts.forEach((p, idx) => idx === 0 ? ctx.moveTo(p.x, p.y) : ctx.lineTo(p.x, p.y));
+					ctx.closePath();
+					ctx.fill();
+					ctx.stroke();
+
+					// River waterway corridor
+					ctx.save();
+					ctx.shadowColor = 'rgba(56, 189, 248, 0.5)';
+					ctx.shadowBlur = 5;
+					ctx.strokeStyle = '#0284c7';
+					ctx.lineWidth = 2.5;
+					ctx.beginPath();
+					const rivPts = [
+						toCanvas(centerLon + rx * 0.7, centerLat + ry * 0.8),
+						toCanvas(centerLon + rx * 0.1, centerLat + ry * 0.1),
+						toCanvas(centerLon - rx * 0.6, centerLat - ry * 0.7)
+					];
+					rivPts.forEach((p, idx) => idx === 0 ? ctx.moveTo(p.x, p.y) : ctx.lineTo(p.x, p.y));
+					ctx.stroke();
+					ctx.restore();
+				}
+
+				// 2. Hazard Impact Buffer Zone
 				const centerPos = toCanvas(centerLon, centerLat);
-				const bufferRadiusPx = Math.max(75, Math.hypot(scaleX * (spanLon * Math.PI / 180 * cosLat), scaleY * (spanLat * Math.PI / 180)) * 0.75);
+				const bufferRadiusPx = Math.max(90, Math.hypot(scaleX * (spanLon * Math.PI / 180 * cosLat), scaleY * (spanLat * Math.PI / 180)) * 0.75 * userZoom);
 				ctx.beginPath();
 				ctx.arc(centerPos.x, centerPos.y, bufferRadiusPx, 0, Math.PI * 2);
 				ctx.fillStyle = 'rgba(239, 68, 68, 0.08)';
@@ -455,7 +674,7 @@
 					ctx.closePath();
 				}
 
-				// Draw asset markers & non-colliding labels
+				// 3. Draw Asset Markers & Collision-Free Badges
 				const labelBoxes = [];
 				assets.forEach((asset, idx) => {
 					const pos = toCanvas(asset.coords[0], asset.coords[1]);
@@ -468,7 +687,7 @@
 					// Outer pulsing halo for high-risk assets
 					if (isHigh) {
 						ctx.beginPath();
-						ctx.arc(pos.x, pos.y, 11, 0, Math.PI * 2);
+						ctx.arc(pos.x, pos.y, 12, 0, Math.PI * 2);
 						ctx.fillStyle = 'rgba(239, 68, 68, 0.25)';
 						ctx.fill();
 					}
@@ -491,12 +710,12 @@
 					// Measure label dimensions
 					ctx.font = 'bold 10px sans-serif';
 					const nameWidth = ctx.measureText(asset.name).width;
-					const badgeW = Math.max(nameWidth + 16, 140);
+					const badgeW = Math.max(nameWidth + 18, 140);
 					const badgeH = 26;
 
 					// Alternating initial placement (above vs below pin)
 					let offX = 14;
-					let offY = (idx % 2 === 0) ? -32 : 10;
+					let offY = (idx % 2 === 0) ? -34 : 12;
 
 					// Boundary check
 					if (pos.x + offX + badgeW > w - 12) offX = -badgeW - 14;
@@ -507,14 +726,14 @@
 					let by = pos.y + offY;
 
 					// Collision-avoidance nudge against previously placed badges
-					for (let step = 0; step < 6; step++) {
+					for (let step = 0; step < 8; step++) {
 						let collides = false;
 						for (const box of labelBoxes) {
 							if (bx < box.x + box.w + 6 && bx + badgeW + 6 > box.x &&
 							    by < box.y + box.h + 6 && by + badgeH + 6 > box.y) {
 								collides = true;
 								by += badgeH + 6;
-								if (by + badgeH > h - 8) {
+								if (by + badgeH > h - 10) {
 									by = box.y - badgeH - 6;
 								}
 								break;
@@ -523,7 +742,9 @@
 						if (!collides) break;
 					}
 
-					labelBoxes.push({ x: bx, y: by, w: badgeW, h: badgeH });
+					const bbox = { x: bx, y: by, w: badgeW, h: badgeH };
+					labelBoxes.push(bbox);
+					asset._bbox = bbox;
 
 					// Leader line connecting pin to badge
 					const anchorX = bx > pos.x ? bx : bx + badgeW;
@@ -531,7 +752,7 @@
 					ctx.beginPath();
 					ctx.moveTo(pos.x, pos.y);
 					ctx.lineTo(anchorX, anchorY);
-					ctx.strokeStyle = 'rgba(100, 116, 139, 0.45)';
+					ctx.strokeStyle = 'rgba(148, 163, 184, 0.6)';
 					ctx.lineWidth = 1;
 					ctx.setLineDash([2, 2]);
 					ctx.stroke();
@@ -539,9 +760,9 @@
 
 					// Badge Background
 					drawBadge(bx, by, badgeW, badgeH, 4);
-					ctx.fillStyle = 'rgba(15, 23, 42, 0.92)';
+					ctx.fillStyle = 'rgba(15, 23, 42, 0.94)';
 					ctx.fill();
-					ctx.strokeStyle = isHigh ? 'rgba(239, 68, 68, 0.5)' : 'rgba(51, 65, 85, 0.8)';
+					ctx.strokeStyle = isHigh ? 'rgba(239, 68, 68, 0.6)' : 'rgba(71, 85, 105, 0.9)';
 					ctx.lineWidth = 1;
 					ctx.stroke();
 
@@ -557,7 +778,7 @@
 					ctx.fillText((asset.category || 'ASSET').toUpperCase() + ' • MDR ' + (asset.mdr * 100).toFixed(0) + '%', bx + 7, by + 21);
 				});
 
-				// Tactical Compass Rose (North Arrow)
+				// 4. Tactical Compass Rose (North Arrow)
 				const compassX = w - 24;
 				const compassY = 24;
 				ctx.beginPath();
@@ -586,27 +807,6 @@
 				ctx.textAlign = 'center';
 				ctx.fillText('N', compassX, compassY - 10);
 			}
-
-			canvas.addEventListener('mousemove', function(e) {
-				const rect = canvas.getBoundingClientRect();
-				const mx = e.clientX - rect.left;
-				const my = e.clientY - rect.top;
-				let hit = null;
-
-				assets.forEach(a => {
-					if (a._px != null && Math.hypot(a._px - mx, a._py - my) <= 10) hit = a;
-				});
-
-				if (hit) {
-					tooltip.style.display = 'block';
-					tooltipName.textContent = hit.name;
-					tooltipDetails.textContent = hit.category.toUpperCase() + ' • MDR: ' + (hit.mdr * 100).toFixed(1) + '% • Est. Loss: $' + (hit.lossUsd || 0).toLocaleString();
-					canvas.style.cursor = 'pointer';
-				} else {
-					tooltip.style.display = 'none';
-					canvas.style.cursor = 'default';
-				}
-			});
 
 			window.addEventListener('resize', resize);
 			setTimeout(resize, 50);
