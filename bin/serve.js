@@ -11,8 +11,9 @@ const fs = require("fs");
 const path = require("path");
 
 const PORT = parseInt(process.env.PORT || "3300", 10);
-const HOST = process.env.HOST || "0.0.0.0";
+const HOST = process.env.HOST || "127.0.0.1";
 const ROOT_DIR = path.resolve(__dirname, "..");
+const MAX_TILE_BYTES = 5 * 1024 * 1024; // 5 MB max per tile response
 
 const MIME_TYPES = {
 	".html": "text/html; charset=UTF-8",
@@ -73,8 +74,19 @@ function handleOsmTileProxy(req, res, z, x, y) {
 		}
 
 		const chunks = [];
-		osmRes.on("data", (chunk) => chunks.push(chunk));
+		let receivedBytes = 0;
+		let aborted = false;
+		osmRes.on("data", (chunk) => {
+			receivedBytes += chunk.length;
+			if (receivedBytes > MAX_TILE_BYTES) {
+				aborted = true;
+				proxyReq.destroy(new Error("Tile response exceeded maximum allowed size"));
+				return;
+			}
+			chunks.push(chunk);
+		});
 		osmRes.on("end", () => {
+			if (aborted) return;
 			const buffer = Buffer.concat(chunks);
 			if (tileMemoryCache.size >= MAX_CACHE_ENTRIES) {
 				const firstKey = tileMemoryCache.keys().next().value;
@@ -130,11 +142,23 @@ const server = http.createServer((req, res) => {
 	}
 
 	const filePath = path.join(ROOT_DIR, safePath);
+	const normalizedRoot = ROOT_DIR.endsWith(path.sep) ? ROOT_DIR : ROOT_DIR + path.sep;
 
-	// Security: prevent path traversal out of repository root
-	if (!filePath.startsWith(ROOT_DIR)) {
+	// Security: prevent path traversal or sibling prefix collision out of repository root
+	if (filePath !== ROOT_DIR && !filePath.startsWith(normalizedRoot)) {
 		res.writeHead(403, { "Content-Type": "text/plain" });
 		return res.end("403 Forbidden");
+	}
+
+	// Security: block dotfiles (.env, .git, etc.) and local credential configs
+	const relPath = path.relative(ROOT_DIR, filePath);
+	const relSegments = relPath.split(path.sep);
+	if (
+		relSegments.some((seg) => seg.startsWith(".")) ||
+		relPath === "alerts-config.json"
+	) {
+		res.writeHead(403, { "Content-Type": "text/plain" });
+		return res.end("403 Forbidden: Restricted file");
 	}
 
 	fs.stat(filePath, (err, stats) => {
@@ -152,7 +176,14 @@ const server = http.createServer((req, res) => {
 			"Access-Control-Allow-Origin": "*",
 		});
 
-		fs.createReadStream(filePath).pipe(res);
+		const stream = fs.createReadStream(filePath);
+		stream.on("error", () => {
+			if (!res.headersSent) {
+				res.writeHead(500, { "Content-Type": "text/plain" });
+			}
+			res.end("500 Internal Server Error");
+		});
+		stream.pipe(res);
 	});
 });
 

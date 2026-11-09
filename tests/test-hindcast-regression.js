@@ -5,6 +5,8 @@ const vm = require("vm");
 const { spatialExposureJoin } = require("../lib/spatial");
 const { evaluateVulnerabilityMatrix } = require("../lib/vulnerability");
 const { generateVisualSitRepHtml, generateEmergencyBrief } = require("../lib/cap");
+const { fetchExposureFromDelta } = require("../lib/delta");
+const { dispatchWebhook } = require("../lib/monitor");
 
 console.log("Testing Southern Thailand Catastrophic Flood Hindcast Regression Benchmark...");
 
@@ -82,4 +84,58 @@ assert(briefMd.includes("16,749"), "Brief must include exact displaced populatio
 assert(briefMd.includes("127,025,600"), "Brief must include exact direct loss USD");
 assert(briefMd.includes("7 facilities"), "Brief must report exact Target D facility damage");
 
-console.log("✅ Southern Thailand Hindcast Regression & Cartographic Verification tests passed!");
+// 5. Security & Performance Hardening Verification
+const xssHtml = generateVisualSitRepHtml({
+	hazard: {
+		eventName: '<script>alert("xss")</script>',
+		country: '<img src=x onerror=alert(1)>',
+		alertLevel: "Red",
+	},
+	vulnerability: {
+		topDamagedAssets: [
+			{
+				id: "xss_1",
+				name: 'Hospital </script><script>alert("breakout")</script>',
+				category: 'healthcare"><script>',
+				meanDamageRatio: 0.5,
+				estimatedEconomicLossUsd: 1000,
+				coordinates: [100.5, 7.0],
+			},
+		],
+	},
+});
+assert(!xssHtml.includes('<script>alert("xss")</script>'), "XSS payload in eventName must be escaped");
+assert(!xssHtml.includes('<img src=x onerror=alert(1)>'), "XSS payload in region must be escaped");
+assert(!xssHtml.includes('</script><script>alert("breakout")'), "Script breakout in JSON asset array must be escaped");
+
+// Verify DELTA entity allowlist blocks arbitrary tool names
+assert.rejects(
+	async () => fetchExposureFromDelta("arbitrary_tool_injection", {}, { mock: true }),
+	/Invalid DELTA entity/,
+	"Should reject non-allowlisted DELTA entity names"
+);
+
+// Verify webhook blocks unexpanded ${VAR} placeholders and non-http protocols
+dispatchWebhook("https://hooks.slack.com/services/${UNSET_SECRET}", { headline: "Test" }).then((res) => {
+	assert.strictEqual(res.dispatched, false, "Webhook should block unexpanded ${VAR} placeholders");
+});
+dispatchWebhook("file:///etc/passwd", { headline: "Test" }).then((res) => {
+	assert.strictEqual(res.dispatched, false, "Webhook should block non-HTTP protocols");
+});
+
+// Verify BBox fast-rejection performance on 5,000 points outside hazard footprint
+const syntheticPoints = [];
+for (let i = 0; i < 5000; i++) {
+	syntheticPoints.push({
+		type: "Feature",
+		properties: { id: `pt_${i}`, name: `Asset ${i}`, category: "residential", valueUsd: 10000, population: 5 },
+		geometry: { type: "Point", coordinates: [10.0 + (i % 50) * 0.01, 10.0 + Math.floor(i / 50) * 0.01] },
+	});
+}
+const t0 = Date.now();
+const perfJoin = spatialExposureJoin(hazardGeoJson, { type: "FeatureCollection", features: syntheticPoints });
+const elapsedMs = Date.now() - t0;
+assert.strictEqual(perfJoin.summary.totalExposedAssets, 0);
+assert(elapsedMs < 200, `Spatial BBox fast-rejection took too long (${elapsedMs}ms for 5,000 assets)`);
+
+console.log("✅ Southern Thailand Hindcast Regression, Security & Performance Verification tests passed!");
