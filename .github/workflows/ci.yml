@@ -1,0 +1,31 @@
+name: DRR Agent Plugin CI
+
+on:
+  push:
+    branches: [ main ]
+    tags: [ 'v*' ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  test:
+    name: Test Suite (Node ${{ matrix.node-version }})
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        node-version: [18.x, 20.x, 22.x]
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node-version }}
+
+      - name: Run All 11 Unit & MCP Test Suites
+        run: bash tests/run-all-tests.sh
+
+      - name: Run Southern Thailand Flood 2026 Benchmark
+        run: bash examples/thailand-flood-scenario/run.sh

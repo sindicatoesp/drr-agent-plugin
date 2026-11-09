@@ -3,6 +3,7 @@
 [![Agent Plugins Standard](https://img.shields.io/badge/Agent_Plugins-v1.0.0-blue.svg)](https://agent-plugins.org/)
 [![License: Apache 2.0](https://img.shields.io/badge/License-Apache_2.0-green.svg)](LICENSE)
 [![Zero Dependencies](https://img.shields.io/badge/dependencies-0_external-brightgreen.svg)]()
+[![CI](https://github.com/sindicatoesp/drr-agent-plugin/actions/workflows/ci.yml/badge.svg)](https://github.com/sindicatoesp/drr-agent-plugin/actions/workflows/ci.yml)
 
 A standalone, multi-platform AI Agent Plugin for **Disaster Risk Reduction (DRR) analytics**, built to the [agent-plugins.org](https://agent-plugins.org/) open specification.
 
