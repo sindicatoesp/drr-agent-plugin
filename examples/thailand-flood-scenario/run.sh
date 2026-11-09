@@ -45,10 +45,18 @@ echo ""
 echo "=== Step 4: Synthesizing Executive Markdown Brief & Visual SitRep HTML ==="
 node "$PLUGIN_ROOT/bin/cli.js" sitrep \
   --file "$DIR/vulnerability-report.json" \
+  --spatial "$DIR/spatial-report.json" \
+  --name "Southern Thailand Catastrophic Flood (Yala-Songkhla-Pattani-Narathiwat)" \
+  --country "Southern Thailand (Yala, Songkhla, Pattani, Narathiwat)" \
+  --severity "Red" \
   --output "$DIR/emergency-brief.md"
 
 node "$PLUGIN_ROOT/bin/cli.js" sitrep \
   --file "$DIR/vulnerability-report.json" \
+  --spatial "$DIR/spatial-report.json" \
+  --name "Southern Thailand Catastrophic Flood (Yala-Songkhla-Pattani-Narathiwat)" \
+  --country "Southern Thailand (Yala, Songkhla, Pattani, Narathiwat)" \
+  --severity "Red" \
   --html \
   --output "$DIR/situation-report.html"
 echo "✓ Executive Brief: $DIR/emergency-brief.md"

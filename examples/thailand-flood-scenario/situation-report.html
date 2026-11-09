@@ -3,7 +3,7 @@
 <head>
 	<meta charset="UTF-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
-	<title>Emergency Situation Report: Disaster Event</title>
+	<title>Emergency Situation Report: Southern Thailand Catastrophic Flood (Yala-Songkhla-Pattani-Narathiwat)</title>
 	<style>
 		@media print {
 			body { background: #ffffff !important; color: #0f172a !important; padding: 0 !important; }
@@ -39,9 +39,9 @@
 			font-weight: 700;
 			letter-spacing: 0.05em;
 			text-transform: uppercase;
-			background: rgba(249, 115, 22, 0.15);
-			color: #fb923c;
-			border: 1px solid #fb923c;
+			background: rgba(239, 68, 68, 0.15);
+			color: #f87171;
+			border: 1px solid #f87171;
 			margin-bottom: 12px;
 		}
 		.grid-3 {
@@ -122,12 +122,12 @@
 		<div class="header">
 			<div style="display: flex; justify-content: space-between; align-items: flex-start;">
 				<div>
-					<span class="header-badge">ORANGE ALERT</span>
-					<h1 style="margin: 0 0 8px 0; font-size: 24px; font-weight: 800; color: #ffffff;">Disaster Event</h1>
+					<span class="header-badge">RED ALERT</span>
+					<h1 style="margin: 0 0 8px 0; font-size: 24px; font-weight: 800; color: #ffffff;">Southern Thailand Catastrophic Flood (Yala-Songkhla-Pattani-Narathiwat)</h1>
 					<div style="color: #94a3b8; font-size: 13px;">
-						<strong>Region:</strong> Affected Region &nbsp;|&nbsp; 
-						<strong>Intensity:</strong> High &nbsp;|&nbsp; 
-						<strong>Issued:</strong> Mon, 09 Nov 2026 05:52:47 GMT
+						<strong>Region:</strong> Southern Thailand (Yala, Songkhla, Pattani, Narathiwat) &nbsp;|&nbsp; 
+						<strong>Intensity:</strong> 2.2 Inundation Depth (meters) &nbsp;|&nbsp; 
+						<strong>Issued:</strong> Mon, 09 Nov 2026 05:58:48 GMT
 					</div>
 				</div>
 				<button class="btn no-print" onclick="window.print()">🖨️ Print / Save PDF</button>
@@ -138,7 +138,7 @@
 		<div class="grid-3">
 			<div class="card" style="border-top: 4px solid #38bdf8;">
 				<h4 class="card-title">Sendai Target B (Affected)</h4>
-				<p class="card-value">0</p>
+				<p class="card-value">18,610</p>
 				<p class="card-subtext">Exposed Population | <strong>16,749</strong> Est. Displaced</p>
 			</div>
 			<div class="card" style="border-top: 4px solid #fb923c;">
@@ -306,7 +306,7 @@
 				<li>
 					<span class="check-icon">3.</span>
 					<div>
-						<strong>OASIS CAP v1.2 Broadcast Verification:</strong> Ensure cell broadcast emergency alerts are disseminated across targeted telecom towers in <strong>Affected Region</strong>.
+						<strong>OASIS CAP v1.2 Broadcast Verification:</strong> Ensure cell broadcast emergency alerts are disseminated across targeted telecom towers in <strong>Southern Thailand (Yala, Songkhla, Pattani, Narathiwat)</strong>.
 					</div>
 				</li>
 				<li>
@@ -331,7 +331,7 @@
 			const tooltip = document.getElementById('sitrepMapTooltip');
 			const tooltipName = document.getElementById('tooltipName');
 			const tooltipDetails = document.getElementById('tooltipDetails');
-			const assets = [{"name":"Mueang Yala Sateng Riverfront Community (ชุมชนสะเตง ริมแม่น้ำปัตตานี เทศบาลนครยะลา)","category":"residential","coords":[85.3,27.695],"mdr":0.6304,"lossUsd":32780800},{"name":"Yala Regional Hospital (โรงพยาบาลศูนย์ยะลา)","category":"healthcare","coords":[85.315,27.707],"mdr":0.6304,"lossUsd":23955200},{"name":"Pattani Hospital (โรงพยาบาลปัตตานี)","category":"healthcare","coords":[85.33,27.719],"mdr":0.6304,"lossUsd":18281600},{"name":"Narathiwat Ratchanakharin Hospital (โรงพยาบาลนราธิวาสราชนครินทร์)","category":"healthcare","coords":[85.345,27.731],"mdr":0.6304,"lossUsd":16390400},{"name":"PEA Yala 1 High-Voltage Electrical Substation (สถานีไฟฟ้าแรงสูงยะลา 1 การไฟฟ้าส่วนภูมิภาค)","category":"power_station","coords":[85.36,27.743000000000002],"mdr":0.6304,"lossUsd":12292800},{"name":"Highway 418 Pattani River Transit Bridge (สะพานข้ามแม่น้ำปัตตานี ทางหลวงหมายเลข 418)","category":"transit","coords":[85.375,27.755000000000003],"mdr":0.6304,"lossUsd":10401600},{"name":"Yala Railway Station & SRT Southern Line Depot (สถานีรถไฟยะลา การรถไฟแห่งประเทศไทย)","category":"transit","coords":[85.38999999999999,27.767],"mdr":0.6304,"lossUsd":6934400},{"name":"Hat Yai Municipal Evacuation & Relief Center (ศูนย์ประสานงานช่วยเหลือผู้ประสบอุทกภัย เทศบาลนครหาดใหญ่)","category":"education","coords":[85.40499999999999,27.779],"mdr":0.6304,"lossUsd":5988800}];
+			const assets = [{"name":"Yala Regional Hospital (โรงพยาบาลศูนย์ยะลา)","category":"healthcare","coords":[101.2818,6.5416],"mdr":0.35,"lossUsd":0},{"name":"Pattani Hospital (โรงพยาบาลปัตตานี)","category":"healthcare","coords":[101.2505,6.868],"mdr":0.35,"lossUsd":0},{"name":"Narathiwat Ratchanakharin Hospital (โรงพยาบาลนราธิวาสราชนครินทร์)","category":"healthcare","coords":[101.8252,6.4258],"mdr":0.35,"lossUsd":0},{"name":"Hat Yai Municipal Evacuation & Relief Center (ศูนย์ประสานงานช่วยเหลือผู้ประสบอุทกภัย เทศบาลนครหาดใหญ่)","category":"education","coords":[100.4746,7.0082],"mdr":0.35,"lossUsd":0},{"name":"PEA Yala 1 High-Voltage Electrical Substation (สถานีไฟฟ้าแรงสูงยะลา 1 การไฟฟ้าส่วนภูมิภาค)","category":"power_station","coords":[101.2752,6.5388],"mdr":0.35,"lossUsd":0},{"name":"Highway 418 Pattani River Transit Bridge (สะพานข้ามแม่น้ำปัตตานี ทางหลวงหมายเลข 418)","category":"transit","coords":[101.2682,6.7154],"mdr":0.35,"lossUsd":0},{"name":"Yala Railway Station & SRT Southern Line Depot (สถานีรถไฟยะลา การรถไฟแห่งประเทศไทย)","category":"transit","coords":[101.2805,6.5401],"mdr":0.35,"lossUsd":0},{"name":"Mueang Yala Sateng Riverfront Community (ชุมชนสะเตง ริมแม่น้ำปัตตานี เทศบาลนครยะลา)","category":"residential","coords":[101.2855,6.5524],"mdr":0.35,"lossUsd":0}];
 
 			function resize() {
 				const rect = canvas.getBoundingClientRect();

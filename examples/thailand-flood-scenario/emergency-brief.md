@@ -1,16 +1,16 @@
-# 🟠 Emergency Situation Brief: Disaster Event
-**Alert Level:** `[ORANGE]` | **Issued:** Mon, 09 Nov 2026 05:52:47 GMT  
-**Target Region:** **Affected Region** | **Certainty:** Observed  
+# 🔴 Emergency Situation Brief: Southern Thailand Catastrophic Flood (Yala-Songkhla-Pattani-Narathiwat)
+**Alert Level:** `[RED]` | **Issued:** Mon, 09 Nov 2026 05:58:48 GMT  
+**Target Region:** **Southern Thailand (Yala, Songkhla, Pattani, Narathiwat)** | **Certainty:** Observed  
 
 ---
 
 ## 1. Executive Summary
-A major **earthquake** event occurred with estimated intensity of **High**. Immediate spatial analysis indicates an exposed population of **0** people across the hazard impact footprint.
+A major **flood** event occurred with estimated intensity of **2.2 Inundation Depth (meters)**. Immediate spatial analysis indicates an exposed population of **18,610** people across the hazard impact footprint.
 
 | Indicator | Impact Value | Operational Severity |
 | :--- | :--- | :--- |
-| **Hazard Intensity** | High | ORANGE |
-| **Exposed Population** | 0 people | MODERATE |
+| **Hazard Intensity** | 2.2 Inundation Depth (meters) | RED |
+| **Exposed Population** | 18,610 people | HIGH EXPOSURE |
 | **Est. Displaced (Sendai B)** | 16,749 persons | Immediate shelter required |
 | **Direct Physical Loss (Sendai C)** | $127,025,600 USD | Loss Ratio: 63.04% |
 | **Damaged Critical Infra (Sendai D)** | 7 facilities | Healthcare / Education / Vital |
@@ -19,10 +19,10 @@ A major **earthquake** event occurred with estimated intensity of **High**. Imme
 
 ## 2. Priority Impact Estimates (Sendai Framework Metrics)
 * **Target B (Affected Population):**
-  * Total Exposed Population: **0**
+  * Total Exposed Population: **18,610**
   * Estimated Displaced Persons: **16,749**
 * **Target C (Direct Economic Loss):**
-  * Exposed Asset Valuation: **$0 USD**
+  * Exposed Asset Valuation: **$201,500,000 USD**
   * Estimated Direct Physical Loss: **$127,025,600 USD**
   * Aggregate Loss Ratio: **63.04%**
 * **Target D (Critical Infrastructure Disruption):**

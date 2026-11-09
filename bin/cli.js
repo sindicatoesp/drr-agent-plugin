@@ -68,6 +68,10 @@ Commands:
 
   sitrep               Synthesize executive Situation Brief or visual HTML SitRep
     --file <path>         Path to assessment JSON or vulnerability report
+    --spatial <path>      Optional path to spatial report JSON (for exposed asset geometries)
+    --name <string>       Optional event headline/title
+    --country <string>    Optional target country or province region
+    --severity <level>    Optional alert severity (Red, Orange, Green)
     --html                Output standalone visual HTML format (printable / web)
     --output <file>       Write to file (e.g. sitrep.html or brief.md)
 
@@ -261,16 +265,86 @@ async function main() {
 					process.exit(1);
 				}
 				const raw = JSON.parse(fs.readFileSync(filePath, "utf8"));
+
+				// 1. Resolve spatial data (file option or embedded)
+				let spatialData = raw.spatialReport || raw.spatial || {};
+				if (options.spatial && fs.existsSync(options.spatial)) {
+					try {
+						spatialData = JSON.parse(fs.readFileSync(options.spatial, "utf8"));
+					} catch (_) {}
+				}
+
+				// 2. Resolve vulnerability & sendai metrics
+				const vulnerability = raw.vulnerabilityReport || raw.vulnerability || raw;
+				const sendai = vulnerability.sendaiFrameworkMetrics || raw.sendaiFrameworkMetrics;
+
+				// 3. Resolve hazard characteristics
+				const detectedHazardType = options.hazard
+					|| raw.hazard?.hazardType
+					|| raw.hazardAssessment?.hazardType
+					|| raw.event?.hazardType
+					|| raw.hazardType
+					|| (vulnerability.hazardAssessment?.hazardType)
+					|| "flood";
+
+				const detectedIntensity = options.intensity
+					|| raw.hazard?.hazardIntensity
+					|| raw.hazardAssessment?.hazardIntensity
+					|| raw.event?.intensity
+					|| raw.intensity
+					|| (vulnerability.hazardAssessment?.hazardIntensity)
+					|| "High";
+
+				const detectedAlertLevel = options.severity
+					|| options["alert-level"]
+					|| raw.hazard?.alertLevel
+					|| raw.event?.alertLevel
+					|| raw.alertLevel
+					|| "Orange";
+
+				const detectedEventName = options.name
+					|| options.event
+					|| raw.name
+					|| raw.hazard?.eventName
+					|| raw.event?.title
+					|| raw.event?.eventName
+					|| (detectedHazardType === "flood"
+						? "Catastrophic Flash & Fluvial Flood Warning"
+						: `${detectedHazardType.charAt(0).toUpperCase() + detectedHazardType.slice(1)} Event`);
+
+				const detectedCountry = options.country
+					|| options.region
+					|| raw.country
+					|| raw.hazard?.country
+					|| raw.event?.country
+					|| raw.event?.place
+					|| "Affected Region";
+
+				const spatialSummary = spatialData.summary || spatialData || {};
+				const totalExposedPop = spatialSummary.totalExposedPopulation
+					?? sendai?.targetB_AffectedPeople?.totalExposedPopulation
+					?? 0;
+				const totalExposedVal = spatialSummary.totalExposedAssetValueUsd
+					?? sendai?.targetC_DirectEconomicLoss?.totalExposedAssetValueUsd
+					?? 0;
+
 				const context = {
-					hazard: raw.hazard || {
-						eventName: raw.event?.title || raw.event?.eventName || raw.name || "Disaster Event",
-						hazardType: raw.event?.hazardType || raw.hazardType || "earthquake",
-						alertLevel: raw.event?.alertLevel || raw.alertLevel || "Orange",
-						country: raw.event?.country || raw.event?.place || raw.country || "Affected Region",
-						hazardIntensity: raw.event?.intensity || raw.intensity || "High",
+					hazard: {
+						eventName: detectedEventName,
+						hazardType: detectedHazardType,
+						alertLevel: detectedAlertLevel,
+						country: detectedCountry,
+						hazardIntensity: detectedIntensity,
 					},
-					spatial: raw.spatialReport || raw.spatial || {},
-					vulnerability: raw.vulnerabilityReport || raw.vulnerability || raw,
+					spatial: {
+						summary: {
+							totalExposedPopulation: totalExposedPop,
+							totalExposedAssetValueUsd: totalExposedVal,
+							totalAssetsExposed: spatialSummary.totalAssetsExposed || spatialSummary.totalExposedAssets || raw.evaluatedAssetsCount || 0,
+						},
+						intersectedAssets: spatialData.exposedAssets || spatialData.intersectedAssets || vulnerability.topDamagedAssets || [],
+					},
+					vulnerability,
 				};
 				const isHtml = options.html || (options.output && options.output.endsWith(".html"));
 				const output = isHtml ? generateVisualSitRepHtml(context) : generateEmergencyBrief(context);
