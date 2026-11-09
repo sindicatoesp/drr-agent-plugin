@@ -1,0 +1,78 @@
+{
+  "type": "Feature",
+  "properties": {
+    "hazardType": "flood",
+    "hazardCode": "MH0007",
+    "hazardName": "Fluvial (Riverine) and Flash Flood",
+    "undrrHipCluster": "1072",
+    "undrrHipType": "1042",
+    "eventName": "Southern Thailand Catastrophic Flood (Yala, Songkhla, Pattani, Narathiwat)",
+    "eventDate": "2026-11-06T00:00:00Z",
+    "country": "Thailand",
+    "countryCode": "THA",
+    "provinces": ["Yala", "Songkhla", "Pattani", "Narathiwat"],
+    "floodDepthM": 2.2,
+    "intensityUnit": "meters",
+    "recurrenceInterval": "1-in-20-year flood event (worst inundation in Yala in two decades)",
+    "telemetryReferences": {
+      "meteorologicalAgency": "Thai Meteorological Department (TMD, กรมอุตุนิยมวิทยา)",
+      "weatherWarningBulletin": "TMD Severe Weather Advisory: Strong Northeast Monsoon over the Gulf of Thailand and Lower South",
+      "hydrologicalAuthority": "Royal Irrigation Department (RID, กรมชลประทาน)",
+      "riverBasins": [
+        "Pattani River Basin (ลุ่มน้ำปัตตานี, RID Basin Code 20)",
+        "Sai Buri River Basin (ลุ่มน้ำสายบุรี, RID Basin Code 21)",
+        "Golok River Basin (ลุ่มน้ำโก-ลก, RID Basin Code 22)",
+        "Songkhla Lake Basin (ลุ่มน้ำทะเลสาบสงขลา, RID Basin Code 23)"
+      ],
+      "hydrologicalStations": [
+        {
+          "stationId": "X.40A",
+          "name": "Pattani River at Ban Sateng, Mueang Yala District",
+          "coordinates": [101.285, 6.551],
+          "bankfullCapacityMsl": 16.50,
+          "peakWaterLevelMsl": 18.72,
+          "inundationDepthM": 2.22
+        },
+        {
+          "stationId": "X.275",
+          "name": "Pattani River at Yarang / Mueang Pattani",
+          "coordinates": [101.258, 6.782],
+          "bankfullCapacityMsl": 3.80,
+          "peakWaterLevelMsl": 5.45,
+          "inundationDepthM": 1.65
+        },
+        {
+          "stationId": "X.119B",
+          "name": "Kolok River at Su-ngai Kolok, Narathiwat",
+          "coordinates": [101.967, 6.033],
+          "bankfullCapacityMsl": 7.50,
+          "peakWaterLevelMsl": 9.38,
+          "inundationDepthM": 1.88
+        }
+      ],
+      "damManagement": "EGAT Bang Lang Dam (เขื่อนบางลาง กฟผ., Bannang Sata, Yala, Capacity 1,420M m³)",
+      "disasterManagementAgency": "Department of Disaster Prevention and Mitigation (DDPM, กรมป้องกันและบรรเทาสาธารณภัย กระทรวงมหาดไทย)",
+      "declaredDisasterZones": [
+        "Yala: Mueang Yala, Raman, Yaha, Bannang Sata",
+        "Pattani: Mueang Pattani, Nong Chik, Yarang, Sai Buri",
+        "Narathiwat: Su-ngai Kolok, Mueang Narathiwat, Ra-ngae, Rueso",
+        "Songkhla: Hat Yai, Thepha, Saba Yoi, Chana"
+      ]
+    }
+  },
+  "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+      [
+        [100.35, 7.15],
+        [101.35, 6.95],
+        [102.05, 6.55],
+        [102.00, 6.10],
+        [101.60, 5.85],
+        [101.10, 6.10],
+        [100.40, 6.70],
+        [100.35, 7.15]
+      ]
+    ]
+  }
+}

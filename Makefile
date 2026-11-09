@@ -178,6 +178,9 @@ sitrep-sample: ## Generate an executive HTML Situation Report from HAZUS scenari
 	@node bin/cli.js sitrep --file examples/earthquake-hazus-scenario/vulnerability-report.json --html --output examples/earthquake-hazus-scenario/situation-report.html
 	@printf "$(GREEN)✓ Visual SitRep generated: examples/earthquake-hazus-scenario/situation-report.html$(RESET)\n"
 
+thailand-flood: ## Run Southern Thailand (Nov 2026) 20-year flood hindcast validation scenario
+	@bash examples/thailand-flood-scenario/run.sh
+
 clean-alerts: ## Remove generated CAP alert XMLs and reports from alerts/
 	@rm -rf alerts/*.xml alerts/*.json alerts/*.md
 	@printf "$(GREEN)Cleaned generated files from alerts/$(RESET)\n"

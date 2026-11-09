@@ -1,0 +1,173 @@
+{
+  "type": "FeatureCollection",
+  "features": [
+    {
+      "type": "Feature",
+      "id": "th_hosp_yala",
+      "properties": {
+        "name": "Yala Regional Hospital (โรงพยาบาลศูนย์ยะลา)",
+        "facilityCodeMOPH": "10672",
+        "administrativeLocation": "152 Thetsaban 1 Road, Tambon Sateng, Amphoe Mueang Yala, Yala 95000",
+        "province": "Yala",
+        "category": "healthcare",
+        "taxonomy": "C1_PRE_CODE",
+        "capacityBeds": 430,
+        "valueUsd": 38000000,
+        "population": 1450,
+        "isCriticalInfrastructure": true,
+        "dataSource": "Ministry of Public Health (MOPH) Thailand Healthcare Facility Registry"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [101.2818, 6.5416]
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "th_hosp_pattani",
+      "properties": {
+        "name": "Pattani Hospital (โรงพยาบาลปัตตานี)",
+        "facilityCodeMOPH": "10673",
+        "administrativeLocation": "2 Nong Chik Road, Tambon Sabarang, Amphoe Mueang Pattani, Pattani 94000",
+        "province": "Pattani",
+        "category": "healthcare",
+        "taxonomy": "C1_MODERATE_CODE",
+        "capacityBeds": 500,
+        "valueUsd": 29000000,
+        "population": 920,
+        "isCriticalInfrastructure": true,
+        "dataSource": "Ministry of Public Health (MOPH) Thailand Healthcare Facility Registry"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [101.2505, 6.8680]
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "th_hosp_narathiwat",
+      "properties": {
+        "name": "Narathiwat Ratchanakharin Hospital (โรงพยาบาลนราธิวาสราชนครินทร์)",
+        "facilityCodeMOPH": "10674",
+        "administrativeLocation": "102 Rangaemakha Road, Tambon Bang Nak, Amphoe Mueang Narathiwat, Narathiwat 96000",
+        "province": "Narathiwat",
+        "category": "healthcare",
+        "taxonomy": "C1_MODERATE_CODE",
+        "capacityBeds": 400,
+        "valueUsd": 26000000,
+        "population": 850,
+        "isCriticalInfrastructure": true,
+        "dataSource": "Ministry of Public Health (MOPH) Thailand Healthcare Facility Registry"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [101.8252, 6.4258]
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "th_shelter_hatyai",
+      "properties": {
+        "name": "Hat Yai Municipal Evacuation & Relief Center (ศูนย์ประสานงานช่วยเหลือผู้ประสบอุทกภัย เทศบาลนครหาดใหญ่)",
+        "facilityCode": "DDPM-SKL-001",
+        "administrativeLocation": "Phetkasem Road, Tambon Hat Yai, Amphoe Hat Yai, Songkhla 90110",
+        "province": "Songkhla",
+        "category": "education",
+        "taxonomy": "C2",
+        "capacityPersons": 3500,
+        "valueUsd": 9500000,
+        "population": 3200,
+        "isCriticalInfrastructure": true,
+        "dataSource": "Songkhla Provincial Civil Defense & DDPM Shelter Register"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [100.4746, 7.0082]
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "th_substation_yala",
+      "properties": {
+        "name": "PEA Yala 1 High-Voltage Electrical Substation (สถานีไฟฟ้าแรงสูงยะลา 1 การไฟฟ้าส่วนภูมิภาค)",
+        "facilityCodePEA": "YLA-SUB-115KV",
+        "administrativeLocation": "Sukyang Road, Tambon Sateng Nok, Amphoe Mueang Yala, Yala 95000",
+        "province": "Yala",
+        "category": "power_station",
+        "taxonomy": "C2",
+        "voltageCapacity": "115kV / 22kV",
+        "valueUsd": 19500000,
+        "population": 40,
+        "isCriticalInfrastructure": true,
+        "dataSource": "Provincial Electricity Authority (PEA) Southern Regional Office"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [101.2752, 6.5388]
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "th_bridge_hwy418",
+      "properties": {
+        "name": "Highway 418 Pattani River Transit Bridge (สะพานข้ามแม่น้ำปัตตานี ทางหลวงหมายเลข 418)",
+        "bridgeCodeDOH": "DOH-418-BR04",
+        "administrativeLocation": "National Highway 418, km 22+400, Pattani-Yala Expressway Corridor",
+        "province": "Pattani",
+        "category": "transit",
+        "taxonomy": "S1",
+        "designSpecification": "Prestressed Concrete Box Girder (4 lanes)",
+        "valueUsd": 16500000,
+        "population": 0,
+        "isCriticalInfrastructure": true,
+        "dataSource": "Department of Highways (DOH) Highway District 18 (Songkhla)"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [101.2682, 6.7154]
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "th_rail_southern",
+      "properties": {
+        "name": "Yala Railway Station & SRT Southern Line Depot (สถานีรถไฟยะลา การรถไฟแห่งประเทศไทย)",
+        "stationCodeSRT": "4232",
+        "administrativeLocation": "Railway Road, Tambon Sateng, Amphoe Mueang Yala, Yala 95000",
+        "province": "Yala",
+        "category": "transit",
+        "taxonomy": "S1",
+        "trackSection": "SRT Southern Main Line, km 1038+740",
+        "valueUsd": 11000000,
+        "population": 350,
+        "isCriticalInfrastructure": true,
+        "dataSource": "State Railway of Thailand (SRT) District 4 (Hat Yai)"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [101.2805, 6.5401]
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "th_res_yala_sateng",
+      "properties": {
+        "name": "Mueang Yala Sateng Riverfront Community (ชุมชนสะเตง ริมแม่น้ำปัตตานี เทศบาลนครยะลา)",
+        "communityId": "YLA-MUN-SATENG-02",
+        "administrativeLocation": "Pattani River Flood Basin, Tambon Sateng, Amphoe Mueang Yala, Yala 95000",
+        "province": "Yala",
+        "category": "residential",
+        "taxonomy": "URM",
+        "housingType": "Urban Masonry & Elevated Timber Riverfront Portfolios",
+        "valueUsd": 52000000,
+        "population": 11800,
+        "isCriticalInfrastructure": false,
+        "dataSource": "Yala City Municipality Department of Public Works"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [101.2855, 6.5524]
+      }
+    }
+  ]
+}

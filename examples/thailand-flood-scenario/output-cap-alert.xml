@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<alert xmlns="urn:oasis:names:tc:emergency:cap:1.2">
+  <identifier>DELTA-CAP-1794203567029</identifier>
+  <sender>alerts@delta.preventionweb.net</sender>
+  <sent>2026-11-09T05:52:47.029Z</sent>
+  <status>Actual</status>
+  <msgType>Alert</msgType>
+  <scope>Public</scope>
+  <info>
+    <category>Geo</category>
+    <event>Catastrophic Flash &amp; Fluvial Flood Warning (Southern Thailand)</event>
+    <urgency>Immediate</urgency>
+    <severity>Extreme</severity>
+    <certainty>Observed</certainty>
+    <headline>EXTREME FLASH &amp; RIVERINE FLOOD WARNING: YALA, SONGKHLA, PATTANI, NARATHIWAT</headline>
+    <description>Disaster alert issued for affected region.</description>
+    <instruction>Follow national civil protection evacuation directives immediately.</instruction>
+      <area>
+        <areaDesc>Southern Thailand: Yala, Songkhla, Pattani, Narathiwat Provinces (Pattani, Saiburi, Kolok River Basins)</areaDesc>
+      </area>
+  </info>
+</alert>

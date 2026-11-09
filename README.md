@@ -45,8 +45,9 @@ For the detailed operational guide, see **[docs/operational-playbook.md](docs/op
 For stakeholder briefings, executive donor reviews, and emergency operational training:
 
 * **[Interactive Slide Presentation (HTML)](docs/presentation/slides.html)**: Standalone, browser-ready presentation deck with dark/light themes, keyboard navigation (`◀` / `▶` / `Space`), speaker notes drawer (`N`), and fullscreen mode (`F`).
-* **[Offline GIS Mapping Presentation (HTML)](docs/presentation/gis-map-presentation.html)**: 100% offline Leaflet-compatible spatial console featuring real-time ray-casting buffer queries, multi-scenario overlays (Nepal EQ, Cyclone Pamela, Bangladesh Flood), dynamic GEM/HAZUS damage pins, and Sendai scorecards.
+* **[Offline GIS Mapping Presentation (HTML)](docs/presentation/gis-map-presentation.html)**: 100% offline Leaflet-compatible spatial console featuring real-time ray-casting buffer queries, multi-scenario overlays (Nepal EQ, Cyclone Pamela, Bangladesh Flood, Southern Thailand Flood), dynamic GEM/HAZUS damage pins, and Sendai scorecards.
 * **[Marp-Compliant Presentation Deck (Markdown)](docs/presentation/drr-agent-plugin-presentation.md)**: 13-slide structured presentation ready to export directly to **PowerPoint (`.pptx`)** or **PDF** via Marp CLI (`npx @marp-team/marp-cli docs/presentation/drr-agent-plugin-presentation.md -o presentation.pptx`) or the VS Code Marp extension.
+* **[Featured Use Case: Southern Thailand Flood (Nov 2026)](docs/use-cases/thailand-flood-2026-simulation.md)**: Post-disaster hindcast validation of the 6–7 November 2026 flood across Yala, Songkhla, Pattani, and Narathiwat (Yala 20-year flood event), with point-in-polygon exposure, HAZUS damage math, CAP v1.2 XML alert, visual HTML SitRep, and DELTA push (`make thailand-flood`).
 * **[Visual Situation Report (HTML SitRep)](examples/earthquake-hazus-scenario/situation-report.html)**: Printable executive disaster situation report with embedded offline vector GIS map generated directly from deterministic assessment data via `drr-tool sitrep --html` or `make sitrep-sample`.
 
 ---
