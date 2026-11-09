@@ -16,7 +16,10 @@
     "drr-mcp": "./bin/mcp-server.js"
   },
   "scripts": {
+    "lint": "node scripts/lint.js",
+    "check": "node scripts/lint.js && bash tests/run-all-tests.sh",
     "test": "bash tests/run-all-tests.sh",
+    "precommit": "npm run check",
     "mcp": "node bin/mcp-server.js"
   },
   "keywords": [

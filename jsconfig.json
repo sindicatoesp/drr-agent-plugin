@@ -1,0 +1,17 @@
+{
+  "compilerOptions": {
+    "target": "ES2022",
+    "module": "commonjs",
+    "moduleResolution": "node",
+    "allowJs": true,
+    "checkJs": false,
+    "noEmit": true,
+    "resolveJsonModule": true
+  },
+  "include": [
+    "bin/**/*",
+    "lib/**/*",
+    "scripts/**/*",
+    "tests/**/*"
+  ]
+}
