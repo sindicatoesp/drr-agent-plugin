@@ -24,6 +24,9 @@ jobs:
         with:
           node-version: ${{ matrix.node-version }}
 
+      - name: Run Static Lint & Syntax Check
+        run: node scripts/lint.js
+
       - name: Run All 11 Unit & MCP Test Suites
         run: bash tests/run-all-tests.sh
 
