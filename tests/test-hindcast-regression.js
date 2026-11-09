@@ -1,6 +1,7 @@
 const assert = require("assert");
 const fs = require("fs");
 const path = require("path");
+const vm = require("vm");
 const { spatialExposureJoin } = require("../lib/spatial");
 const { evaluateVulnerabilityMatrix } = require("../lib/vulnerability");
 const { generateVisualSitRepHtml, generateEmergencyBrief } = require("../lib/cap");
@@ -53,6 +54,16 @@ const sitrepContext = {
 };
 
 const sitrepHtml = generateVisualSitRepHtml(sitrepContext);
+
+// Verify inline JavaScript syntax validity with Node vm engine
+const scriptMatches = sitrepHtml.match(/<script[\s\S]*?>([\s\S]*?)<\/script>/gi);
+assert(scriptMatches && scriptMatches.length > 0, "SitRep must contain at least one <script> tag");
+scriptMatches.forEach((s, idx) => {
+	const code = s.replace(/<script[\s\S]*?>/i, "").replace(/<\/script>/i, "");
+	assert.doesNotThrow(() => {
+		new vm.Script(code);
+	}, `SitRep <script> tag #${idx + 1} contains syntax error`);
+});
 
 // Verify deconfliction, table row IDs, and data attributes exist
 assert(sitrepHtml.includes('class="sitrep-asset-row"'), "SitRep must contain accessible interactive table rows");

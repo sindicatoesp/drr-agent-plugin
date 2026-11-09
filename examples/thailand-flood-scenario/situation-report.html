@@ -365,7 +365,7 @@
 					<div class="header-meta" style="color: #94a3b8; font-size: 13px;">
 						<strong>Region:</strong> Southern Thailand (Yala, Songkhla, Pattani, Narathiwat) &nbsp;|&nbsp; 
 						<strong>Intensity:</strong> 2.2 Inundation Depth (meters) &nbsp;|&nbsp; 
-						<strong>Issued:</strong> Mon, 09 Nov 2026 07:05:05 GMT
+						<strong>Issued:</strong> Mon, 09 Nov 2026 07:09:51 GMT
 					</div>
 				</div>
 				<button class="btn no-print" onclick="window.print()" aria-label="Print or Save Situation Report as PDF">🖨️ Print / Save PDF</button>
@@ -654,14 +654,21 @@
 
 			function cleanLabelName(fullName) {
 				if (!fullName) return "Asset";
-				let clean = fullName.split(/s*(|s*[/)[0].trim();
+				var parenIdx = fullName.indexOf('(');
+				var brackIdx = fullName.indexOf('[');
+				var cutIdx = -1;
+				if (parenIdx !== -1 && brackIdx !== -1) cutIdx = Math.min(parenIdx, brackIdx);
+				else if (parenIdx !== -1) cutIdx = parenIdx;
+				else if (brackIdx !== -1) cutIdx = brackIdx;
+
+				var clean = (cutIdx !== -1 ? fullName.substring(0, cutIdx) : fullName).trim();
 				clean = clean
-					.replace(/^Highways+/i, 'Hwy ')
-					.replace(/High-Voltages+Electricals+Substation/i, 'Substation')
-					.replace(/Municipals+Evacuations+&s+Reliefs+Center/i, 'Evacuation Center')
-					.replace(/Ratchanakharins+Hospital/i, 'Hospital')
-					.replace(/&s+SRTs+Southerns+Lines+Depot/i, '')
-					.replace(/Mueangs+Yalas+/i, '');
+					.replace(/^Highway\s+/i, 'Hwy ')
+					.replace(/High-Voltage\s+Electrical\s+Substation/i, 'Substation')
+					.replace(/Municipal\s+Evacuation\s+&\s+Relief\s+Center/i, 'Evacuation Center')
+					.replace(/Ratchanakharin\s+Hospital/i, 'Hospital')
+					.replace(/&\s+SRT\s+Southern\s+Line\s+Depot/i, '')
+					.replace(/Mueang\s+Yala\s+/i, '');
 				if (clean.length > 25) clean = clean.substring(0, 23) + '…';
 				return clean;
 			}
