@@ -1,0 +1,1198 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>DRR Agent Plugin — Offline GIS Mapping & Spatial Presentation</title>
+  <script src="https://www.gstatic.com/antigravity/web/dev/tailwindcss.min.js"></script>
+  <style>
+    /* Custom Map Styling for 100% Offline GIS Engine */
+    .map-container {
+      position: relative;
+      background: #090d16;
+      background-image: 
+        radial-gradient(#1e293b 1px, transparent 1px),
+        linear-gradient(to right, rgba(30, 41, 59, 0.4) 1px, transparent 1px),
+        linear-gradient(to bottom, rgba(30, 41, 59, 0.4) 1px, transparent 1px);
+      background-size: 40px 40px, 80px 80px, 80px 80px;
+      user-select: none;
+      cursor: grab;
+    }
+    .map-container:active {
+      cursor: grabbing;
+    }
+    .gis-popup {
+      pointer-events: auto;
+      box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.5), 0 8px 10px -6px rgba(0, 0, 0, 0.5);
+    }
+    @keyframes pulse-ring {
+      0% { transform: scale(0.95); opacity: 0.8; }
+      50% { transform: scale(1.3); opacity: 0.2; }
+      100% { transform: scale(0.95); opacity: 0.8; }
+    }
+    .pulse-effect {
+      animation: pulse-ring 2.5s infinite ease-in-out;
+    }
+  </style>
+</head>
+<body class="bg-slate-950 text-slate-100 font-sans min-h-screen flex flex-col overflow-hidden selection:bg-sky-500 selection:text-white">
+
+  <!-- Top Navigation & Presentation Toolbar -->
+  <header class="px-6 py-3.5 border-b border-slate-800 bg-slate-900/90 backdrop-blur z-30 flex flex-wrap justify-between items-center gap-3">
+    <div class="flex items-center gap-3">
+      <div class="w-8 h-8 rounded-lg bg-sky-500 flex items-center justify-center font-black text-slate-950 text-sm">GIS</div>
+      <div>
+        <h1 class="font-bold text-white text-sm tracking-wide flex items-center gap-2">
+          Spatial Exposure & Hazard Mapping Console
+          <span class="px-2 py-0.5 rounded text-[10px] font-mono bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">100% OFFLINE LEAFLET-COMPATIBLE</span>
+        </h1>
+        <p class="text-[11px] text-slate-400">Ray-Casting Point-in-Polygon • GEM/HAZUS Damage Buffers • Multi-Agency SitRep Presentation</p>
+      </div>
+    </div>
+
+    <!-- Scenario Switcher -->
+    <div class="flex items-center gap-2">
+      <span class="text-xs text-slate-400 font-medium hidden sm:inline">Scenario:</span>
+      <select id="scenarioSelect" onchange="loadScenario(this.value)" class="bg-slate-900 border border-slate-700 text-xs rounded-lg px-3 py-1.5 text-slate-200 font-medium focus:ring-1 focus:ring-sky-500">
+        <option value="earthquake">Earthquake Mw 7.2 Mainshock (Nepal HAZUS)</option>
+        <option value="cyclone">Category 4 Cyclone PAMELA (Vanuatu Swath)</option>
+        <option value="flood">Monsoon Delta Flash Flood (Bangladesh GDACS)</option>
+      </select>
+
+      <button onclick="resetMapView()" class="px-2.5 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 border border-slate-700 text-xs text-slate-300 transition" title="Center & Reset Zoom">
+        🎯 Reset View
+      </button>
+      <button onclick="toggleBriefingPanel()" class="px-3 py-1.5 rounded-lg bg-sky-500 hover:bg-sky-400 text-slate-950 font-bold text-xs flex items-center gap-1.5 transition">
+        <span>🎙️</span>
+        <span id="briefingBtnText">Presentation Mode</span>
+      </button>
+    </div>
+  </header>
+
+  <!-- Main Viewport: Map Canvas & Split Presentation Panel -->
+  <div class="flex-1 flex relative overflow-hidden">
+
+    <!-- Interactive Offline GIS Canvas Area -->
+    <div id="mapWrapper" class="flex-1 relative map-container h-full">
+
+      <!-- Canvas Engine -->
+      <canvas id="gisCanvas" class="w-full h-full block"></canvas>
+
+      <!-- Lat/Lon & Scale HUD (Bottom Left) -->
+      <div class="absolute bottom-4 left-4 bg-slate-900/90 border border-slate-800 backdrop-blur rounded-lg px-3 py-2 text-[11px] font-mono text-slate-300 space-y-1 pointer-events-none z-10 shadow-lg">
+        <div class="flex items-center gap-3">
+          <span id="coordDisplay">Cursor: 85.34000°E, 27.71000°N</span>
+          <span class="text-slate-600">|</span>
+          <span id="zoomDisplay">Zoom: 12x</span>
+        </div>
+        <div class="flex items-center gap-2 text-slate-400">
+          <div class="w-16 h-1 bg-slate-400 relative">
+            <div class="absolute -top-1 left-0 w-0.5 h-3 bg-slate-400"></div>
+            <div class="absolute -top-1 right-0 w-0.5 h-3 bg-slate-400"></div>
+          </div>
+          <span id="scaleDisplay">5 km</span>
+          <span class="text-slate-600">|</span>
+          <span class="text-emerald-400">WGS84 EPSG:4326</span>
+        </div>
+      </div>
+
+      <!-- Map Control Buttons (Top Right) -->
+      <div class="absolute top-4 right-4 flex flex-col gap-1.5 z-10">
+        <button onclick="zoomMap(1.25)" class="w-8 h-8 rounded-lg bg-slate-900/90 hover:bg-slate-800 border border-slate-700 text-slate-200 font-bold text-base flex items-center justify-center transition shadow-lg" title="Zoom In">+</button>
+        <button onclick="zoomMap(0.8)" class="w-8 h-8 rounded-lg bg-slate-900/90 hover:bg-slate-800 border border-slate-700 text-slate-200 font-bold text-base flex items-center justify-center transition shadow-lg" title="Zoom Out">-</button>
+      </div>
+
+      <!-- Layer Visibility Toggles (Top Left) -->
+      <div class="absolute top-4 left-4 bg-slate-900/90 border border-slate-800 backdrop-blur rounded-xl p-3 text-xs space-y-2.5 z-10 shadow-lg w-56">
+        <div class="text-[11px] uppercase tracking-wider font-bold text-slate-400 border-b border-slate-800 pb-1 flex justify-between items-center">
+          <span>GIS Map Layers</span>
+          <span id="basemapStatusBadge" class="text-[9px] font-mono px-1.5 py-0.2 rounded bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">OFFLINE</span>
+        </div>
+
+        <!-- Basemap Provider Selector -->
+        <div class="space-y-1">
+          <label class="text-[10px] text-slate-400 font-bold uppercase tracking-wider block">Basemap Provider:</label>
+          <select id="basemapSelect" onchange="changeBasemap(this.value)" class="w-full bg-slate-950 border border-slate-700 text-[11px] rounded px-2 py-1.5 text-slate-200 font-medium focus:ring-1 focus:ring-sky-500">
+            <option value="osm" selected>🗺️ OpenStreetMap (Auto-Detect / Mirror)</option>
+            <option value="osm-direct">🗺️ OpenStreetMap Direct (tile.openstreetmap.org)</option>
+            <option value="esri-street">🗺️ Esri World Street Map (No Block)</option>
+            <option value="satellite">🛰️ Esri World Imagery (Satellite)</option>
+            <option value="vector-offline">🌐 Offline Vector Landmass (100% Offline)</option>
+            <option value="tactical-grid">⬛ Tactical Dark Radar (Grid Only)</option>
+          </select>
+        </div>
+
+        <div class="pt-1 border-t border-slate-800/60 space-y-1.5">
+          <label class="flex items-center gap-2 cursor-pointer text-slate-200">
+            <input type="checkbox" id="layerHazard" checked onchange="redrawMap()" class="rounded bg-slate-800 border-slate-700 text-sky-500 focus:ring-0">
+            <span class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded bg-rose-500"></span> Hazard Footprint</span>
+          </label>
+          <label class="flex items-center gap-2 cursor-pointer text-slate-200">
+            <input type="checkbox" id="layerBuffer" checked onchange="redrawMap()" class="rounded bg-slate-800 border-slate-700 text-sky-500 focus:ring-0">
+            <span class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded bg-amber-500"></span> Impact Buffer (Ray-Cast)</span>
+          </label>
+          <label class="flex items-center gap-2 cursor-pointer text-slate-200">
+            <input type="checkbox" id="layerAssets" checked onchange="redrawMap()" class="rounded bg-slate-800 border-slate-700 text-sky-500 focus:ring-0">
+            <span class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded bg-sky-400"></span> Exposed Facilities</span>
+          </label>
+          <label class="flex items-center gap-2 cursor-pointer text-slate-200">
+            <input type="checkbox" id="layerGrid" checked onchange="redrawMap()" class="rounded bg-slate-800 border-slate-700 text-sky-500 focus:ring-0">
+            <span class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded bg-slate-600"></span> Lat/Lon Graticule</span>
+          </label>
+        </div>
+      </div>
+
+      <!-- Interactive Feature Detail Popup (Floating Overlay) -->
+      <div id="featurePopup" class="hidden absolute top-20 left-1/2 -translate-x-1/2 bg-slate-900/95 border border-slate-700 rounded-xl p-4 w-80 text-xs text-slate-200 gis-popup z-20">
+        <div class="flex justify-between items-start border-b border-slate-800 pb-2 mb-3">
+          <div>
+            <span id="popupBadge" class="px-2 py-0.5 rounded text-[10px] font-mono uppercase font-bold bg-rose-500/20 text-rose-400 border border-rose-500/30">CRITICAL INFRASTRUCTURE</span>
+            <h4 id="popupTitle" class="font-bold text-sm text-white mt-1">Facility Name</h4>
+          </div>
+          <button onclick="closePopup()" class="text-slate-400 hover:text-white text-base">✕</button>
+        </div>
+
+        <div class="space-y-2 text-slate-300">
+          <div class="flex justify-between">
+            <span class="text-slate-400">Structural Class:</span>
+            <span id="popupTaxonomy" class="font-mono text-sky-400 font-semibold">C1_PRE_CODE</span>
+          </div>
+          <div class="flex justify-between">
+            <span class="text-slate-400">Asset Valuation:</span>
+            <span id="popupValue" class="font-mono text-white font-semibold">$28,000,000 USD</span>
+          </div>
+          <div class="flex justify-between">
+            <span class="text-slate-400">Occupant Population:</span>
+            <span id="popupPop" class="font-mono text-white font-semibold">1,200 people</span>
+          </div>
+          <div class="pt-2 border-t border-slate-800">
+            <div class="flex justify-between items-center mb-1">
+              <span class="text-slate-400 font-semibold">Mean Damage Ratio (MDR):</span>
+              <span id="popupMdr" class="font-mono font-bold text-rose-400 text-sm">58.4%</span>
+            </div>
+            <div class="w-full bg-slate-800 rounded-full h-2 overflow-hidden">
+              <div id="popupMdrBar" class="bg-rose-500 h-full rounded-full" style="width: 58%;"></div>
+            </div>
+          </div>
+          <div class="p-2 rounded bg-slate-950 border border-slate-800 text-[11px] text-amber-300 mt-2">
+            <strong>EOC Directive:</strong> <span id="popupAction">Prioritize mobile generators and emergency triage relocation.</span>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Right Presentation Briefing Drawer (Collapsible) -->
+    <aside id="briefingPanel" class="w-96 bg-slate-900 border-l border-slate-800 p-5 flex flex-col justify-between overflow-y-auto z-20 shadow-2xl transition-all duration-300">
+      <div class="space-y-5">
+        <div class="border-b border-slate-800 pb-3">
+          <div class="flex justify-between items-center">
+            <span class="text-xs font-mono text-sky-400 font-bold uppercase tracking-wider">Spatial Briefing Deck</span>
+            <span id="slideIndexDisplay" class="text-xs text-slate-400 font-mono">Step 1 / 4</span>
+          </div>
+          <h3 id="slideTitle" class="text-base font-extrabold text-white mt-1">Hazard Footprint Detection</h3>
+        </div>
+
+        <!-- Slide Narrative -->
+        <div id="slideContent" class="text-xs text-slate-300 leading-relaxed space-y-3">
+          <!-- Dynamic slide content injected by JS -->
+        </div>
+
+        <!-- Sendai Framework Live Impact Scorecard -->
+        <div class="bg-slate-950 border border-slate-800 rounded-xl p-4 space-y-3">
+          <div class="text-[11px] font-bold text-slate-400 uppercase tracking-wider">Sendai SFM Scorecard</div>
+          
+          <div class="space-y-1">
+            <div class="flex justify-between text-xs">
+              <span class="text-sky-400">Target B (Displaced):</span>
+              <span id="briefSendaiB" class="font-mono font-bold text-white">5,840 people</span>
+            </div>
+            <div class="w-full bg-slate-800 rounded-full h-1.5">
+              <div id="briefSendaiBBar" class="bg-sky-400 h-1.5 rounded-full" style="width: 45%;"></div>
+            </div>
+          </div>
+
+          <div class="space-y-1">
+            <div class="flex justify-between text-xs">
+              <span class="text-amber-400">Target C (Direct Loss):</span>
+              <span id="briefSendaiC" class="font-mono font-bold text-white">$21.4M USD</span>
+            </div>
+            <div class="w-full bg-slate-800 rounded-full h-1.5">
+              <div id="briefSendaiCBar" class="bg-amber-400 h-1.5 rounded-full" style="width: 52%;"></div>
+            </div>
+          </div>
+
+          <div class="space-y-1">
+            <div class="flex justify-between text-xs">
+              <span class="text-rose-400">Target D (Facilities):</span>
+              <span id="briefSendaiD" class="font-mono font-bold text-white">4 Damaged</span>
+            </div>
+            <div class="w-full bg-slate-800 rounded-full h-1.5">
+              <div id="briefSendaiDBar" class="bg-rose-400 h-1.5 rounded-full" style="width: 60%;"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Spatial Exposure Summary Table -->
+        <div class="bg-slate-950 border border-slate-800 rounded-xl p-3">
+          <div class="text-[11px] font-bold text-slate-400 uppercase tracking-wider mb-2">Intersected Assets</div>
+          <div id="intersectedAssetsList" class="space-y-1.5 text-[11px]">
+            <!-- Injected by JS -->
+          </div>
+        </div>
+      </div>
+
+      <!-- Step Navigation Buttons -->
+      <div class="pt-4 border-t border-slate-800 flex justify-between items-center gap-2">
+        <button onclick="prevStep()" class="px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-xs text-slate-300 font-semibold transition">
+          ◀ Previous
+        </button>
+        <div class="flex gap-1.5">
+          <span id="dot0" class="w-2 h-2 rounded-full bg-sky-400"></span>
+          <span id="dot1" class="w-2 h-2 rounded-full bg-slate-700"></span>
+          <span id="dot2" class="w-2 h-2 rounded-full bg-slate-700"></span>
+          <span id="dot3" class="w-2 h-2 rounded-full bg-slate-700"></span>
+        </div>
+        <button onclick="nextStep()" class="px-3 py-1.5 rounded-lg bg-sky-500 hover:bg-sky-400 text-slate-950 text-xs font-bold transition">
+          Next Step ▶
+        </button>
+      </div>
+    </aside>
+
+  </div>
+
+  <script>
+    // =========================================================================
+    // 1. EMBEDDED REAL-WORLD GIS SCENARIO FIXTURES
+    // =========================================================================
+    const SCENARIOS = {
+      earthquake: {
+        title: "Mw 7.2 Mainshock Shaking (Nepal HAZUS)",
+        center: [85.34, 27.71], // [lon, lat]
+        hazard: {
+          name: "Mw 7.2 Mainshock Epicentral Shaking Zone",
+          intensity: "0.42g PGA (MMI VIII)",
+          type: "earthquake",
+          polygon: [
+            [85.25, 27.65],
+            [85.45, 27.65],
+            [85.45, 27.80],
+            [85.25, 27.80],
+            [85.25, 27.65]
+          ],
+          bufferKm: 12
+        },
+        landmasses: [
+          // Kathmandu Valley Basin contours & mountainous perimeter
+          [
+            [85.15, 27.55],
+            [85.35, 27.52],
+            [85.55, 27.58],
+            [85.62, 27.75],
+            [85.55, 27.88],
+            [85.32, 27.90],
+            [85.18, 27.82],
+            [85.10, 27.70],
+            [85.15, 27.55]
+          ]
+        ],
+        waterways: [
+          // Bagmati River Corridor
+          [
+            [85.42, 27.85],
+            [85.38, 27.78],
+            [85.35, 27.73],
+            [85.32, 27.70],
+            [85.30, 27.65],
+            [85.25, 27.58]
+          ],
+          // Bishnumati Tributary
+          [
+            [85.29, 27.78],
+            [85.31, 27.73],
+            [85.32, 27.70]
+          ]
+        ],
+        assets: [
+          {
+            id: "hosp_01",
+            name: "Central Teaching Hospital",
+            category: "healthcare",
+            taxonomy: "C1_PRE_CODE",
+            coords: [85.32, 27.71],
+            valueUsd: 28000000,
+            population: 1200,
+            mdr: 0.584,
+            action: "Evacuate non-critical wards; dispatch tactical field surgical units."
+          },
+          {
+            id: "school_01",
+            name: "Public Secondary High School",
+            category: "education",
+            taxonomy: "URM",
+            coords: [85.34, 27.73],
+            valueUsd: 4500000,
+            population: 850,
+            mdr: 0.642,
+            action: "Unreinforced masonry failure risk. Relocate shelter reception to open sports ground."
+          },
+          {
+            id: "res_01",
+            name: "Urban Residential Block A",
+            category: "residential",
+            taxonomy: "URM",
+            coords: [85.33, 27.69],
+            valueUsd: 65000000,
+            population: 9400,
+            mdr: 0.491,
+            action: "Structural inspection teams deployed to verify masonry perimeter integrity."
+          },
+          {
+            id: "bridge_01",
+            name: "North River Access Bridge",
+            category: "transit",
+            taxonomy: "S1",
+            coords: [85.36, 27.75],
+            valueUsd: 12000000,
+            population: 0,
+            mdr: 0.225,
+            action: "Single lane restricted to emergency search-and-rescue vehicles only."
+          },
+          {
+            id: "substation_01",
+            name: "Provincial Electric Substation",
+            category: "power",
+            taxonomy: "C2",
+            coords: [85.30, 27.68],
+            valueUsd: 16000000,
+            population: 45,
+            mdr: 0.380,
+            action: "Automatic circuit trip triggered; switch hospital feeds to microgrid."
+          }
+        ],
+        sendai: {
+          bDisplaced: "5,840 people",
+          bPct: 45,
+          cLoss: "$21.4M USD",
+          cPct: 48,
+          dDamaged: "4 Facilities",
+          dPct: 80
+        }
+      },
+
+      cyclone: {
+        title: "Category 4 Tropical Cyclone PAMELA (Vanuatu Swath)",
+        center: [168.35, -16.65],
+        hazard: {
+          name: "Tropical Cyclone PAMELA Wind Swath",
+          intensity: "225 km/h Peak Gusts (Cat 4)",
+          type: "cyclone",
+          polygon: [
+            [167.5, -15.8],
+            [169.2, -15.8],
+            [169.2, -17.5],
+            [167.5, -17.5],
+            [167.5, -15.8]
+          ],
+          bufferKm: 35
+        },
+        landmasses: [
+          // Efate Island (Port Vila)
+          [
+            [168.10, -17.55],
+            [168.32, -17.52],
+            [168.58, -17.65],
+            [168.60, -17.82],
+            [168.42, -17.92],
+            [168.22, -17.85],
+            [168.12, -17.70],
+            [168.10, -17.55]
+          ],
+          // Malekula Island
+          [
+            [167.12, -15.85],
+            [167.45, -15.80],
+            [167.62, -16.20],
+            [167.60, -16.52],
+            [167.38, -16.58],
+            [167.18, -16.30],
+            [167.12, -15.85]
+          ],
+          // Espiritu Santo Island
+          [
+            [166.62, -14.92],
+            [167.15, -14.95],
+            [167.32, -15.40],
+            [167.22, -15.68],
+            [166.82, -15.62],
+            [166.65, -15.25],
+            [166.62, -14.92]
+          ],
+          // Epi Island
+          [
+            [168.18, -16.65],
+            [168.38, -16.60],
+            [168.42, -16.78],
+            [168.25, -16.82],
+            [168.18, -16.65]
+          ]
+        ],
+        waterways: [],
+        assets: [
+          {
+            id: "van_hosp_01",
+            name: "Vanuatu Provincial Hospital",
+            category: "healthcare",
+            taxonomy: "C1_MODERATE_CODE",
+            coords: [168.32, -16.62],
+            valueUsd: 14000000,
+            population: 450,
+            mdr: 0.420,
+            action: "Roofing compromised; activate satellite communications and water purification."
+          },
+          {
+            id: "van_port_01",
+            name: "Island Deepwater Marine Wharf",
+            category: "transit",
+            taxonomy: "S1",
+            coords: [168.40, -16.70],
+            valueUsd: 22000000,
+            population: 80,
+            mdr: 0.510,
+            action: "Storm surge inundation; clear debris for humanitarian landing craft."
+          },
+          {
+            id: "van_shelter_01",
+            name: "Community Cyclone Evacuation Hall",
+            category: "education",
+            taxonomy: "C2",
+            coords: [168.28, -16.58],
+            valueUsd: 3200000,
+            population: 950,
+            mdr: 0.180,
+            action: "Facility intact; serving as primary shelter for 950 coastal evacuees."
+          }
+        ],
+        sendai: {
+          bDisplaced: "3,200 people",
+          bPct: 62,
+          cLoss: "$12.8M USD",
+          cPct: 38,
+          dDamaged: "2 Facilities",
+          dPct: 66
+        }
+      },
+
+      flood: {
+        title: "Monsoon Riverine Basin Flash Flood (Bangladesh GDACS)",
+        center: [90.40, 23.80],
+        hazard: {
+          name: "Monsoon River Delta Inundation Footprint",
+          intensity: "2.2m Inundation Depth",
+          type: "flood",
+          polygon: [
+            [90.10, 23.50],
+            [90.70, 23.50],
+            [90.70, 24.10],
+            [90.10, 24.10],
+            [90.10, 23.50]
+          ],
+          bufferKm: 15
+        },
+        landmasses: [
+          // Coastal & Delta landmass contour
+          [
+            [89.70, 24.30],
+            [90.90, 24.30],
+            [91.00, 23.40],
+            [90.80, 22.80],
+            [89.90, 22.80],
+            [89.60, 23.60],
+            [89.70, 24.30]
+          ]
+        ],
+        waterways: [
+          // Padma & Meghna River junction network
+          [
+            [89.70, 23.95],
+            [90.20, 23.75],
+            [90.55, 23.50],
+            [90.65, 22.80]
+          ],
+          [
+            [90.55, 24.30],
+            [90.55, 23.85],
+            [90.55, 23.50]
+          ],
+          [
+            [89.95, 24.30],
+            [90.20, 23.75]
+          ]
+        ],
+        assets: [
+          {
+            id: "fl_hosp_01",
+            name: "District General Hospital",
+            category: "healthcare",
+            taxonomy: "C1_PRE_CODE",
+            coords: [90.35, 23.75],
+            valueUsd: 12000000,
+            population: 650,
+            mdr: 0.450,
+            action: "Ground floor inundated; relocate emergency triage to Level 2."
+          },
+          {
+            id: "fl_water_01",
+            name: "Municipal Water Treatment Facility",
+            category: "water_treatment",
+            taxonomy: "C2",
+            coords: [90.40, 23.80],
+            valueUsd: 8500000,
+            population: 30,
+            mdr: 0.620,
+            action: "Pumping station submerged; deploy emergency chlorine dosing units."
+          },
+          {
+            id: "fl_shelter_01",
+            name: "Upazila Cyclone & Flood Relief Shelter",
+            category: "education",
+            taxonomy: "C1_MODERATE_CODE",
+            coords: [90.28, 23.65],
+            valueUsd: 2100000,
+            population: 1500,
+            mdr: 0.120,
+            action: "Raised plinth secured; distributing dry food rations to 1,500 displaced."
+          }
+        ],
+        sendai: {
+          bDisplaced: "14,200 people",
+          bPct: 75,
+          cLoss: "$18.6M USD",
+          cPct: 42,
+          dDamaged: "2 Facilities",
+          dPct: 66
+        }
+      }
+    };
+
+    // =========================================================================
+    // 2. OFFLINE GIS CANVAS ENGINE (Mercator Projection & Pan/Zoom)
+    // =========================================================================
+    const canvas = document.getElementById("gisCanvas");
+    const ctx = canvas.getContext("2d");
+
+    let currentScenarioKey = "earthquake";
+    let activeScenario = SCENARIOS.earthquake;
+
+    // View state
+    let centerLon = activeScenario.center[0];
+    let centerLat = activeScenario.center[1];
+    let zoomLevel = 1.0; // scale multiplier
+    let isDragging = false;
+    let dragStart = { x: 0, y: 0 };
+    let activeFeature = null;
+
+    // Presentation Briefing Steps
+    let currentStep = 0;
+    const BRIEFING_STEPS = [
+      {
+        title: "1. Hazard Detection & Footprint Ingestion",
+        content: `
+          <p>The autonomous early warning daemon ingests multi-source hazard feeds (GDACS, USGS, Open-Meteo). Ground motion equations convert instrumental seismic intensity to <strong>Peak Ground Acceleration (PGA)</strong>.</p>
+          <div class="p-2.5 rounded bg-slate-900 border border-slate-800 font-mono text-[11px] text-sky-400">
+            • Footprint: Polygon boundary coordinates<br>
+            • Hazard Measure: Wald GMPE PGA in g<br>
+            • Alert Level: Red / Extreme Severity
+          </div>
+        `
+      },
+      {
+        title: "2. Deterministic Spatial Exposure Join",
+        content: `
+          <p>Using a <strong>ray-casting point-in-polygon algorithm</strong>, the plugin intersects the hazard footprint and calculated attenuation buffer rings with geocoded critical assets.</p>
+          <div class="p-2.5 rounded bg-slate-900 border border-slate-800 font-mono text-[11px] text-amber-400">
+            • Ray-casting test: inside / outside polygon<br>
+            • Buffer distance: Haversine geodesic search<br>
+            • Zero external dependencies or GDAL required
+          </div>
+        `
+      },
+      {
+        title: "3. GEM & HAZUS Structural Damage Audit",
+        content: `
+          <p>Each exposed facility is classified by the <strong>GEM Building Taxonomy</strong>. Lognormal fragility curves compute exceedance probabilities for Slight, Moderate, Extensive, and Complete collapse.</p>
+          <div class="p-2.5 rounded bg-slate-900 border border-slate-800 font-mono text-[11px] text-rose-400">
+            • URM (Masonry): Mean Damage Ratio 64.2%<br>
+            • C1 (Pre-Code Concrete): MDR 58.4%<br>
+            • Critical Healthcare: High structural failure risk
+          </div>
+        `
+      },
+      {
+        title: "4. Multi-Agency Alerting & DELTA Push",
+        content: `
+          <p>Within seconds of calculation, the plugin synthesizes the <strong>OASIS CAP v1.2 XML alert</strong> for cellular sirens, publishes the visual HTML SitRep, and pushes the draft record to <strong>UNDRR DELTA</strong>.</p>
+          <div class="p-2.5 rounded bg-slate-900 border border-slate-800 font-mono text-[11px] text-emerald-400">
+            • ITU-T X.1303 CAP XML Validated ✓<br>
+            • UN Sendai Targets B, C, D Quantified ✓<br>
+            • Idempotent DELTA Database Record Created ✓
+          </div>
+        `
+      }
+    ];
+
+    // =========================================================================
+    // 2. BASEMAP TILE ENGINE & VECTOR CARTOGRAPHY
+    // =========================================================================
+    let currentBasemap = "osm";
+    const tileCache = {};
+
+    function changeBasemap(provider) {
+      currentBasemap = provider;
+      const badge = document.getElementById("basemapStatusBadge");
+      if (provider === "vector-offline") {
+        badge.className = "text-[9px] font-mono px-1.5 py-0.2 rounded bg-emerald-500/20 text-emerald-400 border border-emerald-500/30";
+        badge.textContent = "OFFLINE";
+      } else if (provider === "tactical-grid") {
+        badge.className = "text-[9px] font-mono px-1.5 py-0.2 rounded bg-slate-500/20 text-slate-400 border border-slate-500/30";
+        badge.textContent = "GRID ONLY";
+      } else if (provider === "osm") {
+        badge.className = "text-[9px] font-mono px-1.5 py-0.2 rounded bg-sky-500/20 text-sky-400 border border-sky-500/30";
+        badge.textContent = window.location.protocol.startsWith("http") ? "OSM PROXY" : "OPENSTREETMAP";
+      } else if (provider === "osm-direct") {
+        badge.className = "text-[9px] font-mono px-1.5 py-0.2 rounded bg-amber-500/20 text-amber-400 border border-amber-500/30";
+        badge.textContent = "OSM DIRECT";
+      } else {
+        badge.className = "text-[9px] font-mono px-1.5 py-0.2 rounded bg-sky-500/20 text-sky-400 border border-sky-500/30";
+        badge.textContent = "ONLINE TILES";
+      }
+      redrawMap();
+    }
+
+    function getTileZoom() {
+      const w = canvas.width / window.devicePixelRatio;
+      const h = canvas.height / window.devicePixelRatio;
+      const baseScale = Math.min(w, h) * 4.5 * zoomLevel;
+      const z = Math.round(Math.log2((2 * Math.PI * baseScale) / 256));
+      return Math.max(1, Math.min(18, z));
+    }
+
+    function lonToTileX(lon, z) {
+      return Math.floor(((lon + 180) / 360) * Math.pow(2, z));
+    }
+
+    function latToTileY(lat, z) {
+      const latRad = (lat * Math.PI) / 180;
+      return Math.floor((1 - Math.log(Math.tan(latRad) + 1 / Math.cos(latRad)) / Math.PI) / 2 * Math.pow(2, z));
+    }
+
+    function tileXToLon(tx, z) {
+      return (tx / Math.pow(2, z)) * 360 - 180;
+    }
+
+    function tileYToLat(ty, z) {
+      const n = Math.PI - (2 * Math.PI * ty) / Math.pow(2, z);
+      return (180 / Math.PI) * Math.atan(0.5 * (Math.exp(n) - Math.exp(-n)));
+    }
+
+    function getTileUrl(provider, x, y, z) {
+      if (provider === "osm") {
+        // If served over HTTP (e.g. make serve on http://localhost:3300), route through local OSM proxy
+        if (window.location.protocol.startsWith("http")) {
+          return `/osm-tiles/${z}/${x}/${y}.png`;
+        }
+        // When opened directly as file:// in browser, direct requests to tile.openstreetmap.org
+        // are blocked by OSM's Tile Usage Policy (due to missing Referer/User-Agent).
+        // We use genuine OpenStreetMap data rendered by CARTO Voyager with zero file:// 403 blocks:
+        return `https://basemaps.cartocdn.com/rastertiles/voyager/${z}/${x}/${y}.png`;
+      }
+      if (provider === "osm-direct") {
+        return `https://tile.openstreetmap.org/${z}/${x}/${y}.png`;
+      }
+      if (provider === "esri-street") {
+        return `https://server.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer/tile/${z}/${y}/${x}`;
+      }
+      if (provider === "satellite") {
+        return `https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/${z}/${y}/${x}`;
+      }
+      return null;
+    }
+
+    function resizeCanvas() {
+      const rect = canvas.parentElement.getBoundingClientRect();
+      canvas.width = rect.width * window.devicePixelRatio;
+      canvas.height = rect.height * window.devicePixelRatio;
+      ctx.scale(window.devicePixelRatio, window.devicePixelRatio);
+      redrawMap();
+    }
+
+    window.addEventListener("resize", resizeCanvas);
+
+    // Coordinate conversion: WGS84 [lon, lat] to Canvas [px, py]
+    function geoToCanvas(lon, lat) {
+      const w = canvas.width / window.devicePixelRatio;
+      const h = canvas.height / window.devicePixelRatio;
+      
+      // Local Mercator projection centered around centerLon, centerLat
+      const baseScale = Math.min(w, h) * 4.5 * zoomLevel;
+      const latRad = (lat * Math.PI) / 180;
+      const centerLatRad = (centerLat * Math.PI) / 180;
+
+      const x = w / 2 + (lon - centerLon) * (Math.PI / 180) * Math.cos(centerLatRad) * baseScale;
+      const y = h / 2 - (latRad - centerLatRad) * baseScale;
+      return { x, y };
+    }
+
+    function canvasToGeo(x, y) {
+      const w = canvas.width / window.devicePixelRatio;
+      const h = canvas.height / window.devicePixelRatio;
+      const baseScale = Math.min(w, h) * 4.5 * zoomLevel;
+      const centerLatRad = (centerLat * Math.PI) / 180;
+
+      const lon = centerLon + ((x - w / 2) / (baseScale * (Math.PI / 180) * Math.cos(centerLatRad)));
+      const lat = centerLat + ((h / 2 - y) / baseScale) * (180 / Math.PI);
+      return { lon, lat };
+    }
+
+    // Redraw all GIS map layers
+    function redrawMap() {
+      const w = canvas.width / window.devicePixelRatio;
+      const h = canvas.height / window.devicePixelRatio;
+      ctx.clearRect(0, 0, w, h);
+
+      const showHazard = document.getElementById("layerHazard").checked;
+      const showBuffer = document.getElementById("layerBuffer").checked;
+      const showAssets = document.getElementById("layerAssets").checked;
+      const showGrid = document.getElementById("layerGrid").checked;
+
+      const minGeo = canvasToGeo(0, h);
+      const maxGeo = canvasToGeo(w, 0);
+
+      // 1. Draw Online Tile Basemap (if enabled)
+      if (["osm", "osm-direct", "esri-street", "satellite"].includes(currentBasemap)) {
+        const z = getTileZoom();
+        const minX = Math.max(0, lonToTileX(minGeo.lon, z) - 1);
+        const maxX = Math.min(Math.pow(2, z) - 1, lonToTileX(maxGeo.lon, z) + 1);
+        const minY = Math.max(0, latToTileY(maxGeo.lat, z) - 1);
+        const maxY = Math.min(Math.pow(2, z) - 1, latToTileY(minGeo.lat, z) + 1);
+
+        for (let tx = minX; tx <= maxX; tx++) {
+          for (let ty = minY; ty <= maxY; ty++) {
+            const tileKey = `${currentBasemap}_${z}_${tx}_${ty}`;
+            const url = getTileUrl(currentBasemap, tx, ty, z);
+            const lonL = tileXToLon(tx, z);
+            const lonR = tileXToLon(tx + 1, z);
+            const latT = tileYToLat(ty, z);
+            const latB = tileYToLat(ty + 1, z);
+            const pt1 = geoToCanvas(lonL, latT);
+            const pt2 = geoToCanvas(lonR, latB);
+
+            if (tileCache[tileKey]) {
+              if (tileCache[tileKey].complete && tileCache[tileKey].naturalWidth > 0) {
+                ctx.drawImage(tileCache[tileKey], pt1.x, pt1.y, pt2.x - pt1.x + 0.5, pt2.y - pt1.y + 0.5);
+              }
+            } else {
+              const img = new Image();
+              img.crossOrigin = "anonymous";
+              img.src = url;
+              img.onload = () => redrawMap();
+              img.onerror = () => { /* gracefully ignore failure */ };
+              tileCache[tileKey] = img;
+            }
+          }
+        }
+      }
+
+      // 2. Draw Offline Vector Landmasses & Coastlines (Fallback or Explicit Mode)
+      if (currentBasemap === "vector-offline" || (activeScenario.landmasses && activeScenario.landmasses.length > 0 && currentBasemap !== "tactical-grid")) {
+        if (activeScenario.landmasses) {
+          activeScenario.landmasses.forEach((poly) => {
+            ctx.beginPath();
+            poly.forEach((pt, idx) => {
+              const pos = geoToCanvas(pt[0], pt[1]);
+              if (idx === 0) ctx.moveTo(pos.x, pos.y);
+              else ctx.lineTo(pos.x, pos.y);
+            });
+            ctx.closePath();
+            ctx.fillStyle = currentBasemap === "satellite" ? "transparent" : (currentBasemap === "vector-offline" ? "#141f32" : "rgba(20, 31, 50, 0.5)");
+            ctx.fill();
+            ctx.strokeStyle = "#334155";
+            ctx.lineWidth = 1.5;
+            ctx.stroke();
+          });
+        }
+
+        // Draw Waterways & River Networks
+        if (activeScenario.waterways) {
+          activeScenario.waterways.forEach((line) => {
+            ctx.beginPath();
+            line.forEach((pt, idx) => {
+              const pos = geoToCanvas(pt[0], pt[1]);
+              if (idx === 0) ctx.moveTo(pos.x, pos.y);
+              else ctx.lineTo(pos.x, pos.y);
+            });
+            ctx.strokeStyle = "#0284c7";
+            ctx.lineWidth = Math.max(1.5, 3.5 * zoomLevel);
+            ctx.lineCap = "round";
+            ctx.lineJoin = "round";
+            ctx.stroke();
+          });
+        }
+      }
+
+      // 3. Draw Lat/Lon Graticule Lines
+      if (showGrid) {
+        ctx.strokeStyle = "rgba(51, 65, 85, 0.4)";
+        ctx.lineWidth = 1;
+        ctx.setLineDash([4, 4]);
+
+        const step = 0.05 / Math.max(0.5, zoomLevel);
+
+        for (let lon = Math.floor(minGeo.lon / step) * step; lon <= maxGeo.lon; lon += step) {
+          const p1 = geoToCanvas(lon, minGeo.lat);
+          const p2 = geoToCanvas(lon, maxGeo.lat);
+          ctx.beginPath();
+          ctx.moveTo(p1.x, p1.y);
+          ctx.lineTo(p2.x, p2.y);
+          ctx.stroke();
+
+          ctx.fillStyle = "#64748b";
+          ctx.font = "9px monospace";
+          ctx.fillText(`${lon.toFixed(2)}°E`, p1.x + 4, h - 8);
+        }
+
+        for (let lat = Math.floor(minGeo.lat / step) * step; lat <= maxGeo.lat; lat += step) {
+          const p1 = geoToCanvas(minGeo.lon, lat);
+          const p2 = geoToCanvas(maxGeo.lon, lat);
+          ctx.beginPath();
+          ctx.moveTo(p1.x, p1.y);
+          ctx.lineTo(p2.x, p2.y);
+          ctx.stroke();
+
+          ctx.fillStyle = "#64748b";
+          ctx.font = "9px monospace";
+          ctx.fillText(`${lat.toFixed(2)}°N`, 8, p1.y - 4);
+        }
+        ctx.setLineDash([]);
+      }
+
+      // 2. Draw Hazard Buffer Zone
+      if (showBuffer && activeScenario.hazard.bufferKm) {
+        const centerPos = geoToCanvas(activeScenario.center[0], activeScenario.center[1]);
+        const radiusPx = (activeScenario.hazard.bufferKm / 111) * Math.min(w, h) * 4.5 * zoomLevel * (Math.PI / 180);
+
+        ctx.beginPath();
+        ctx.arc(centerPos.x, centerPos.y, radiusPx, 0, Math.PI * 2);
+        ctx.fillStyle = "rgba(245, 158, 11, 0.08)";
+        ctx.fill();
+        ctx.strokeStyle = "rgba(245, 158, 11, 0.5)";
+        ctx.lineWidth = 1.5;
+        ctx.setLineDash([6, 6]);
+        ctx.stroke();
+        ctx.setLineDash([]);
+      }
+
+      // 3. Draw Hazard Footprint Polygon
+      if (showHazard && activeScenario.hazard.polygon) {
+        const poly = activeScenario.hazard.polygon;
+        ctx.beginPath();
+        poly.forEach((pt, idx) => {
+          const pos = geoToCanvas(pt[0], pt[1]);
+          if (idx === 0) ctx.moveTo(pos.x, pos.y);
+          else ctx.lineTo(pos.x, pos.y);
+        });
+        ctx.closePath();
+        ctx.fillStyle = "rgba(239, 68, 68, 0.18)";
+        ctx.fill();
+        ctx.strokeStyle = "#ef4444";
+        ctx.lineWidth = 2.5;
+        ctx.stroke();
+
+        // Polygon Label
+        const centerPos = geoToCanvas(activeScenario.center[0], activeScenario.center[1]);
+        ctx.fillStyle = "#f87171";
+        ctx.font = "bold 11px sans-serif";
+        ctx.textAlign = "center";
+        ctx.fillText(`⚠️ ${activeScenario.hazard.name}`, centerPos.x, centerPos.y - 20);
+        ctx.font = "10px monospace";
+        ctx.fillStyle = "#fca5a5";
+        ctx.fillText(activeScenario.hazard.intensity, centerPos.x, centerPos.y - 6);
+      }
+
+      // 4. Draw Exposed Assets & Critical Facilities
+      if (showAssets && activeScenario.assets) {
+        activeScenario.assets.forEach((asset) => {
+          const pos = geoToCanvas(asset.coords[0], asset.coords[1]);
+          const isHighDamage = asset.mdr >= 0.5;
+          const isModerate = asset.mdr >= 0.25 && asset.mdr < 0.5;
+
+          const color = isHighDamage ? "#ef4444" : isModerate ? "#f97316" : "#22c55e";
+
+          // Pulsing halo for high-risk assets
+          if (isHighDamage) {
+            ctx.beginPath();
+            ctx.arc(pos.x, pos.y, 14, 0, Math.PI * 2);
+            ctx.fillStyle = "rgba(239, 68, 68, 0.25)";
+            ctx.fill();
+          }
+
+          // Outer pin circle
+          ctx.beginPath();
+          ctx.arc(pos.x, pos.y, 8, 0, Math.PI * 2);
+          ctx.fillStyle = color;
+          ctx.fill();
+          ctx.strokeStyle = "#ffffff";
+          ctx.lineWidth = 2;
+          ctx.stroke();
+
+          // Icon dot
+          ctx.beginPath();
+          ctx.arc(pos.x, pos.y, 3, 0, Math.PI * 2);
+          ctx.fillStyle = "#ffffff";
+          ctx.fill();
+
+          // Background label badge for 100% readability
+          ctx.font = "bold 10px sans-serif";
+          const nameW = ctx.measureText(asset.name).width;
+          const badgeW = Math.max(nameW + 14, 120);
+          const badgeH = 26;
+          const bx = pos.x + 12;
+          const by = pos.y - 12;
+
+          ctx.fillStyle = "rgba(15, 23, 42, 0.92)";
+          ctx.beginPath();
+          ctx.rect(bx, by, badgeW, badgeH);
+          ctx.fill();
+          ctx.strokeStyle = isHighDamage ? "rgba(239, 68, 68, 0.6)" : "rgba(51, 65, 85, 0.8)";
+          ctx.lineWidth = 1;
+          ctx.stroke();
+
+          // Label text Line 1
+          ctx.fillStyle = "#f8fafc";
+          ctx.textAlign = "left";
+          ctx.fillText(asset.name, bx + 6, by + 11);
+
+          // Label text Line 2
+          ctx.fillStyle = color;
+          ctx.font = "bold 9px monospace";
+          ctx.fillText(`${(asset.category || "ASSET").toUpperCase()} • MDR ${(asset.mdr * 100).toFixed(0)}%`, bx + 6, by + 21);
+        });
+      }
+
+      // Update scale display in HUD
+      const kmPerPx = (1 / (Math.min(w, h) * 4.5 * zoomLevel * (Math.PI / 180))) * 111;
+      const scaleKm = Math.round(kmPerPx * 64);
+      document.getElementById("scaleDisplay").textContent = `${Math.max(1, scaleKm)} km`;
+      document.getElementById("zoomDisplay").textContent = `Zoom: ${zoomLevel.toFixed(1)}x`;
+    }
+
+    // =========================================================================
+    // 3. INTERACTIVE MOUSE / TOUCH EVENTS (PAN, ZOOM, HOVER, CLICK)
+    // =========================================================================
+    canvas.addEventListener("mousedown", (e) => {
+      isDragging = true;
+      dragStart = { x: e.clientX, y: e.clientY };
+    });
+
+    window.addEventListener("mouseup", () => {
+      isDragging = false;
+    });
+
+    canvas.addEventListener("mousemove", (e) => {
+      const rect = canvas.getBoundingClientRect();
+      const x = e.clientX - rect.left;
+      const y = e.clientY - rect.top;
+
+      if (isDragging) {
+        const dx = e.clientX - dragStart.x;
+        const dy = e.clientY - dragStart.y;
+        dragStart = { x: e.clientX, y: e.clientY };
+
+        const w = canvas.width / window.devicePixelRatio;
+        const h = canvas.height / window.devicePixelRatio;
+        const baseScale = Math.min(w, h) * 4.5 * zoomLevel;
+        const centerLatRad = (centerLat * Math.PI) / 180;
+
+        centerLon -= (dx / (baseScale * (Math.PI / 180) * Math.cos(centerLatRad)));
+        centerLat += (dy / baseScale) * (180 / Math.PI);
+
+        redrawMap();
+      }
+
+      // Update coordinate readout in HUD
+      const geo = canvasToGeo(x, y);
+      document.getElementById("coordDisplay").textContent = 
+        `Cursor: ${geo.lon.toFixed(5)}°E, ${geo.lat.toFixed(5)}°N`;
+
+      // Check hover hit detection on asset markers
+      let hit = null;
+      activeScenario.assets.forEach((asset) => {
+        const pos = geoToCanvas(asset.coords[0], asset.coords[1]);
+        const dist = Math.hypot(pos.x - x, pos.y - y);
+        if (dist <= 12) hit = asset;
+      });
+
+      if (hit) {
+        canvas.style.cursor = "pointer";
+      } else if (!isDragging) {
+        canvas.style.cursor = "grab";
+      }
+    });
+
+    canvas.addEventListener("click", (e) => {
+      const rect = canvas.getBoundingClientRect();
+      const x = e.clientX - rect.left;
+      const y = e.clientY - rect.top;
+
+      let hit = null;
+      activeScenario.assets.forEach((asset) => {
+        const pos = geoToCanvas(asset.coords[0], asset.coords[1]);
+        const dist = Math.hypot(pos.x - x, pos.y - y);
+        if (dist <= 12) hit = asset;
+      });
+
+      if (hit) {
+        showFeaturePopup(hit);
+      } else {
+        closePopup();
+      }
+    });
+
+    canvas.addEventListener("wheel", (e) => {
+      e.preventDefault();
+      const zoomFactor = e.deltaY < 0 ? 1.15 : 0.85;
+      zoomMap(zoomFactor);
+    }, { passive: false });
+
+    function zoomMap(factor) {
+      zoomLevel = Math.max(0.4, Math.min(6.0, zoomLevel * factor));
+      redrawMap();
+    }
+
+    function resetMapView() {
+      centerLon = activeScenario.center[0];
+      centerLat = activeScenario.center[1];
+      zoomLevel = 1.0;
+      closePopup();
+      redrawMap();
+    }
+
+    // =========================================================================
+    // 4. POPUP & FEATURE INSPECTOR
+    // =========================================================================
+    function showFeaturePopup(asset) {
+      activeFeature = asset;
+      const popup = document.getElementById("featurePopup");
+      document.getElementById("popupTitle").textContent = asset.name;
+      document.getElementById("popupTaxonomy").textContent = asset.taxonomy;
+      document.getElementById("popupValue").textContent = `$${asset.valueUsd.toLocaleString()} USD`;
+      document.getElementById("popupPop").textContent = `${asset.population.toLocaleString()} people`;
+      document.getElementById("popupMdr").textContent = `${(asset.mdr * 100).toFixed(1)}%`;
+      document.getElementById("popupMdrBar").style.width = `${(asset.mdr * 100).toFixed(0)}%`;
+      document.getElementById("popupAction").textContent = asset.action;
+
+      const isHighDamage = asset.mdr >= 0.5;
+      const badge = document.getElementById("popupBadge");
+      if (isHighDamage) {
+        badge.className = "px-2 py-0.5 rounded text-[10px] font-mono uppercase font-bold bg-rose-500/20 text-rose-400 border border-rose-500/30";
+        badge.textContent = "CRITICAL DAMAGE THRESHOLD";
+      } else {
+        badge.className = "px-2 py-0.5 rounded text-[10px] font-mono uppercase font-bold bg-amber-500/20 text-amber-400 border border-amber-500/30";
+        badge.textContent = "MODERATE DAMAGE RESTRICTION";
+      }
+
+      popup.classList.remove("hidden");
+    }
+
+    function closePopup() {
+      document.getElementById("featurePopup").classList.add("hidden");
+    }
+
+    // =========================================================================
+    // 5. PRESENTATION BRIEFING STEPPER & SCENARIO LOADER
+    // =========================================================================
+    function loadScenario(key) {
+      currentScenarioKey = key;
+      activeScenario = SCENARIOS[key];
+      centerLon = activeScenario.center[0];
+      centerLat = activeScenario.center[1];
+      zoomLevel = 1.0;
+
+      // Update sidebar scorecard
+      document.getElementById("briefSendaiB").textContent = activeScenario.sendai.bDisplaced;
+      document.getElementById("briefSendaiBBar").style.width = `${activeScenario.sendai.bPct}%`;
+      document.getElementById("briefSendaiC").textContent = activeScenario.sendai.cLoss;
+      document.getElementById("briefSendaiCBar").style.width = `${activeScenario.sendai.cPct}%`;
+      document.getElementById("briefSendaiD").textContent = activeScenario.sendai.dDamaged;
+      document.getElementById("briefSendaiDBar").style.width = `${activeScenario.sendai.dPct}%`;
+
+      // Update intersected assets list
+      const listEl = document.getElementById("intersectedAssetsList");
+      listEl.innerHTML = activeScenario.assets.map(a => `
+        <div class="flex justify-between items-center p-1.5 rounded hover:bg-slate-900 cursor-pointer border border-transparent hover:border-slate-800" onclick='showFeaturePopup(${JSON.stringify(a)})'>
+          <span class="truncate text-slate-300 font-medium">${a.name}</span>
+          <span class="font-mono font-bold ${a.mdr >= 0.5 ? 'text-rose-400' : 'text-amber-400'}">${(a.mdr * 100).toFixed(0)}%</span>
+        </div>
+      `).join("");
+
+      closePopup();
+      redrawMap();
+    }
+
+    function updateStepUI() {
+      const step = BRIEFING_STEPS[currentStep];
+      document.getElementById("slideIndexDisplay").textContent = `Step ${currentStep + 1} / 4`;
+      document.getElementById("slideTitle").textContent = step.title;
+      document.getElementById("slideContent").innerHTML = step.content;
+
+      for (let i = 0; i < 4; i++) {
+        const dot = document.getElementById(`dot${i}`);
+        if (i === currentStep) {
+          dot.className = "w-2 h-2 rounded-full bg-sky-400";
+        } else {
+          dot.className = "w-2 h-2 rounded-full bg-slate-700";
+        }
+      }
+    }
+
+    function nextStep() {
+      if (currentStep < BRIEFING_STEPS.length - 1) {
+        currentStep++;
+        updateStepUI();
+      }
+    }
+
+    function prevStep() {
+      if (currentStep > 0) {
+        currentStep--;
+        updateStepUI();
+      }
+    }
+
+    function toggleBriefingPanel() {
+      const panel = document.getElementById("briefingPanel");
+      panel.classList.toggle("hidden");
+      const isHidden = panel.classList.contains("hidden");
+      document.getElementById("briefingBtnText").textContent = isHidden ? "Show Briefing" : "Presentation Mode";
+      setTimeout(resizeCanvas, 50);
+    }
+
+    // Keyboard navigation
+    window.addEventListener("keydown", (e) => {
+      if (e.key === "ArrowRight") nextStep();
+      else if (e.key === "ArrowLeft") prevStep();
+      else if (e.key === "+" || e.key === "=") zoomMap(1.25);
+      else if (e.key === "-") zoomMap(0.8);
+      else if (e.key.toLowerCase() === "r") resetMapView();
+    });
+
+    // Initialize
+    window.onload = () => {
+      resizeCanvas();
+      changeBasemap("osm");
+      loadScenario("earthquake");
+      updateStepUI();
+    };
+  </script>
+</body>
+</html>

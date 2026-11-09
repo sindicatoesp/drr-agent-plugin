@@ -26,7 +26,7 @@ DOCKER_IMAGE ?= undrr/drr-agent-plugin:latest
         config-init config-check config-show alerts-validate \
         test monitor monitor-once mcp usgs forecast \
         scenario-earthquake scenario-flood scenario-cyclone scenarios \
-        clean-alerts \
+        presentation gis-map serve sitrep-sample clean-alerts \
         docker-build docker-up docker-down docker-restart docker-status \
         docker-logs docker-test docker-once docker-shell
 
@@ -157,6 +157,26 @@ scenario-cyclone: ## Run full cyclone wind speed & situation brief pipeline
 	@bash examples/cyclone-emergency-brief/run.sh
 
 scenarios: scenario-earthquake scenario-flood scenario-cyclone ## Run all three real-world scenario pipelines
+
+presentation: ## Show links and instructions for executive presentation decks
+	@printf "$(BOLD)Executive & Technical Slide Decks:$(RESET)\n"
+	@printf "  $(GREEN)Interactive HTML Deck:$(RESET) docs/presentation/slides.html\n"
+	@printf "  $(GREEN)Marp Markdown Deck:   $(RESET) docs/presentation/drr-agent-plugin-presentation.md\n"
+	@printf "\n$(CYAN)Export to PowerPoint (.pptx) via Marp:$(RESET)\n"
+	@printf "  npx @marp-team/marp-cli docs/presentation/drr-agent-plugin-presentation.md -o presentation.pptx\n"
+
+gis-map: ## Show link and launch instructions for the 100% offline GIS mapping presentation
+	@printf "$(BOLD)Offline GIS Mapping & Spatial Presentation Console:$(RESET)\n"
+	@printf "  $(GREEN)Viewer Location:$(RESET) docs/presentation/gis-map-presentation.html\n"
+	@printf "  $(CYAN)Features:$(RESET) 100%% offline Leaflet-compatible vector map, multi-hazard scenarios (EQ, Cyclone, Flood),\n"
+	@printf "            ray-casting buffer queries, interactive tooltips, and Sendai scorecards.\n"
+
+serve: ## Launch local web server & compliant OSM tile proxy on http://localhost:3300
+	@node bin/serve.js
+
+sitrep-sample: ## Generate an executive HTML Situation Report from HAZUS scenario
+	@node bin/cli.js sitrep --file examples/earthquake-hazus-scenario/vulnerability-report.json --html --output examples/earthquake-hazus-scenario/situation-report.html
+	@printf "$(GREEN)✓ Visual SitRep generated: examples/earthquake-hazus-scenario/situation-report.html$(RESET)\n"
 
 clean-alerts: ## Remove generated CAP alert XMLs and reports from alerts/
 	@rm -rf alerts/*.xml alerts/*.json alerts/*.md

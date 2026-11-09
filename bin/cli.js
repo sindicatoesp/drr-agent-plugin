@@ -9,7 +9,7 @@ const { ingestGdacsAlerts } = require("../lib/gdacs");
 const { spatialExposureJoin } = require("../lib/spatial");
 const { evaluateSeismicFragility, evaluateFloodDamage, evaluateWindDamage } = require("../lib/fragility");
 const { evaluateVulnerabilityMatrix } = require("../lib/vulnerability");
-const { generateCapXml, validateCapXml, generateEmergencyBrief } = require("../lib/cap");
+const { generateCapXml, validateCapXml, generateEmergencyBrief, generateVisualSitRepHtml } = require("../lib/cap");
 const { ingestUsgsEarthquakes } = require("../lib/usgs");
 const { fetchWeatherForecast } = require("../lib/openmeteo");
 const { pushDraftDisasterRecord, fetchExposureFromDelta, fetchDeltaDocs, fetchDeltaHazards } = require("../lib/delta");
@@ -65,6 +65,11 @@ Commands:
 
   cap-validate         Validate a CAP XML file
     <file>                Path to CAP XML file to validate
+
+  sitrep               Synthesize executive Situation Brief or visual HTML SitRep
+    --file <path>         Path to assessment JSON or vulnerability report
+    --html                Output standalone visual HTML format (printable / web)
+    --output <file>       Write to file (e.g. sitrep.html or brief.md)
 
   delta-push           Push a validated assessment to DELTA Resilience as a Draft record
     --file <path>         Path to vulnerability report JSON
@@ -246,6 +251,35 @@ async function main() {
 				const res = validateCapXml(xmlContent);
 				console.log(JSON.stringify(res, null, 2));
 				if (!res.isValid) process.exit(1);
+				break;
+			}
+
+			case "sitrep": {
+				const filePath = options.file || options._file;
+				if (!filePath) {
+					console.error("Error: --file <path-to-assessment.json> is required.");
+					process.exit(1);
+				}
+				const raw = JSON.parse(fs.readFileSync(filePath, "utf8"));
+				const context = {
+					hazard: raw.hazard || {
+						eventName: raw.event?.title || raw.event?.eventName || raw.name || "Disaster Event",
+						hazardType: raw.event?.hazardType || raw.hazardType || "earthquake",
+						alertLevel: raw.event?.alertLevel || raw.alertLevel || "Orange",
+						country: raw.event?.country || raw.event?.place || raw.country || "Affected Region",
+						hazardIntensity: raw.event?.intensity || raw.intensity || "High",
+					},
+					spatial: raw.spatialReport || raw.spatial || {},
+					vulnerability: raw.vulnerabilityReport || raw.vulnerability || raw,
+				};
+				const isHtml = options.html || (options.output && options.output.endsWith(".html"));
+				const output = isHtml ? generateVisualSitRepHtml(context) : generateEmergencyBrief(context);
+				if (options.output) {
+					fs.writeFileSync(options.output, output, "utf8");
+					console.log(`Situation report written to ${options.output}`);
+				} else {
+					console.log(output);
+				}
 				break;
 			}
 

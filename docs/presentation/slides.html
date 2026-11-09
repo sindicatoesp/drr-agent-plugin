@@ -1,0 +1,605 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>DRR Agent Plugin — Executive & Technical Presentation</title>
+  <script src="https://www.gstatic.com/antigravity/web/dev/tailwindcss.min.js"></script>
+  <style>
+    @media print {
+      body { background: #ffffff !important; color: #000000 !important; }
+      .slide { page-break-after: always; min-height: 100vh; display: flex !important; }
+      .nav-controls, .speaker-notes-panel { display: none !important; }
+    }
+    .slide-active { display: flex !important; }
+    .slide { display: none; }
+  </style>
+</head>
+<body class="bg-slate-950 text-slate-100 font-sans min-h-screen flex flex-col justify-between selection:bg-sky-500 selection:text-white">
+
+  <!-- Top Progress Bar -->
+  <div class="w-full bg-slate-800 h-1.5 fixed top-0 left-0 z-50">
+    <div id="progressBar" class="bg-gradient-to-r from-sky-400 to-indigo-500 h-full w-0 transition-all duration-300"></div>
+  </div>
+
+  <!-- Header -->
+  <header class="px-8 py-4 border-b border-slate-800 flex justify-between items-center bg-slate-900/60 backdrop-blur z-40">
+    <div class="flex items-center gap-3">
+      <div class="w-7 h-7 rounded-lg bg-sky-500 flex items-center justify-center font-bold text-slate-950 text-sm">DRR</div>
+      <span class="font-semibold text-slate-200 tracking-wide text-sm">Disaster Risk Reduction Agent Plugin</span>
+      <span class="text-xs px-2 py-0.5 rounded-full bg-sky-500/20 text-sky-400 border border-sky-500/30">v1.3.0</span>
+    </div>
+    <div class="flex items-center gap-4 text-xs text-slate-400">
+      <span id="slideCounter" class="font-mono">Slide 1 / 12</span>
+      <div class="flex gap-1.5">
+        <button onclick="prevSlide()" class="p-1.5 px-2.5 rounded bg-slate-800 hover:bg-slate-700 text-slate-300 transition">◀</button>
+        <button onclick="nextSlide()" class="p-1.5 px-2.5 rounded bg-slate-800 hover:bg-slate-700 text-slate-300 transition">▶</button>
+        <button onclick="toggleFullscreen()" class="p-1.5 px-2 rounded bg-slate-800 hover:bg-slate-700 text-slate-300 transition" title="Fullscreen (F)">⛶</button>
+        <button onclick="toggleNotes()" class="p-1.5 px-2 rounded bg-slate-800 hover:bg-slate-700 text-slate-300 transition" title="Toggle Speaker Notes (N)">📝</button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Slide Canvas Container -->
+  <main class="flex-1 flex items-center justify-center p-6 md:p-12 relative overflow-hidden">
+
+    <!-- Slide 1: Title -->
+    <div class="slide slide-active flex-col items-center justify-center text-center max-w-4xl mx-auto space-y-6" data-notes="Welcome everyone. This presentation introduces the DRR Agent Plugin, bridging autonomous AI agents and deterministic disaster risk reduction models.">
+      <div class="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-sky-500/10 border border-sky-500/30 text-sky-400 text-xs font-medium">
+        <span>🌐 UN Sendai Framework</span> • <span>📡 OASIS CAP v1.2</span> • <span>⚡ Zero Dependencies</span>
+      </div>
+      <h1 class="text-4xl md:text-6xl font-extrabold tracking-tight text-transparent bg-clip-text bg-gradient-to-r from-sky-400 via-indigo-300 to-sky-200">
+        Disaster Risk Reduction<br><span class="text-white">AI Agent Plugin</span>
+      </h1>
+      <p class="text-lg md:text-xl text-slate-300 max-w-2xl font-light">
+        Autonomous telemetry ingestion, deterministic physical fragility modeling, and multi-agency emergency alert orchestration for modern AI agents.
+      </p>
+      <div class="flex flex-wrap justify-center gap-3 pt-4">
+        <span class="px-3 py-1 rounded bg-slate-800 border border-slate-700 text-xs text-slate-300">Google Antigravity</span>
+        <span class="px-3 py-1 rounded bg-slate-800 border border-slate-700 text-xs text-slate-300">Cursor IDE</span>
+        <span class="px-3 py-1 rounded bg-slate-800 border border-slate-700 text-xs text-slate-300">Claude Code</span>
+        <span class="px-3 py-1 rounded bg-slate-800 border border-slate-700 text-xs text-slate-300">GitHub Copilot</span>
+        <span class="px-3 py-1 rounded bg-slate-800 border border-slate-700 text-xs text-slate-300">OpenCode CLI</span>
+      </div>
+    </div>
+
+    <!-- Slide 2: Problem Statement -->
+    <div class="slide flex-col max-w-5xl w-full mx-auto space-y-6" data-notes="In disaster management, the first 120 minutes dictate survival, while anticipatory action 72 hours prior dictates economic resilience. Pure conversational LLMs hallucinate calculations; deterministic tools are mandatory.">
+      <div>
+        <span class="text-xs font-semibold text-rose-400 uppercase tracking-widest">The Operational Reality</span>
+        <h2 class="text-3xl font-bold text-white mt-1">The Critical 120-Minute EOC Window</h2>
+      </div>
+      <div class="grid md:grid-cols-2 gap-6">
+        <div class="bg-slate-900/80 border border-rose-500/30 rounded-xl p-6 relative overflow-hidden">
+          <div class="absolute top-0 right-0 w-24 h-24 bg-rose-500/10 rounded-full blur-xl pointer-events-none"></div>
+          <h3 class="text-lg font-bold text-rose-400 flex items-center gap-2">⚠️ The EOC & Humanitarian Dilemma</h3>
+          <ul class="mt-4 space-y-3 text-sm text-slate-300">
+            <li class="flex items-start gap-2">
+              <span class="text-rose-400 font-bold">•</span>
+              <span><strong>Sensory Overload:</strong> Seismic waveforms, satellite swaths, and numerical forecasts flood EOC duty desks without unified impact synthesis.</span>
+            </li>
+            <li class="flex items-start gap-2">
+              <span class="text-rose-400 font-bold">•</span>
+              <span><strong>LLM Hallucinations:</strong> Standard generative AI cannot reliably calculate logarithmic ground motion equations (PGA) or structural damage curves.</span>
+            </li>
+            <li class="flex items-start gap-2">
+              <span class="text-rose-400 font-bold">•</span>
+              <span><strong>Fragmented Delivery:</strong> Cell broadcast sirens (CAP), UN cluster SitReps, and national loss accounts require entirely disparate data schemas.</span>
+            </li>
+          </ul>
+        </div>
+        <div class="bg-slate-900/80 border border-emerald-500/30 rounded-xl p-6 relative overflow-hidden">
+          <div class="absolute top-0 right-0 w-24 h-24 bg-emerald-500/10 rounded-full blur-xl pointer-events-none"></div>
+          <h3 class="text-lg font-bold text-emerald-400 flex items-center gap-2">💡 The DRR Agent Plugin Solution</h3>
+          <ul class="mt-4 space-y-3 text-sm text-slate-300">
+            <li class="flex items-start gap-2">
+              <span class="text-emerald-400 font-bold">•</span>
+              <span><strong>Deterministic Precision:</strong> 100% verified math for Wald GMPE ground acceleration, GEM/HAZUS lognormal CDFs, and point-in-polygon ray casting.</span>
+            </li>
+            <li class="flex items-start gap-2">
+              <span class="text-emerald-400 font-bold">•</span>
+              <span><strong>Standardized Interoperability:</strong> Zero-dependency Model Context Protocol (MCP) server callable by any coding assistant or autonomous agent.</span>
+            </li>
+            <li class="flex items-start gap-2">
+              <span class="text-emerald-400 font-bold">•</span>
+              <span><strong>Unified Dispatch:</strong> Automatically produces OASIS CAP v1.2 XML, Markdown SitReps, and DELTA draft records simultaneously.</span>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <!-- Slide 3: Stakeholders & Lifecycles -->
+    <div class="slide flex-col max-w-5xl w-full mx-auto space-y-6" data-notes="The plugin spans pre-disaster anticipatory action 72 hours before a shock, co-disaster response during the first minutes and hours, and post-disaster Sendai accounting weeks later.">
+      <div>
+        <span class="text-xs font-semibold text-sky-400 uppercase tracking-widest">Operational Playbook</span>
+        <h2 class="text-3xl font-bold text-white mt-1">Lifecycle Operations: "When & By Whom"</h2>
+      </div>
+      <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+        <div class="bg-slate-900 border border-slate-800 rounded-xl p-4 flex flex-col justify-between">
+          <div>
+            <span class="text-xs font-mono text-sky-400">T -72h to -24h</span>
+            <h4 class="font-bold text-white text-sm mt-1">Anticipatory Action</h4>
+            <p class="text-xs text-slate-400 mt-2">Red Cross & WFP FbF leads verify rainfall thresholds to trigger pre-allocated contingency finance.</p>
+          </div>
+          <div class="mt-4 pt-3 border-t border-slate-800 text-[11px] text-sky-300 font-mono">drr_openmeteo_forecast</div>
+        </div>
+        <div class="bg-slate-900 border border-slate-800 rounded-xl p-4 flex flex-col justify-between">
+          <div>
+            <span class="text-xs font-mono text-rose-400">T +5m to +2h</span>
+            <h4 class="font-bold text-white text-sm mt-1">Immediate Seismic Response</h4>
+            <p class="text-xs text-slate-400 mt-2">EOC Watchstanders ingest USGS hypocenters, estimate PGA, and trigger OASIS CAP broadcast sirens.</p>
+          </div>
+          <div class="mt-4 pt-3 border-t border-slate-800 text-[11px] text-rose-300 font-mono">drr_usgs_earthquake_fetch</div>
+        </div>
+        <div class="bg-slate-900 border border-slate-800 rounded-xl p-4 flex flex-col justify-between">
+          <div>
+            <span class="text-xs font-mono text-amber-400">T +6h to +48h</span>
+            <h4 class="font-bold text-white text-sm mt-1">Tactical Search & Rescue</h4>
+            <p class="text-xs text-slate-400 mt-2">UN OCHA & UNDAC intersect GDACS swaths with hospitals to route field surgical units.</p>
+          </div>
+          <div class="mt-4 pt-3 border-t border-slate-800 text-[11px] text-amber-300 font-mono">drr_spatial_exposure_join</div>
+        </div>
+        <div class="bg-slate-900 border border-slate-800 rounded-xl p-4 flex flex-col justify-between">
+          <div>
+            <span class="text-xs font-mono text-indigo-400">T +2w to +3m</span>
+            <h4 class="font-bold text-white text-sm mt-1">Sendai Loss Accounting</h4>
+            <p class="text-xs text-slate-400 mt-2">National focal points reconcile structural losses directly to UN Sendai Targets B, C, and D in DELTA.</p>
+          </div>
+          <div class="mt-4 pt-3 border-t border-slate-800 text-[11px] text-indigo-300 font-mono">drr_vulnerability_matrix_calc</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Slide 4: Architecture -->
+    <div class="slide flex-col max-w-5xl w-full mx-auto space-y-6" data-notes="The architecture separates feeds, deterministic computational engines, dispatch layers, and client agent runtimes. Zero third-party npm packages ensures 100% auditability and air-gapped readiness.">
+      <div>
+        <span class="text-xs font-semibold text-sky-400 uppercase tracking-widest">System Architecture</span>
+        <h2 class="text-3xl font-bold text-white mt-1">Deterministic Engine & Dispatch Pipeline</h2>
+      </div>
+      <div class="space-y-3 font-mono text-xs">
+        <div class="bg-slate-900 border border-sky-500/30 p-3 rounded-lg flex items-center justify-between">
+          <span class="text-sky-400 font-bold">1. TELEMETRY FEEDS</span>
+          <span class="text-slate-300">GDACS GeoJSON API • USGS FDSN-WS • Open-Meteo Multi-Model (ECMWF, GFS, ICON)</span>
+        </div>
+        <div class="text-center text-slate-600">▼</div>
+        <div class="bg-slate-900 border border-indigo-500/30 p-3 rounded-lg flex items-center justify-between">
+          <span class="text-indigo-400 font-bold">2. COMPUTATIONAL CORE</span>
+          <span class="text-slate-300">Wald GMPE (MMI ➔ PGA) • Ray-Casting PIP • GEM & HAZUS Lognormal Fragility Curves</span>
+        </div>
+        <div class="text-center text-slate-600">▼</div>
+        <div class="bg-slate-900 border border-amber-500/30 p-3 rounded-lg flex items-center justify-between">
+          <span class="text-amber-400 font-bold">3. STANDARDS DISPATCH</span>
+          <span class="text-slate-300">OASIS CAP v1.2 XML • UNDRR DELTA Push (HIP Taxonomy) • Webhooks (Slack/Teams)</span>
+        </div>
+        <div class="text-center text-slate-600">▼</div>
+        <div class="bg-slate-900 border border-emerald-500/30 p-3 rounded-lg flex items-center justify-between">
+          <span class="text-emerald-400 font-bold">4. AGENT RUNTIMES</span>
+          <span class="text-slate-300">Model Context Protocol (11 Stdio Tools) • Docker Alpine (~130MB) • Autonomous Daemon</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Slide 5: Physics & Math Modeling -->
+    <div class="slide flex-col max-w-5xl w-full mx-auto space-y-6" data-notes="Ground motion prediction equations convert seismic intensity to PGA in g, while lognormal cumulative distribution functions compute damage state exceedance probabilities.">
+      <div>
+        <span class="text-xs font-semibold text-sky-400 uppercase tracking-widest">Scientific Rigor</span>
+        <h2 class="text-3xl font-bold text-white mt-1">Wald GMPE & GEM Fragility Formulation</h2>
+      </div>
+      <div class="grid md:grid-cols-2 gap-6">
+        <div class="bg-slate-900 border border-slate-800 rounded-xl p-5 space-y-4">
+          <h3 class="text-sky-400 font-bold text-sm">Ground Motion: MMI to PGA ($g$)</h3>
+          <p class="text-xs text-slate-300">Automated conversion of Instrumental Modified Mercalli Intensity to Peak Ground Acceleration via Wald et al. (1999):</p>
+          <div class="bg-slate-950 p-3 rounded border border-slate-800 font-mono text-center text-sky-300 text-sm">
+            PGA = 10^((MMI + 1.66) / 3.66) / 980.665
+          </div>
+          <p class="text-xs text-slate-400">Ensures seismic telemetry immediately maps into engineering acceleration units required for structural vulnerability.</p>
+        </div>
+        <div class="bg-slate-900 border border-slate-800 rounded-xl p-5 space-y-4">
+          <h3 class="text-indigo-400 font-bold text-sm">Damage State Exceedance: Lognormal CDF</h3>
+          <p class="text-xs text-slate-300">Conditional probability of structural damage state exceedance given intensity measure $IM$:</p>
+          <div class="bg-slate-950 p-3 rounded border border-slate-800 font-mono text-center text-indigo-300 text-sm">
+            P(DS &ge; ds_i | IM) = &Phi;( (ln(IM / &theta;_i)) / &beta;_i )
+          </div>
+          <p class="text-xs text-slate-400">Mean Damage Ratio: MDR = &sum; P(DS = ds_i) &times; DF(ds_i), directly yielding monetary loss percentages.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Slide: Offline GIS Mapping -->
+    <div class="slide flex-col max-w-5xl w-full mx-auto space-y-6" data-notes="In disaster zones, internet connectivity is the first infrastructure to fail. Our GIS mapping presentation runs completely offline, rendering spatial polygons, buffer rings, and facility damage without external tile requests.">
+      <div>
+        <span class="text-xs font-semibold text-emerald-400 uppercase tracking-widest">Geospatial Intelligence</span>
+        <h2 class="text-3xl font-bold text-white mt-1">100% Offline Leaflet GIS Mapping & Exposure Joins</h2>
+      </div>
+      <div class="grid md:grid-cols-2 gap-6">
+        <div class="bg-slate-900 border border-slate-800 rounded-xl p-5 space-y-3">
+          <h3 class="text-emerald-400 font-bold text-sm">Air-Gapped EOC Geospatial Pipeline</h3>
+          <ul class="text-xs text-slate-300 space-y-2">
+            <li>• <strong>Zero External Tile Dependencies:</strong> Operates entirely offline without needing OpenStreetMap or Google tile servers.</li>
+            <li>• <strong>Deterministic Ray-Casting:</strong> Intersects hazard footprint polygons with critical infrastructure coordinates in microseconds.</li>
+            <li>• <strong>Dynamic Severity Markers:</strong> Color-codes facilities by damage state (🔴 Collapse &ge;50%, 🟠 Moderate 25-50%, 🟢 Operational &lt;25%).</li>
+            <li>• <strong>Multi-Scenario Database:</strong> Nepal M7.2 Earthquake, Cyclone Pamela Vanuatu, and Bangladesh Monsoon Flood.</li>
+          </ul>
+          <div class="pt-2">
+            <a href="gis-map-presentation.html" target="_blank" class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-sky-500 hover:bg-sky-400 text-slate-950 font-bold text-xs transition">
+              <span>🗺️</span>
+              <span>Launch Fullscreen GIS Console</span>
+            </a>
+          </div>
+        </div>
+        <div class="bg-slate-950 border border-slate-800 rounded-xl p-4 flex flex-col justify-between">
+          <div class="text-xs font-mono text-slate-400 mb-2 flex justify-between">
+            <span>Spatial Exposure Joins (CLI):</span>
+            <span class="text-emerald-400">EPSG:4326</span>
+          </div>
+          <div class="p-3 bg-slate-900 rounded font-mono text-xs text-sky-300 border border-slate-800">
+            drr-tool spatial-join \<br>
+            &nbsp;&nbsp;--hazard input-hazard.json \<br>
+            &nbsp;&nbsp;--exposure input-exposure.json \<br>
+            &nbsp;&nbsp;--buffer 15
+          </div>
+          <div class="mt-3 text-[11px] text-slate-400">
+            Outputs GeoJSON FeatureCollection with computed distance, containment flags, and affected asset valuations.
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Slide 6: Sendai Framework -->
+    <div class="slide flex-col max-w-5xl w-full mx-auto space-y-6" data-notes="Sendai Framework loss accounting is built directly into every assessment. Target B tracks displaced people, Target C tracks direct physical loss, and Target D tracks health and education facilities.">
+      <div>
+        <span class="text-xs font-semibold text-sky-400 uppercase tracking-widest">International Standards</span>
+        <h2 class="text-3xl font-bold text-white mt-1">UN Sendai Framework Loss Accounting</h2>
+      </div>
+      <div class="grid md:grid-cols-3 gap-5">
+        <div class="bg-slate-900/90 border border-sky-500/40 rounded-xl p-5 flex flex-col justify-between">
+          <div>
+            <div class="flex justify-between items-center">
+              <span class="px-2 py-0.5 rounded bg-sky-500/20 text-sky-400 text-xs font-mono font-bold">Target B</span>
+              <span class="text-xs text-slate-400">Population</span>
+            </div>
+            <h3 class="text-base font-bold text-white mt-3">Displaced People</h3>
+            <p class="text-xs text-slate-300 mt-2">Calculates displaced and shelter-dependent individuals from building collapse probabilities.</p>
+          </div>
+          <div class="mt-4 pt-3 border-t border-slate-800 text-xs font-mono text-sky-300">
+            Shelter-dependent = pop &times; (P_ext &times; 0.2 + P_comp &times; 1.0)
+          </div>
+        </div>
+        <div class="bg-slate-900/90 border border-amber-500/40 rounded-xl p-5 flex flex-col justify-between">
+          <div>
+            <div class="flex justify-between items-center">
+              <span class="px-2 py-0.5 rounded bg-amber-500/20 text-amber-400 text-xs font-mono font-bold">Target C</span>
+              <span class="text-xs text-slate-400">Economy</span>
+            </div>
+            <h3 class="text-base font-bold text-white mt-3">Direct Economic Loss</h3>
+            <p class="text-xs text-slate-300 mt-2">Computes physical monetary replacement cost in USD across all exposed building stock.</p>
+          </div>
+          <div class="mt-4 pt-3 border-t border-slate-800 text-xs font-mono text-amber-300">
+            Direct Loss ($) = &sum; (Asset Valuation &times; MDR)
+          </div>
+        </div>
+        <div class="bg-slate-900/90 border border-rose-500/40 rounded-xl p-5 flex flex-col justify-between">
+          <div>
+            <div class="flex justify-between items-center">
+              <span class="px-2 py-0.5 rounded bg-rose-500/20 text-rose-400 text-xs font-mono font-bold">Target D</span>
+              <span class="text-xs text-slate-400">Critical Infra</span>
+            </div>
+            <h3 class="text-base font-bold text-white mt-3">Basic Service Disruption</h3>
+            <p class="text-xs text-slate-300 mt-2">Identifies impacted hospitals, clinics, schools, and bridges exceeding structural damage thresholds.</p>
+          </div>
+          <div class="mt-4 pt-3 border-t border-slate-800 text-xs font-mono text-rose-300">
+            Damaged Facilities (MDR &ge; 0.25)
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Slide 7: OASIS CAP v1.2 -->
+    <div class="slide flex-col max-w-5xl w-full mx-auto space-y-6" data-notes="OASIS CAP v1.2 is the international standard for public emergency warnings, used for cellular cell-broadcasts, television overlays, and sirens. The plugin generates and validates compliant XML.">
+      <div>
+        <span class="text-xs font-semibold text-emerald-400 uppercase tracking-widest">Public Life Safety</span>
+        <h2 class="text-3xl font-bold text-white mt-1">OASIS CAP v1.2 & ITU-T X.1303 Alerting</h2>
+      </div>
+      <div class="grid md:grid-cols-2 gap-6 items-center">
+        <div class="space-y-4">
+          <p class="text-sm text-slate-300 leading-relaxed">
+            The plugin features an integrated generator and strict validator for the <strong>Common Alerting Protocol (CAP v1.2)</strong>, enabling AI agents to issue cell-broadcast-ready XML in seconds:
+          </p>
+          <div class="grid grid-cols-2 gap-3 text-xs">
+            <div class="bg-slate-900 border border-slate-800 p-3 rounded">
+              <span class="text-emerald-400 font-bold block">Status & Scope</span>
+              <span class="text-slate-400">Actual • Exercise • Public</span>
+            </div>
+            <div class="bg-slate-900 border border-slate-800 p-3 rounded">
+              <span class="text-emerald-400 font-bold block">Urgency / Severity</span>
+              <span class="text-slate-400">Immediate • Extreme / Severe</span>
+            </div>
+            <div class="bg-slate-900 border border-slate-800 p-3 rounded">
+              <span class="text-emerald-400 font-bold block">Geotargeting</span>
+              <span class="text-slate-400">lat,lon Polygons & Circles</span>
+            </div>
+            <div class="bg-slate-900 border border-slate-800 p-3 rounded">
+              <span class="text-emerald-400 font-bold block">Multi-Agency Briefs</span>
+              <span class="text-slate-400">Markdown & Executive SitReps</span>
+            </div>
+          </div>
+        </div>
+        <div class="bg-slate-950 border border-slate-800 rounded-xl p-4 font-mono text-xs text-slate-300 overflow-x-auto shadow-inner">
+          <div class="text-slate-500 mb-1">&lt;!-- OASIS CAP v1.2 Sample Output --&gt;</div>
+          <span class="text-sky-400">&lt;alert</span> <span class="text-amber-300">xmlns</span>=<span class="text-emerald-300">"urn:oasis:names:tc:emergency:cap:1.2"</span><span class="text-sky-400">&gt;</span><br>
+          &nbsp;&nbsp;<span class="text-sky-400">&lt;identifier&gt;</span>DELTA-CAP-1731118400<span class="text-sky-400">&lt;/identifier&gt;</span><br>
+          &nbsp;&nbsp;<span class="text-sky-400">&lt;status&gt;</span>Actual<span class="text-sky-400">&lt;/status&gt;</span><br>
+          &nbsp;&nbsp;<span class="text-sky-400">&lt;msgType&gt;</span>Alert<span class="text-sky-400">&lt;/msgType&gt;</span><br>
+          &nbsp;&nbsp;<span class="text-sky-400">&lt;info&gt;</span><br>
+          &nbsp;&nbsp;&nbsp;&nbsp;<span class="text-sky-400">&lt;category&gt;</span>Geo<span class="text-sky-400">&lt;/category&gt;</span><br>
+          &nbsp;&nbsp;&nbsp;&nbsp;<span class="text-sky-400">&lt;event&gt;</span>Major Earthquake Emergency<span class="text-sky-400">&lt;/event&gt;</span><br>
+          &nbsp;&nbsp;&nbsp;&nbsp;<span class="text-sky-400">&lt;urgency&gt;</span>Immediate<span class="text-sky-400">&lt;/urgency&gt;</span><br>
+          &nbsp;&nbsp;&nbsp;&nbsp;<span class="text-sky-400">&lt;severity&gt;</span>Extreme<span class="text-sky-400">&lt;/severity&gt;</span><br>
+          &nbsp;&nbsp;<span class="text-sky-400">&lt;/info&gt;</span><br>
+          <span class="text-sky-400">&lt;/alert&gt;</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Slide 8: Autonomous Daemon -->
+    <div class="slide flex-col max-w-5xl w-full mx-auto space-y-6" data-notes="The autonomous daemon continuously polls feeds in the background, matching live events against declarative rules in alerts-config.json and pushing draft records to DELTA.">
+      <div>
+        <span class="text-xs font-semibold text-indigo-400 uppercase tracking-widest">Autonomous Monitoring</span>
+        <h2 class="text-3xl font-bold text-white mt-1">24/7 Early Warning Daemon & Webhook Engine</h2>
+      </div>
+      <div class="grid md:grid-cols-2 gap-6">
+        <div class="bg-slate-900 border border-slate-800 rounded-xl p-5 space-y-3">
+          <h3 class="text-indigo-400 font-bold text-sm">Declarative Threshold Rules (`alerts-config.json`)</h3>
+          <ul class="text-xs text-slate-300 space-y-2">
+            <li>• <strong>Earthquakes:</strong> Magnitude &ge; 5.5 OR Estimated PGA &ge; 0.15g</li>
+            <li>• <strong>Weather/Floods:</strong> 72h Rain &ge; 200mm OR Daily Peak &ge; 80mm</li>
+            <li>• <strong>Cyclones:</strong> GDACS Alert Level Red or Orange</li>
+            <li>• <strong>Country Boundary Guard:</strong> Filter to national borders (e.g. `Vanuatu`, `Indonesia`) or custom bounding box.</li>
+          </ul>
+          <div class="pt-2">
+            <span class="text-[11px] font-mono text-emerald-400">✓ Webhook Dispatch (Slack/Teams Block Kit)</span><br>
+            <span class="text-[11px] font-mono text-sky-400">✓ DELTA Database Draft Record Insertion</span>
+          </div>
+        </div>
+        <div class="bg-slate-900 border border-slate-800 rounded-xl p-5 space-y-4">
+          <h3 class="text-sky-400 font-bold text-sm">Lightweight Deployment Options</h3>
+          <div class="space-y-2 font-mono text-xs">
+            <div class="p-2.5 rounded bg-slate-950 border border-slate-800">
+              <span class="text-slate-400"># Native Background Process:</span><br>
+              <span class="text-sky-300">make monitor INTERVAL=60</span>
+            </div>
+            <div class="p-2.5 rounded bg-slate-950 border border-slate-800">
+              <span class="text-slate-400"># Production Alpine Docker Daemon:</span><br>
+              <span class="text-emerald-300">make docker-up && make docker-logs</span>
+            </div>
+            <div class="p-2.5 rounded bg-slate-950 border border-slate-800">
+              <span class="text-slate-400"># Fast Single Feed Scan:</span><br>
+              <span class="text-amber-300">drr-tool monitor --once --mock</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Slide 9: UNDRR HIP Taxonomy & DELTA -->
+    <div class="slide flex-col max-w-5xl w-full mx-auto space-y-6" data-notes="The plugin embeds the full UNDRR/ISC Hazard Information Profiles (HIPs) taxonomy offline: 8 hazard types, 49 clusters, and 301 hazards.">
+      <div>
+        <span class="text-xs font-semibold text-amber-400 uppercase tracking-widest">Taxonomy & Governance</span>
+        <h2 class="text-3xl font-bold text-white mt-1">Full UNDRR/ISC HIP Taxonomy Embedded</h2>
+      </div>
+      <div class="grid md:grid-cols-3 gap-4 text-center">
+        <div class="bg-slate-900 border border-slate-800 rounded-xl p-4">
+          <div class="text-3xl font-black text-amber-400 font-mono">8</div>
+          <div class="text-xs text-slate-300 font-semibold mt-1">Hazard Types</div>
+          <div class="text-[11px] text-slate-400 mt-1">Geological, Hydromet, Extraterrestrial, Chemical...</div>
+        </div>
+        <div class="bg-slate-900 border border-slate-800 rounded-xl p-4">
+          <div class="text-3xl font-black text-sky-400 font-mono">49</div>
+          <div class="text-xs text-slate-300 font-semibold mt-1">Hazard Clusters</div>
+          <div class="text-[11px] text-slate-400 mt-1">Seismogenic, Flood, Windstorm, Volcanogenic...</div>
+        </div>
+        <div class="bg-slate-900 border border-slate-800 rounded-xl p-4">
+          <div class="text-3xl font-black text-emerald-400 font-mono">301</div>
+          <div class="text-xs text-slate-300 font-semibold mt-1">Individual Hazards</div>
+          <div class="text-[11px] text-slate-400 mt-1">Standardized codes: GH0001 (Earthquake), MH0001...</div>
+        </div>
+      </div>
+      <div class="bg-slate-900 border border-slate-800 rounded-xl p-4 text-xs text-slate-300">
+        <strong>Offline Resilience:</strong> Even in air-gapped field operations without internet access, agents can resolve official UNDRR/ISC HIP hazard classifications, cluster relationships, and DELTA draft records.
+      </div>
+    </div>
+
+    <!-- Slide 10: Multi-Platform AI Readiness -->
+    <div class="slide flex-col max-w-5xl w-full mx-auto space-y-6" data-notes="Seamlessly runs across Google Antigravity, Cursor, Claude Code, GitHub Copilot, and OpenCode via the open Model Context Protocol.">
+      <div>
+        <span class="text-xs font-semibold text-sky-400 uppercase tracking-widest">Multi-Platform Ecosystem</span>
+        <h2 class="text-3xl font-bold text-white mt-1">Native AI Agent Interoperability</h2>
+      </div>
+      <div class="grid md:grid-cols-2 gap-6">
+        <div class="bg-slate-900 border border-slate-800 rounded-xl p-5 space-y-3">
+          <h3 class="text-sky-400 font-bold text-sm">Supported Agent Platforms</h3>
+          <ul class="text-xs text-slate-300 space-y-2">
+            <li>• <strong>Google Antigravity:</strong> Stdio MCP server, custom skills, and generative UI widgets.</li>
+            <li>• <strong>Cursor IDE:</strong> Instant stdio MCP tools in <code>.cursor/mcp.json</code>.</li>
+            <li>• <strong>Claude Code & Desktop:</strong> Direct tool invocation in Claude configuration.</li>
+            <li>• <strong>GitHub Copilot:</strong> VS Code workspace toolchain.</li>
+            <li>• <strong>OpenCode CLI:</strong> Terminal-based AI agent harness.</li>
+          </ul>
+        </div>
+        <div class="bg-slate-900 border border-slate-800 rounded-xl p-5 space-y-3">
+          <h3 class="text-emerald-400 font-bold text-sm">11 Built-in MCP Tools</h3>
+          <div class="grid grid-cols-2 gap-2 text-[11px] font-mono text-slate-300">
+            <span class="p-1 rounded bg-slate-950">drr_gdacs_fetch</span>
+            <span class="p-1 rounded bg-slate-950">drr_usgs_earthquake_fetch</span>
+            <span class="p-1 rounded bg-slate-950">drr_openmeteo_forecast</span>
+            <span class="p-1 rounded bg-slate-950">drr_spatial_exposure_join</span>
+            <span class="p-1 rounded bg-slate-950">drr_fragility_eval</span>
+            <span class="p-1 rounded bg-slate-950">drr_vulnerability_matrix_calc</span>
+            <span class="p-1 rounded bg-slate-950">drr_cap_alert_generate_validate</span>
+            <span class="p-1 rounded bg-slate-950">drr_delta_push_draft_record</span>
+            <span class="p-1 rounded bg-slate-950">drr_delta_fetch_exposure</span>
+            <span class="p-1 rounded bg-slate-950">drr_delta_docs</span>
+            <span class="p-1 rounded bg-slate-950 col-span-2">drr_monitor_check</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Slide 11: Real-World Scenarios -->
+    <div class="slide flex-col max-w-5xl w-full mx-auto space-y-6" data-notes="The repository includes three complete, runnable scenarios with synthetic footprints, exposure data, and automated scripts.">
+      <div>
+        <span class="text-xs font-semibold text-emerald-400 uppercase tracking-widest">Verification & Testing</span>
+        <h2 class="text-3xl font-bold text-white mt-1">Pre-Packaged Tabletop Disaster Scenarios</h2>
+      </div>
+      <div class="grid md:grid-cols-3 gap-4">
+        <div class="bg-slate-900 border border-slate-800 rounded-xl p-4 flex flex-col justify-between">
+          <div>
+            <div class="text-xs font-mono text-rose-400 font-bold">Scenario 1</div>
+            <h4 class="font-bold text-white text-sm mt-1">M7.2 Earthquake HAZUS</h4>
+            <p class="text-xs text-slate-400 mt-2">PGA 0.38g shaking against URM and concrete building stock with 18,400 exposed residents.</p>
+          </div>
+          <div class="mt-4 pt-3 border-t border-slate-800 font-mono text-[11px] text-rose-300">
+            make scenario-earthquake
+          </div>
+        </div>
+        <div class="bg-slate-900 border border-slate-800 rounded-xl p-4 flex flex-col justify-between">
+          <div>
+            <div class="text-xs font-mono text-sky-400 font-bold">Scenario 2</div>
+            <h4 class="font-bold text-white text-sm mt-1">Atmospheric River Flood</h4>
+            <p class="text-xs text-slate-400 mt-2">240mm 72h rainfall forecast trigger with shelter standby notices and 1.8m inundation.</p>
+          </div>
+          <div class="mt-4 pt-3 border-t border-slate-800 font-mono text-[11px] text-sky-300">
+            make scenario-flood
+          </div>
+        </div>
+        <div class="bg-slate-900 border border-slate-800 rounded-xl p-4 flex flex-col justify-between">
+          <div>
+            <div class="text-xs font-mono text-amber-400 font-bold">Scenario 3</div>
+            <h4 class="font-bold text-white text-sm mt-1">Category 4 Cyclone</h4>
+            <p class="text-xs text-slate-400 mt-2">210 km/h wind swath intersecting 4 coastal hospitals with immediate tactical deployment brief.</p>
+          </div>
+          <div class="mt-4 pt-3 border-t border-slate-800 font-mono text-[11px] text-amber-300">
+            make scenario-cyclone
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Slide 12: Summary & Next Steps -->
+    <div class="slide flex-col items-center justify-center text-center max-w-4xl mx-auto space-y-6" data-notes="Thank you. We invite partnerships, trial deployments in national EOCs, and donor collaboration.">
+      <div class="w-16 h-16 rounded-2xl bg-sky-500/20 border border-sky-500/40 flex items-center justify-center text-2xl font-bold text-sky-400 mx-auto">
+        ✓
+      </div>
+      <h2 class="text-3xl md:text-5xl font-extrabold text-white">
+        Elevating Disaster Operations with AI
+      </h2>
+      <p class="text-slate-300 text-sm md:text-base max-w-xl mx-auto">
+        Deterministic physical modeling, international standard alerting, and autonomous monitoring—empowering humanitarian responders worldwide.
+      </p>
+      <div class="flex flex-wrap justify-center gap-4 pt-2 text-xs font-mono">
+        <span class="px-4 py-2 rounded-lg bg-slate-900 border border-slate-800 text-slate-300">make test (10/10 Passing)</span>
+        <span class="px-4 py-2 rounded-lg bg-slate-900 border border-slate-800 text-sky-400">docs/presentation/drr-agent-plugin-presentation.md</span>
+        <span class="px-4 py-2 rounded-lg bg-slate-900 border border-slate-800 text-emerald-400">Apache 2.0 Open Source</span>
+      </div>
+    </div>
+
+  </main>
+
+  <!-- Speaker Notes Drawer -->
+  <div id="speakerNotesDrawer" class="hidden speaker-notes-panel bg-slate-900 border-t border-slate-800 p-4 px-8 text-xs text-slate-300 flex items-start gap-4 z-40">
+    <div class="font-bold text-sky-400 whitespace-nowrap">🎙️ SPEAKER NOTES:</div>
+    <div id="speakerNotesText" class="flex-1 leading-relaxed text-slate-300"></div>
+  </div>
+
+  <!-- Footer Navigation Help -->
+  <footer class="px-8 py-3 border-t border-slate-900 flex justify-between items-center text-xs text-slate-500 bg-slate-950/80 backdrop-blur z-40">
+    <div>Disaster Risk Reduction (DRR) Agent Plugin • Open Standard Implementation</div>
+    <div class="flex gap-4">
+      <span>Keys: <kbd class="px-1.5 py-0.5 rounded bg-slate-800 text-slate-300">◀</kbd> <kbd class="px-1.5 py-0.5 rounded bg-slate-800 text-slate-300">▶</kbd> / <kbd class="px-1.5 py-0.5 rounded bg-slate-800 text-slate-300">Space</kbd></span>
+      <span>Notes: <kbd class="px-1.5 py-0.5 rounded bg-slate-800 text-slate-300">N</kbd></span>
+      <span>Fullscreen: <kbd class="px-1.5 py-0.5 rounded bg-slate-800 text-slate-300">F</kbd></span>
+    </div>
+  </footer>
+
+  <script>
+    const slides = Array.from(document.querySelectorAll('.slide'));
+    let currentSlide = 0;
+
+    function showSlide(index) {
+      if (index < 0) index = 0;
+      if (index >= slides.length) index = slides.length - 1;
+      currentSlide = index;
+
+      slides.forEach((s, idx) => {
+        if (idx === currentSlide) {
+          s.classList.add('slide-active');
+        } else {
+          s.classList.remove('slide-active');
+        }
+      });
+
+      // Update counter and progress bar
+      document.getElementById('slideCounter').textContent = `Slide ${currentSlide + 1} / ${slides.length}`;
+      const progress = ((currentSlide + 1) / slides.length) * 100;
+      document.getElementById('progressBar').style.width = `${progress}%`;
+
+      // Update notes
+      const notes = slides[currentSlide].getAttribute('data-notes') || 'No speaker notes for this slide.';
+      document.getElementById('speakerNotesText').textContent = notes;
+    }
+
+    function nextSlide() {
+      if (currentSlide < slides.length - 1) {
+        showSlide(currentSlide + 1);
+      }
+    }
+
+    function prevSlide() {
+      if (currentSlide > 0) {
+        showSlide(currentSlide - 1);
+      }
+    }
+
+    function toggleNotes() {
+      const drawer = document.getElementById('speakerNotesDrawer');
+      drawer.classList.toggle('hidden');
+    }
+
+    function toggleFullscreen() {
+      if (!document.fullscreenElement) {
+        document.documentElement.requestFullscreen().catch(err => console.log(err));
+      } else {
+        if (document.exitFullscreen) {
+          document.exitFullscreen();
+        }
+      }
+    }
+
+    window.addEventListener('keydown', (e) => {
+      if (e.key === 'ArrowRight' || e.key === ' ' || e.key === 'PageDown') {
+        e.preventDefault();
+        nextSlide();
+      } else if (e.key === 'ArrowLeft' || e.key === 'PageUp' || e.key === 'Backspace') {
+        e.preventDefault();
+        prevSlide();
+      } else if (e.key === 'Home') {
+        e.preventDefault();
+        showSlide(0);
+      } else if (e.key === 'End') {
+        e.preventDefault();
+        showSlide(slides.length - 1);
+      } else if (e.key.toLowerCase() === 'n') {
+        e.preventDefault();
+        toggleNotes();
+      } else if (e.key.toLowerCase() === 'f') {
+        e.preventDefault();
+        toggleFullscreen();
+      }
+    });
+
+    // Initialize
+    showSlide(0);
+  </script>
+</body>
+</html>

@@ -1,5 +1,5 @@
 # Emergency Situation Brief: Tropical Cyclone PAMELA
-**Alert Level:** Red Alert | **Issued:** Sun, 08 Nov 2026 18:25:25 GMT  
+**Alert Level:** Red Alert | **Issued:** Sun, 08 Nov 2026 20:49:05 GMT  
 **Target Region:** Vanuatu / Tafea Province | **Certainty:** Observed  
 
 ---

@@ -18,13 +18,39 @@ This playbook outlines real-world operational scenarios, emergency management ti
 
 ## 2. Real-World Operational Scenarios ("When")
 
-```text
-       PRE-DISASTER                                 CO-DISASTER                                  POST-DISASTER
-┌───────────────────────────┐                ┌───────────────────────────┐                ┌───────────────────────────┐
-│ Anticipatory Action       │                │ Rapid Response & Warnings │                │ Sendai Accounting         │
-│ (T minus 72h to 24h)      │ ─────────────► │ (T plus 5m to 48h)        │ ─────────────► │ (T plus 2w to 3m)         │
-│ Open-Meteo flood triggers │                │ USGS / GDACS / CAP alerts │                │ Targets B, C, D reporting │
-└───────────────────────────┘                └───────────────────────────┘                └───────────────────────────┘
+```mermaid
+flowchart LR
+    subgraph Pre["PRE-DISASTER (T -72h to -24h)"]
+        direction TB
+        A1["Atmospheric River / Monsoon"] --> A2["Open-Meteo Multi-Model Trigger"]
+        A2 --> A3["Forecast-Based Financing Released"]
+        A3 --> A4["Pre-Disaster Evacuation Directives"]
+    end
+
+    subgraph Co1["CO-DISASTER: INSTANT (T +5m to +2h)"]
+        direction TB
+        B1["M7+ Earthquake Strikes"] --> B2["USGS Telemetry + Wald GMPE"]
+        B2 --> B3["PGA Ground Motion Estimation"]
+        B3 --> B4["OASIS CAP v1.2 Cell Broadcast Siren"]
+    end
+
+    subgraph Co2["CO-DISASTER: TACTICAL (T +6h to +48h)"]
+        direction TB
+        C1["GDACS Cyclone Wind Swath"] --> C2["Spatial Exposure Join"]
+        C2 --> C3["Critical Facilities Damage Audit"]
+        C3 --> C4["24h UN OCHA SitRep Brief"]
+    end
+
+    subgraph Post["POST-DISASTER (T +2w to +3m)"]
+        direction TB
+        D1["Fragility Loss Model"] --> D2["Reconcile Structural Damage"]
+        D2 --> D3["DELTA Resilience DB Commit"]
+        D3 --> D4["Official UN Sendai B, C, D Indicators"]
+    end
+
+    Pre ==> Co1
+    Co1 ==> Co2
+    Co2 ==> Post
 ```
 
 ### Scenario 1: Anticipatory Action Before a Severe Flood (T minus 72h to 24h)

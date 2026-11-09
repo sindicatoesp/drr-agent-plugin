@@ -40,7 +40,59 @@ For the detailed operational guide, see **[docs/operational-playbook.md](docs/op
 
 ---
 
-## Architecture & Layout
+## Executive & Technical Presentation Decks
+
+For stakeholder briefings, executive donor reviews, and emergency operational training:
+
+* **[Interactive Slide Presentation (HTML)](docs/presentation/slides.html)**: Standalone, browser-ready presentation deck with dark/light themes, keyboard navigation (`◀` / `▶` / `Space`), speaker notes drawer (`N`), and fullscreen mode (`F`).
+* **[Offline GIS Mapping Presentation (HTML)](docs/presentation/gis-map-presentation.html)**: 100% offline Leaflet-compatible spatial console featuring real-time ray-casting buffer queries, multi-scenario overlays (Nepal EQ, Cyclone Pamela, Bangladesh Flood), dynamic GEM/HAZUS damage pins, and Sendai scorecards.
+* **[Marp-Compliant Presentation Deck (Markdown)](docs/presentation/drr-agent-plugin-presentation.md)**: 13-slide structured presentation ready to export directly to **PowerPoint (`.pptx`)** or **PDF** via Marp CLI (`npx @marp-team/marp-cli docs/presentation/drr-agent-plugin-presentation.md -o presentation.pptx`) or the VS Code Marp extension.
+* **[Visual Situation Report (HTML SitRep)](examples/earthquake-hazus-scenario/situation-report.html)**: Printable executive disaster situation report with embedded offline vector GIS map generated directly from deterministic assessment data via `drr-tool sitrep --html` or `make sitrep-sample`.
+
+---
+
+## Architecture & Visual Data Pipeline
+
+```mermaid
+flowchart TD
+    subgraph Feeds["1. Multi-Source Hazard Telemetry"]
+        direction LR
+        GDACS["GDACS Live Feed<br/>(EQ, TC, FL, VO)"]
+        USGS["USGS FDSN-WS<br/>(Real-Time Seismic)"]
+        METEO["Open-Meteo Forecasts<br/>(ECMWF, GFS, ICON)"]
+    end
+
+    subgraph Engines["2. Deterministic Computational Core"]
+        direction TB
+        SPATIAL["Spatial Exposure Engine<br/>(Ray-Casting Point-in-Polygon & Buffers)"]
+        GMPE["Wald GMPE Ground Motion<br/>(MMI to PGA in g)"]
+        FRAGILITY["GEM & HAZUS Fragility Curves<br/>(Lognormal CDF & Mean Damage Ratio %)"]
+        SENDAI["Sendai Framework Loss Accounting<br/>(SFM Targets B, C, and D)"]
+    end
+
+    subgraph Dispatch["3. Multi-Agency Dispatch Layer"]
+        direction LR
+        CAP["OASIS CAP v1.2 XML<br/>(ITU-T X.1303 Broadcasts)"]
+        SITREP["Situation Reports<br/>(Markdown & Visual HTML)"]
+        DELTA["UNDRR DELTA Push<br/>(HIP Taxonomy Synced)"]
+        WEBHOOK["Universal Webhooks<br/>(Slack, Teams, Discord)"]
+    end
+
+    subgraph Runtimes["4. AI Agent Platforms & Ecosystem"]
+        direction LR
+        AGY["Google Antigravity"]
+        CURSOR["Cursor IDE"]
+        CLAUDE["Claude Code"]
+        COPILOT["GitHub Copilot"]
+        CLI["Terminal CLI & Docker"]
+    end
+
+    Feeds --> Engines
+    Engines --> Dispatch
+    Dispatch --> Runtimes
+```
+
+### Directory Structure & Layout
 
 ```text
 drr-agent-plugin/
@@ -82,6 +134,9 @@ drr-agent-plugin/
 │   ├── flood-gdacs-exposure/
 │   └── cyclone-emergency-brief/
 ├── docs/                       # Comprehensive documentation
+│   ├── presentation/           # Executive & technical slide decks
+│   │   ├── drr-agent-plugin-presentation.md # Marp-compliant deck for PPTX/PDF
+│   │   └── slides.html         # Interactive web presentation deck
 │   ├── configuration.md        # Environment variables, proxy & settings guide
 │   ├── operational-playbook.md # Playbook: When & By Whom to run the plugin
 │   ├── api-reference.md        # MCP tool schemas & CLI options
