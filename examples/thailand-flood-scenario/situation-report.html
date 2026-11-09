@@ -363,9 +363,9 @@
 					<span class="header-badge" role="status">RED ALERT</span>
 					<h1 style="margin: 0 0 8px 0; font-size: 24px; font-weight: 800; color: #ffffff;">Southern Thailand Catastrophic Flood (Yala-Songkhla-Pattani-Narathiwat)</h1>
 					<div class="header-meta" style="color: #94a3b8; font-size: 13px;">
-						<strong>Region:</strong> Southern Thailand (Yala, Songkhla, Pattani, Narathiwat) &nbsp;|&nbsp; 
+						<strong>Region:</strong> Southern Thailand &nbsp;|&nbsp; 
 						<strong>Intensity:</strong> 2.2 Inundation Depth (meters) &nbsp;|&nbsp; 
-						<strong>Issued:</strong> Mon, 09 Nov 2026 07:09:51 GMT
+						<strong>Issued:</strong> Mon, 09 Nov 2026 09:08:04 GMT
 					</div>
 				</div>
 				<button class="btn no-print" onclick="window.print()" aria-label="Print or Save Situation Report as PDF">🖨️ Print / Save PDF</button>
@@ -559,7 +559,7 @@
 			</tr>
 		
 			<tr id="asset-row-6" class="sitrep-asset-row" data-asset-index="6" style="border-bottom: 1px solid #334155;">
-				<td class="asset-name" style="padding: 9px 12px; font-weight: 600; color: #f8fafc;">Yala Railway Station & SRT Southern Line Depot (สถานีรถไฟยะลา การรถไฟแห่งประเทศไทย)</td>
+				<td class="asset-name" style="padding: 9px 12px; font-weight: 600; color: #f8fafc;">Yala Railway Station &amp; SRT Southern Line Depot (สถานีรถไฟยะลา การรถไฟแห่งประเทศไทย)</td>
 				<td style="padding: 9px 12px; text-transform: uppercase; font-size: 11px;"><span class="asset-category-pill" style="background: #1e293b; padding: 2px 8px; border-radius: 4px; border: 1px solid #334155; color: #94a3b8;">transit</span></td>
 				<td class="mdr-cell" style="padding: 9px 12px; text-align: right; color: #f8fafc;">
 					<div style="display: flex; align-items: center; justify-content: flex-end; gap: 8px;">
@@ -573,7 +573,7 @@
 			</tr>
 		
 			<tr id="asset-row-7" class="sitrep-asset-row" data-asset-index="7" style="border-bottom: 1px solid #334155;">
-				<td class="asset-name" style="padding: 9px 12px; font-weight: 600; color: #f8fafc;">Hat Yai Municipal Evacuation & Relief Center (ศูนย์ประสานงานช่วยเหลือผู้ประสบอุทกภัย เทศบาลนครหาดใหญ่)</td>
+				<td class="asset-name" style="padding: 9px 12px; font-weight: 600; color: #f8fafc;">Hat Yai Municipal Evacuation &amp; Relief Center (ศูนย์ประสานงานช่วยเหลือผู้ประสบอุทกภัย เทศบาลนครหาดใหญ่)</td>
 				<td style="padding: 9px 12px; text-transform: uppercase; font-size: 11px;"><span class="asset-category-pill" style="background: #1e293b; padding: 2px 8px; border-radius: 4px; border: 1px solid #334155; color: #94a3b8;">education</span></td>
 				<td class="mdr-cell" style="padding: 9px 12px; text-align: right; color: #f8fafc;">
 					<div style="display: flex; align-items: center; justify-content: flex-end; gap: 8px;">
@@ -612,7 +612,7 @@
 				<li>
 					<span class="check-icon" aria-hidden="true">3.</span>
 					<div>
-						<strong>OASIS CAP v1.2 Broadcast Verification:</strong> Ensure cell broadcast emergency alerts are disseminated across targeted telecom towers in <strong>Southern Thailand (Yala, Songkhla, Pattani, Narathiwat)</strong>.
+						<strong>OASIS CAP v1.2 Broadcast Verification:</strong> Ensure cell broadcast emergency alerts are disseminated across targeted telecom towers in <strong>Southern Thailand</strong>.
 					</div>
 				</li>
 				<li>
@@ -642,7 +642,15 @@
 			const btnZoomIn = document.getElementById('btnZoomIn');
 			const btnZoomOut = document.getElementById('btnZoomOut');
 			const btnResetView = document.getElementById('btnResetView');
-			const assets = [{"id":"th_hosp_yala","name":"Yala Regional Hospital (โรงพยาบาลศูนย์ยะลา)","category":"healthcare","coords":[101.2818,6.5416],"mdr":0.35,"lossUsd":0,"population":1450,"facilityCode":"10672"},{"id":"th_hosp_pattani","name":"Pattani Hospital (โรงพยาบาลปัตตานี)","category":"healthcare","coords":[101.2505,6.868],"mdr":0.35,"lossUsd":0,"population":920,"facilityCode":"10673"},{"id":"th_hosp_narathiwat","name":"Narathiwat Ratchanakharin Hospital (โรงพยาบาลนราธิวาสราชนครินทร์)","category":"healthcare","coords":[101.8252,6.4258],"mdr":0.35,"lossUsd":0,"population":850,"facilityCode":"10674"},{"id":"th_shelter_hatyai","name":"Hat Yai Municipal Evacuation & Relief Center (ศูนย์ประสานงานช่วยเหลือผู้ประสบอุทกภัย เทศบาลนครหาดใหญ่)","category":"education","coords":[100.4746,7.0082],"mdr":0.35,"lossUsd":0,"population":3200,"facilityCode":"DDPM-SKL-001"},{"id":"th_substation_yala","name":"PEA Yala 1 High-Voltage Electrical Substation (สถานีไฟฟ้าแรงสูงยะลา 1 การไฟฟ้าส่วนภูมิภาค)","category":"power_station","coords":[101.2752,6.5388],"mdr":0.35,"lossUsd":0,"population":40,"facilityCode":"YLA-SUB-115KV"},{"id":"th_bridge_hwy418","name":"Highway 418 Pattani River Transit Bridge (สะพานข้ามแม่น้ำปัตตานี ทางหลวงหมายเลข 418)","category":"transit","coords":[101.2682,6.7154],"mdr":0.35,"lossUsd":0,"population":0,"facilityCode":"DOH-418-BR04"},{"id":"th_rail_southern","name":"Yala Railway Station & SRT Southern Line Depot (สถานีรถไฟยะลา การรถไฟแห่งประเทศไทย)","category":"transit","coords":[101.2805,6.5401],"mdr":0.35,"lossUsd":0,"population":350,"facilityCode":"th_rail_southern"},{"id":"th_res_yala_sateng","name":"Mueang Yala Sateng Riverfront Community (ชุมชนสะเตง ริมแม่น้ำปัตตานี เทศบาลนครยะลา)","category":"residential","coords":[101.2855,6.5524],"mdr":0.35,"lossUsd":0,"population":11800,"facilityCode":"th_res_yala_sateng"}];
+			const assets = [{"id":"th_hosp_yala","name":"Yala Regional Hospital (โรงพยาบาลศูนย์ยะลา)","category":"healthcare","coords":[101.2818,6.5416],"mdr":0.35,"lossUsd":0,"population":1450,"facilityCode":"10672"},{"id":"th_hosp_pattani","name":"Pattani Hospital (โรงพยาบาลปัตตานี)","category":"healthcare","coords":[101.2505,6.868],"mdr":0.35,"lossUsd":0,"population":920,"facilityCode":"10673"},{"id":"th_hosp_narathiwat","name":"Narathiwat Ratchanakharin Hospital (โรงพยาบาลนราธิวาสราชนครินทร์)","category":"healthcare","coords":[101.8252,6.4258],"mdr":0.35,"lossUsd":0,"population":850,"facilityCode":"10674"},{"id":"th_shelter_hatyai","name":"Hat Yai Municipal Evacuation \u0026 Relief Center (ศูนย์ประสานงานช่วยเหลือผู้ประสบอุทกภัย เทศบาลนครหาดใหญ่)","category":"education","coords":[100.4746,7.0082],"mdr":0.35,"lossUsd":0,"population":3200,"facilityCode":"DDPM-SKL-001"},{"id":"th_substation_yala","name":"PEA Yala 1 High-Voltage Electrical Substation (สถานีไฟฟ้าแรงสูงยะลา 1 การไฟฟ้าส่วนภูมิภาค)","category":"power_station","coords":[101.2752,6.5388],"mdr":0.35,"lossUsd":0,"population":40,"facilityCode":"YLA-SUB-115KV"},{"id":"th_bridge_hwy418","name":"Highway 418 Pattani River Transit Bridge (สะพานข้ามแม่น้ำปัตตานี ทางหลวงหมายเลข 418)","category":"transit","coords":[101.2682,6.7154],"mdr":0.35,"lossUsd":0,"population":0,"facilityCode":"DOH-418-BR04"},{"id":"th_rail_southern","name":"Yala Railway Station \u0026 SRT Southern Line Depot (สถานีรถไฟยะลา การรถไฟแห่งประเทศไทย)","category":"transit","coords":[101.2805,6.5401],"mdr":0.35,"lossUsd":0,"population":350,"facilityCode":"th_rail_southern"},{"id":"th_res_yala_sateng","name":"Mueang Yala Sateng Riverfront Community (ชุมชนสะเตง ริมแม่น้ำปัตตานี เทศบาลนครยะลา)","category":"residential","coords":[101.2855,6.5524],"mdr":0.35,"lossUsd":0,"population":11800,"facilityCode":"th_res_yala_sateng"}];
+
+			function escHtml(s) {
+				return String(s == null ? '' : s)
+					.replace(/&/g, '&amp;')
+					.replace(/</g, '&lt;')
+					.replace(/>/g, '&gt;')
+					.replace(/"/g, '&quot;');
+			}
 
 			let currentBasemap = "tactical-dark";
 			let userZoom = 1.0;
@@ -762,9 +770,9 @@
 						if (row) row.classList.add('active');
 						tooltip.style.display = 'block';
 						tooltipName.textContent = hoveredAsset.name;
-						tooltipDetails.innerHTML = '<strong>' + (hoveredAsset.category || 'ASSET').toUpperCase() + '</strong> • MDR: <strong>' + (hoveredAsset.mdr * 100).toFixed(1) + '%</strong> • Est. Loss: <strong>$' + (hoveredAsset.lossUsd || 0).toLocaleString() + '</strong>' +
+						tooltipDetails.innerHTML = '<strong>' + escHtml((hoveredAsset.category || 'ASSET').toUpperCase()) + '</strong> • MDR: <strong>' + (hoveredAsset.mdr * 100).toFixed(1) + '%</strong> • Est. Loss: <strong>$' + (hoveredAsset.lossUsd || 0).toLocaleString() + '</strong>' +
 							(hoveredAsset.population ? '<br>Exposed Population: ' + hoveredAsset.population.toLocaleString() : '') +
-							(hoveredAsset.facilityCode ? '<br>Facility Code: ' + hoveredAsset.facilityCode : '');
+							(hoveredAsset.facilityCode ? '<br>Facility Code: ' + escHtml(hoveredAsset.facilityCode) : '');
 						canvas.style.cursor = 'pointer';
 					} else {
 						tooltip.style.display = 'none';
@@ -792,9 +800,9 @@
 						row.classList.add('active');
 						tooltip.style.display = 'block';
 						tooltipName.textContent = hoveredAsset.name;
-						tooltipDetails.innerHTML = '<strong>' + (hoveredAsset.category || 'ASSET').toUpperCase() + '</strong> • MDR: <strong>' + (hoveredAsset.mdr * 100).toFixed(1) + '%</strong> • Est. Loss: <strong>$' + (hoveredAsset.lossUsd || 0).toLocaleString() + '</strong>' +
+						tooltipDetails.innerHTML = '<strong>' + escHtml((hoveredAsset.category || 'ASSET').toUpperCase()) + '</strong> • MDR: <strong>' + (hoveredAsset.mdr * 100).toFixed(1) + '%</strong> • Est. Loss: <strong>$' + (hoveredAsset.lossUsd || 0).toLocaleString() + '</strong>' +
 							(hoveredAsset.population ? '<br>Exposed Population: ' + hoveredAsset.population.toLocaleString() : '') +
-							(hoveredAsset.facilityCode ? '<br>Facility Code: ' + hoveredAsset.facilityCode : '');
+							(hoveredAsset.facilityCode ? '<br>Facility Code: ' + escHtml(hoveredAsset.facilityCode) : '');
 						draw();
 					}
 				});

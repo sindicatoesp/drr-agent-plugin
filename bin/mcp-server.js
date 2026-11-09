@@ -5,6 +5,7 @@
  */
 
 const readline = require("readline");
+const path = require("path");
 const { ingestGdacsAlerts } = require("../lib/gdacs");
 const { spatialExposureJoin } = require("../lib/spatial");
 const { evaluateSeismicFragility, evaluateFloodDamage, evaluateWindDamage } = require("../lib/fragility");
@@ -388,8 +389,24 @@ async function handleToolCall(name, args) {
 		}
 
 		case "drr_monitor_check": {
+			let safeConfigPath = undefined;
+			if (args.configPath) {
+				const rootDir = path.resolve(__dirname, "..");
+				const cwdDir = path.resolve(process.cwd());
+				const resolved = path.resolve(args.configPath);
+				const inRoot =
+					resolved.startsWith(rootDir + path.sep) || resolved === rootDir;
+				const inCwd =
+					resolved.startsWith(cwdDir + path.sep) || resolved === cwdDir;
+				if ((!inRoot && !inCwd) || !resolved.endsWith(".json")) {
+					throw new Error(
+						"Security constraint: configPath must be a .json file within the workspace or plugin directory.",
+					);
+				}
+				safeConfigPath = resolved;
+			}
 			return runMonitoringCycle({
-				configPath: args.configPath,
+				configPath: safeConfigPath,
 				mock: args.mock !== undefined ? args.mock : false,
 			});
 		}
