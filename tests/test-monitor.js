@@ -11,10 +11,18 @@ assert(config.rules, "Rules object must exist");
 assert.strictEqual(config.rules.earthquake.minMagnitude, 5.5);
 assert.strictEqual(config.rules.gdacs.minAlertLevel, "Orange");
 
-// 2. Test Webhook Dispatcher with empty URL (graceful handling)
+// 2. Test Webhook Dispatcher with empty URL and SSRF protection
 async function testWebhook() {
 	const res = await dispatchWebhook("", { headline: "Test" });
 	assert.strictEqual(res.dispatched, false);
+
+	const ssrfLoopback = await dispatchWebhook("http://127.0.0.1:8080/internal-admin", { headline: "Test" });
+	assert.strictEqual(ssrfLoopback.dispatched, false);
+	assert(ssrfLoopback.reason.includes("SSRF guard blocked"), "Loopback webhook must be blocked by SSRF guard");
+
+	const ssrfMetadata = await dispatchWebhook("http://169.254.169.254/latest/meta-data/", { headline: "Test" });
+	assert.strictEqual(ssrfMetadata.dispatched, false);
+	assert(ssrfMetadata.reason.includes("SSRF guard blocked"), "Cloud metadata webhook must be blocked by SSRF guard");
 }
 
 // 3. Test runMonitoringCycle with mock payloads
