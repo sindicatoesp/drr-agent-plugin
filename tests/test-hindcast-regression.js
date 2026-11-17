@@ -138,4 +138,39 @@ const elapsedMs = Date.now() - t0;
 assert.strictEqual(perfJoin.summary.totalExposedAssets, 0);
 assert(elapsedMs < 200, `Spatial BBox fast-rejection took too long (${elapsedMs}ms for 5,000 assets)`);
 
+// Verify Vulnerability Matrix fragility memoization performance on 5,000 exposed assets
+const exposedSynthetic = [];
+for (let i = 0; i < 5000; i++) {
+	exposedSynthetic.push({
+		id: `exp_${i}`,
+		name: `Building ${i}`,
+		category: i % 2 === 0 ? "residential" : "healthcare",
+		valueUsd: 50000,
+		population: 10,
+		coordinates: [100.47, 7.01],
+	});
+}
+const tVuln0 = Date.now();
+const largeVuln = evaluateVulnerabilityMatrix(
+	{ exposedAssets: exposedSynthetic },
+	{ type: "flood", intensity: 2.0 }
+);
+const elapsedVulnMs = Date.now() - tVuln0;
+assert.strictEqual(largeVuln.evaluatedAssetsCount, 5000);
+assert(elapsedVulnMs < 200, `Vulnerability matrix evaluation took too long (${elapsedVulnMs}ms for 5,000 assets)`);
+
+// Verify gis-map-presentation.html inline script syntax and XSS hardening
+const gisHtmlPath = path.join(__dirname, "../docs/presentation/gis-map-presentation.html");
+if (fs.existsSync(gisHtmlPath)) {
+	const gisHtml = fs.readFileSync(gisHtmlPath, "utf8");
+	assert(!gisHtml.includes("showFeaturePopup(${JSON.stringify(a)})"), "gis-map-presentation.html must not inline unescaped JSON into onclick attribute");
+	assert(gisHtml.includes("showFeaturePopupByIndex"), "gis-map-presentation.html must use index-based popup handler");
+	const gisScripts = gisHtml.match(/<script[\s\S]*?>([\s\S]*?)<\/script>/gi) || [];
+	gisScripts.forEach((s, idx) => {
+		const code = s.replace(/<script[\s\S]*?>/i, "").replace(/<\/script>/i, "");
+		assert.doesNotThrow(() => new vm.Script(code), `gis-map-presentation.html <script> #${idx + 1} syntax error`);
+	});
+}
+
 console.log("✅ Southern Thailand Hindcast Regression, Security & Performance Verification tests passed!");
+

@@ -417,6 +417,7 @@ async function handleToolCall(name, args) {
 }
 
 // JSON-RPC 2.0 stdio loop
+const MAX_RPC_LINE_BYTES = 16 * 1024 * 1024; // 16 MB max JSON-RPC message size
 const rl = readline.createInterface({
 	input: process.stdin,
 	output: process.stdout,
@@ -434,6 +435,13 @@ function sendResponse(id, result, error = null) {
 }
 
 rl.on("line", async (line) => {
+	if (Buffer.byteLength(line, "utf8") > MAX_RPC_LINE_BYTES) {
+		sendResponse(null, null, {
+			code: -32600,
+			message: `Invalid Request: JSON-RPC payload exceeds maximum size limit (${MAX_RPC_LINE_BYTES} bytes)`,
+		});
+		return;
+	}
 	const trimmed = line.trim();
 	if (!trimmed) return;
 
