@@ -19,6 +19,7 @@
     "lint": "node scripts/lint.js",
     "check": "node scripts/lint.js && bash tests/run-all-tests.sh",
     "test": "bash tests/run-all-tests.sh",
+    "generate:inventory": "node scripts/generate-inventory.js",
     "precommit": "npm run check",
     "mcp": "node bin/mcp-server.js"
   },
