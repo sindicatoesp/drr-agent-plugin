@@ -10,8 +10,8 @@ name: Scheduled DRR Shadow Monitor
 
 on:
   schedule:
-    # Off-hour minute (minute 17 of every hour) to avoid top-of-hour GitHub Actions queue contention
-    - cron: '17 * * * *'
+    # Every 3 hours at minute 17 to avoid top-of-hour GitHub Actions queue contention
+    - cron: '17 */3 * * *'
   workflow_dispatch:
     inputs:
       scope_id:
