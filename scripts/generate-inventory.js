@@ -51,7 +51,7 @@ const TEST_MAPPING = {
 	drr_delta_fetch_exposure: "tests/test-delta.js",
 	drr_delta_docs: "tests/test-delta.js, tests/test-mcp-server.js",
 	drr_delta_schema_validate: "tests/test-delta-uncertainty-appraisal.js, tests/test-mcp-server.js",
-	drr_monitor_check: "tests/test-monitor.js, tests/test-mcp-server.js",
+	drr_monitor_check: "tests/test-monitor.js, tests/test-scheduled-monitoring.js, tests/test-mcp-server.js",
 	drr_input_contract_validate: "tests/test-contracts-registry.js, tests/test-mcp-server.js",
 	drr_source_provenance_manifest: "tests/test-contracts-registry.js, tests/test-mcp-server.js",
 	drr_model_registry_list: "tests/test-contracts-registry.js, tests/test-mcp-server.js",

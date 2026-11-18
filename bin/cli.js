@@ -19,7 +19,7 @@ const { ingestUsgsEarthquakes } = require("../lib/usgs");
 const { fetchWeatherForecast } = require("../lib/openmeteo");
 const { aggregateBasinRainfall, screenRiverDischarge } = require("../lib/hydro");
 const { pushDraftDisasterRecord, fetchDeltaDocs, fetchDeltaHazards, validateDeltaSchema } = require("../lib/delta");
-const { runMonitoringCycle, startMonitoringDaemon } = require("../lib/monitor");
+const { runOnce, runMonitoringCycle, startMonitoringDaemon } = require("../lib/monitor");
 const { validateInputContract } = require("../lib/contracts");
 const { listRegisteredMethods, checkDomainApplicability } = require("../lib/registry");
 const { runReplayValidation } = require("../lib/replay");
@@ -476,11 +476,74 @@ async function main() {
 			}
 
 			case "monitor": {
-				const configPath = options.rules || options.file;
+				const configPath = options.config || options.rules || options.file;
 				const isMock = options.mock === true;
 				if (options.once) {
-					const summary = await runMonitoringCycle({ configPath, mock: isMock });
-					console.log(JSON.stringify(summary, null, 2));
+					const cliAbort = new AbortController();
+					const onSig = () => cliAbort.abort();
+					process.once("SIGINT", onSig);
+					process.once("SIGTERM", onSig);
+					try {
+						const readOnly =
+							options["read-only"] !== undefined
+								? options["read-only"] !== "false" && options["read-only"] !== false
+								: true;
+						const summary = await runOnce(
+							{
+								configPath,
+								mode: "single-run",
+								readOnly,
+								mock: isMock,
+								scopeId: options.scope || options["scope-id"] || process.env.DRR_MONITOR_SCOPE_ID || "global",
+								stateBackend:
+									options["state-backend"] ||
+									process.env.DRR_STATE_BACKEND ||
+									"cas-file-store",
+								stateStorageDir:
+									options["state-dir"] ||
+									process.env.DRR_STATE_DIR ||
+									undefined,
+								runDeadlineMs: options["deadline-ms"]
+									? parseInt(options["deadline-ms"], 10)
+									: process.env.DRR_RUN_DEADLINE_MS
+										? parseInt(process.env.DRR_RUN_DEADLINE_MS, 10)
+										: undefined,
+								requestTimeoutMs: options["request-timeout-ms"]
+									? parseInt(options["request-timeout-ms"], 10)
+									: undefined,
+								maxAttempts: options["max-attempts"]
+									? parseInt(options["max-attempts"], 10)
+									: undefined,
+								overlapWindowMs: options["overlap-window-ms"]
+									? parseInt(options["overlap-window-ms"], 10)
+									: undefined,
+								retentionPolicy:
+									options["retention-policy"] ||
+									process.env.DRR_RETENTION_POLICY ||
+									undefined,
+								summaryOutputPath:
+									options["summary-out"] ||
+									process.env.DRR_SUMMARY_OUT ||
+									undefined,
+								markdownSummaryPath:
+									options["markdown-out"] ||
+									process.env.DRR_MARKDOWN_OUT ||
+									undefined,
+								skippedExitCode: options["skipped-exit-code"]
+									? parseInt(options["skipped-exit-code"], 10)
+									: 0,
+							},
+							{},
+							cliAbort.signal,
+						);
+						console.log(JSON.stringify(summary, null, 2));
+						if (summary.exitCode && summary.exitCode !== 0) {
+							process.exit(summary.exitCode);
+						}
+					} finally {
+						process.removeListener("SIGINT", onSig);
+						process.removeListener("SIGTERM", onSig);
+					}
 				} else {
 					const intervalMinutes = options.interval ? parseInt(options.interval, 10) : undefined;
 					startMonitoringDaemon({ configPath, intervalMinutes, mock: isMock });

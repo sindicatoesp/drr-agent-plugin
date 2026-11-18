@@ -131,10 +131,10 @@ alerts-validate: ## Validate declarative alert rules in alerts-config.json
 lint: ## Run zero-dependency static lint & syntax checker (node --check, vm.Script, JSON)
 	@node scripts/lint.js
 
-test: ## Run the complete 18-suite unit and MCP test suite
+test: ## Run the complete 19-suite unit and MCP test suite
 	@bash tests/run-all-tests.sh
 
-check: lint test ## Run full pre-commit gate (linting + all 18 test suites)
+check: lint test ## Run full pre-commit gate (linting + all 19 test suites)
 
 pre-commit-install: ## Install automatic Git pre-commit hook into .git/hooks
 	@node scripts/install-git-hook.js
@@ -143,8 +143,8 @@ monitor: ## Run the autonomous early warning daemon (INTERVAL=60)
 	@mkdir -p alerts
 	node bin/cli.js monitor --interval $(INTERVAL) --config $$(test -f $(CONFIG_FILE) && echo $(CONFIG_FILE) || echo alerts-config.example.json)
 
-monitor-once: ## Run a single-scan alert feed evaluation check
-	node bin/cli.js monitor --once --config $$(test -f $(CONFIG_FILE) && echo $(CONFIG_FILE) || echo alerts-config.example.json)
+monitor-once: ## Run a bounded single-run shadow monitor check (read-only by default)
+	node bin/cli.js monitor --once --read-only true --config $$(test -f $(CONFIG_FILE) && echo $(CONFIG_FILE) || echo alerts-config.example.json)
 
 mcp: ## Start the JSON-RPC 2.0 stdio Model Context Protocol server
 	node bin/mcp-server.js

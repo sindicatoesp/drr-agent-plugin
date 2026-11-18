@@ -1,0 +1,124 @@
+name: Scheduled DRR Shadow Monitor
+
+# Scheduling & Platform Caveats (Section 8):
+# - GitHub Actions scheduled workflows run from the default branch, can be delayed or dropped under load,
+#   and public-repository schedules can be automatically disabled after 60 days of repository inactivity.
+# - This workflow operates strictly in READ-ONLY SHADOW MONITORING mode (`--read-only true`) and MUST NOT
+#   be used as the sole scheduler for time-critical public warnings or life-safety sirens.
+# - Independent external missed-run / heartbeat monitoring is required because a workflow cannot reliably
+#   detect its own non-start.
+
+on:
+  schedule:
+    # Off-hour minute (minute 17 of every hour) to avoid top-of-hour GitHub Actions queue contention
+    - cron: '17 * * * *'
+  workflow_dispatch:
+    inputs:
+      scope_id:
+        description: 'Monitoring state & lease scope identifier'
+        required: false
+        default: 'global'
+        type: string
+      run_deadline_ms:
+        description: 'Application run deadline in milliseconds (must be below job timeout)'
+        required: false
+        default: '180000'
+        type: string
+      offline_smoke:
+        description: 'Use deterministic offline fixture mode (--mock) instead of live public feeds'
+        required: false
+        default: false
+        type: boolean
+
+# Least-privilege permissions: read-only repository contents, no write/publish privileges
+permissions:
+  contents: read
+
+# CC-01: One stable workflow concurrency group per environment and monitoring scope.
+# Both scheduled and manual workflow_dispatch runs targeting the same scope share this group.
+# cancel-in-progress is strictly false to avoid cancelling an active state-writing run.
+concurrency:
+  group: drr-shadow-monitor-production-${{ inputs.scope_id || 'global' }}
+  cancel-in-progress: false
+
+jobs:
+  shadow-monitor:
+    name: Bounded Read-Only Shadow Monitor (${{ inputs.scope_id || 'global' }})
+    runs-on: ubuntu-latest
+    # Job timeout (10 minutes) is strictly above the application runDeadlineMs (3 minutes) with ample cleanup margin
+    timeout-minutes: 10
+    env:
+      # Enforce read-only shadow mode: never expose DELTA_MCP_API_KEY, MONITOR_WEBHOOK_URL, or DRR_ENABLE_PRODUCTION_PUBLISH
+      DRR_ENABLE_PRODUCTION_PUBLISH: 'false'
+      DRR_MONITOR_SCOPE_ID: ${{ inputs.scope_id || 'global' }}
+      DRR_RUN_DEADLINE_MS: ${{ inputs.run_deadline_ms || '180000' }}
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js 20.x
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20.x'
+
+      - name: Run Offline Verification Gate Before Live Ingestion
+        run: |
+          node scripts/lint.js
+          node tests/test-monitor.js
+          node tests/test-scheduled-monitoring.js
+
+      - name: Execute Bounded Single-Run Shadow Monitor
+        id: monitor_run
+        # Capture actual runner exit code without masking non-zero status (0=complete, 2=degraded, 1=failed)
+        run: |
+          mkdir -p artifacts/monitor-export .drr-state
+          MOCK_FLAG=""
+          if [ "${{ inputs.offline_smoke }}" = "true" ]; then
+            MOCK_FLAG="--mock"
+          fi
+          set +e
+          node bin/cli.js monitor --once \
+            --read-only true \
+            --scope "${{ inputs.scope_id || 'global' }}" \
+            --state-backend cas-file-store \
+            --state-dir .drr-state \
+            --deadline-ms "${{ inputs.run_deadline_ms || '180000' }}" \
+            --summary-out artifacts/monitor-export/run-summary.json \
+            --markdown-out artifacts/monitor-export/run-summary.md \
+            $MOCK_FLAG
+          EXIT_CODE=$?
+          set -e
+          echo "exit_code=$EXIT_CODE" >> "$GITHUB_OUTPUT"
+          echo "Runner finished with exit code: $EXIT_CODE"
+
+      - name: Publish Human-Readable Summary to Workflow Step Summary
+        if: always()
+        run: |
+          if [ -f artifacts/monitor-export/run-summary.md ]; then
+            cat artifacts/monitor-export/run-summary.md >> "$GITHUB_STEP_SUMMARY"
+          else
+            echo "### DRR Shadow Monitor Summary Unavailable" >> "$GITHUB_STEP_SUMMARY"
+            echo "The monitor process terminated before writing \`run-summary.md\`." >> "$GITHUB_STEP_SUMMARY"
+          fi
+
+      - name: Export Machine-Readable & Human-Readable Evidence Artifacts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: drr-shadow-monitor-${{ inputs.scope_id || 'global' }}-${{ github.run_id }}
+          path: |
+            artifacts/monitor-export/run-summary.json
+            artifacts/monitor-export/run-summary.md
+            alerts/
+          if-no-files-found: warn
+          retention-days: 30
+
+      - name: Preserve Actual Runner Exit Status
+        if: always()
+        run: |
+          EXIT_CODE="${{ steps.monitor_run.outputs.exit_code }}"
+          if [ -z "$EXIT_CODE" ]; then
+            exit 1
+          fi
+          exit "$EXIT_CODE"
