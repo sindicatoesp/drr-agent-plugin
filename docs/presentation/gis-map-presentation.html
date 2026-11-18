@@ -953,6 +953,10 @@
                 ctx.drawImage(tileCache[tileKey], pt1.x, pt1.y, pt2.x - pt1.x + 0.5, pt2.y - pt1.y + 0.5);
               }
             } else {
+              const keys = Object.keys(tileCache);
+              if (keys.length >= 256) {
+                delete tileCache[keys[0]];
+              }
               const img = new Image();
               img.crossOrigin = "anonymous";
               img.src = url;
@@ -1269,6 +1273,21 @@
       document.getElementById("featurePopup").classList.add("hidden");
     }
 
+    function escHtml(s) {
+      return String(s == null ? "" : s)
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#39;");
+    }
+
+    function showFeaturePopupByIndex(idx) {
+      if (activeScenario && activeScenario.assets && activeScenario.assets[idx]) {
+        showFeaturePopup(activeScenario.assets[idx]);
+      }
+    }
+
     // =========================================================================
     // 5. PRESENTATION BRIEFING STEPPER & SCENARIO LOADER
     // =========================================================================
@@ -1287,11 +1306,11 @@
       document.getElementById("briefSendaiD").textContent = activeScenario.sendai.dDamaged;
       document.getElementById("briefSendaiDBar").style.width = `${activeScenario.sendai.dPct}%`;
 
-      // Update intersected assets list
+      // Update intersected assets list safely without inline JSON interpolation
       const listEl = document.getElementById("intersectedAssetsList");
-      listEl.innerHTML = activeScenario.assets.map(a => `
-        <div class="flex justify-between items-center p-1.5 rounded hover:bg-slate-900 cursor-pointer border border-transparent hover:border-slate-800" onclick='showFeaturePopup(${JSON.stringify(a)})'>
-          <span class="truncate text-slate-300 font-medium">${a.name}</span>
+      listEl.innerHTML = activeScenario.assets.map((a, idx) => `
+        <div class="flex justify-between items-center p-1.5 rounded hover:bg-slate-900 cursor-pointer border border-transparent hover:border-slate-800" onclick="showFeaturePopupByIndex(${idx})">
+          <span class="truncate text-slate-300 font-medium">${escHtml(a.name)}</span>
           <span class="font-mono font-bold ${a.mdr >= 0.5 ? 'text-rose-400' : 'text-amber-400'}">${(a.mdr * 100).toFixed(0)}%</span>
         </div>
       `).join("");

@@ -7,161 +7,87 @@
 
 A standalone, multi-platform AI Agent Plugin for **Disaster Risk Reduction (DRR) analytics**, built to the [agent-plugins.org](https://agent-plugins.org/) open specification.
 
-This plugin equips AI coding assistants and autonomous agents with domain knowledge skills and deterministic tools for:
-* **Multi-Source Hazard Feeds**:
-  * **GDACS**: Live and offline UN OCHA / EC DG ECHO alerts for earthquakes, tropical cyclones, floods, and volcanoes.
-  * **USGS**: Real-time Earthquake Hazards Program feeds with automated Peak Ground Acceleration (PGA in $g$) estimation from MMI via Wald et al. (1999) ground motion equations.
-  * **Open-Meteo**: Global numerical weather forecasts (ECMWF, GFS, ICON) with Anticipatory Action cumulative precipitation thresholds and flood triggers.
-* **Deterministic Spatial Exposure Joins**: Ray-casting point-in-polygon and buffer queries intersecting hazard footprints with exposed populations, schools, and hospitals.
-* **GEM & HAZUS Physical Fragility Modeling**: Lognormal damage state probability distributions and Mean Damage Ratios (MDR) for earthquakes (PGA), floods (inundation depth), and cyclones (wind speed).
-* **Sendai Framework Loss Accounting**: Automatic mapping to Sendai Targets B (affected/displaced population), C (direct economic loss), and D (critical infrastructure disruption).
-* **OASIS Common Alerting Protocol (CAP) v1.2**: ITU-T X.1303 compliant XML emergency alert generation and validation, plus multi-agency situation briefs.
+This plugin equips AI coding assistants and autonomous agents with sourced domain knowledge skills and deterministic, provenance-tracked tools for:
+* **Multi-Source Hazard Telemetry & Screening**:
+  * **GDACS**: Active UN OCHA / EC DG ECHO alerts for earthquakes, tropical cyclones, floods, and volcanoes with untrusted-feed prompt-injection sanitization.
+  * **USGS**: Real-time Earthquake Hazards Program feeds estimating Peak Ground Acceleration (PGA in $g$) from MMI via **Wald et al. (1999) GMICE** (with empirical MMI V–VIII applicability & extrapolation flags).
+  * **Open-Meteo & Hydrological Adapters**: Multi-model precipitation screening (never fabricating flood depths from rainfall alone; returns `depthStatus: "depth_unavailable"` without a calibrated depth grid) and **GloFAS river discharge** ($\text{m}^3/\text{s}$) screening with river-cell suitability checks.
+* **Spatial Correctness, CRS & Raster Exposure**: Boundary-inclusive, hole-aware, antimeridian-safe point-in-polygon joins, geodesic buffers, opt-in auditable geometry repair (`originalGeometry` preserved), WGS84 / WebMercator / UTM transformations, and count-vs-density-vs-continuous raster zonal statistics.
+* **Illustrative Physical Fragility & Registered Methods**: Log-normal damage state curves and Mean Damage Ratios (MDR) registered in `MODEL_REGISTRY` with explicit unit conversions (`g`, `m/s2`, `m`, `ft`, `km/h`, `m/s`, `kt`) and production gates blocking uncalibrated illustrative curves.
+* **Sendai Framework Semantic Accounting (C-01..C-03)**: Strict separation of modelled displacement from `B-1` directly affected people, physical facility damage (`D-2`..`D-4`) from service disruption (`D-6`..`D-8`), independent evidence/verification/approval/eligibility states, and missing-data preservation (`null` vs `0`).
+* **OASIS CAP v1.2 Alerting & Publication Controls**: XXE-hardened XML parser/generator defaulting to `Draft` status with separated validity, authenticity, issuer authorization, publication approval, and channel safety enforcement (`DRR_ENABLE_PRODUCTION_PUBLISH !== 'true'` by default).
+* **Crosswalk, Deduplication, Uncertainty & Investment Appraisal**: Versioned UNDRR-ISC HIP crosswalks, reversible multi-source event deduplication, deterministic bounds + seeded Monte Carlo uncertainty propagation, Expected Annual Loss (EAL), and Cost-Benefit Analysis (CBA).
 
 ---
 
-## Real-World Operations: When & By Whom
+## Authoritative Inventory & Governance
 
-For the detailed operational guide, see **[docs/operational-playbook.md](docs/operational-playbook.md)**.
-
-### Target Personas ("By Whom")
-* **EOC Duty Officers & Watchstanders** (National Disaster Management Agencies): Rapid situation awareness, triggering public CAP broadcasts, and immediate search-and-rescue prioritization within the first 2 hours of a shock.
-* **Anticipatory Action Leads** (Red Cross/Crescent, WFP, Start Network): Verifying forecast-based financing (FbF) triggers 48–72h before a flood or cyclone peaks to release prepositioning funds.
-* **UN Humanitarian Affairs Officers** (UN OCHA / UNDAC): Compiling standardized Situation Reports (SitReps) and cluster briefings within the first 6–24 hours of an emergency.
-* **National Disaster Loss Focal Points** (UNDRR DELTA): Auditing and mapping post-event losses to UN Sendai Framework Targets (Target B: displacement, C: direct economic loss, D: critical infrastructure damage).
-* **Municipal Resilience Engineers** (City Planning / Public Works): Running tabletop earthquake or flood scenarios against local building stock (GEM/HAZUS taxonomy) to prioritize retrofitting.
-
-### Emergency Scenarios ("When")
-
-| Operational Phase | Real-World Scenario | Primary Toolchain | Output / Deliverable |
-| :--- | :--- | :--- | :--- |
-| **Pre-Disaster**<br>*(T -72h to -24h)* | **Anticipatory Action Flood Early Warning**<br>Atmospheric river or monsoon depression detected. | `drr_openmeteo_forecast` + `drr_spatial_exposure_join` | Trigger verification, shelter standby alerts, pre-disaster evacuation directives. |
-| **Co-Disaster**<br>*(T +5m to +2h)* | **Sudden-Onset M7+ Earthquake**<br>Shaking felt across populated provinces. | `drr_usgs_earthquake_fetch` + `drr_fragility_eval` + `drr_cap_alert_generate_validate` | Wald GMPE PGA estimate, structural failure probabilities, OASIS CAP v1.2 XML for cell broadcasts. |
-| **Co-Disaster**<br>*(T +6h to +48h)* | **Category 4 Tropical Cyclone Landfall**<br>Catastrophic wind damage along coastal swath. | `drr_gdacs_fetch` + `drr_spatial_exposure_join` + `drr_vulnerability_matrix_calc` | Hospital & bridge damage audit, priority medical deployment list, 24h SitRep brief. |
-| **Post-Disaster**<br>*(T +2w to +3m)* | **Sendai Framework Loss Accounting**<br>End-of-year national reporting to UN. | `drr_vulnerability_matrix_calc` + DELTA Resilience DB | Official Sendai Monitor Target B, C, and D loss indicators. |
-
----
-
-## Executive & Technical Presentation Decks
-
-For stakeholder briefings, executive donor reviews, and emergency operational training:
-
-* **[Interactive Slide Presentation (HTML)](docs/presentation/slides.html)**: Standalone, browser-ready presentation deck with dark/light themes, keyboard navigation (`◀` / `▶` / `Space`), speaker notes drawer (`N`), and fullscreen mode (`F`).
-* **[Offline GIS Mapping Presentation (HTML)](docs/presentation/gis-map-presentation.html)**: 100% offline Leaflet-compatible spatial console featuring real-time ray-casting buffer queries, multi-scenario overlays (Nepal EQ, Cyclone Pamela, Bangladesh Flood, Southern Thailand Flood), dynamic GEM/HAZUS damage pins, and Sendai scorecards.
-* **[Marp-Compliant Presentation Deck (Markdown)](docs/presentation/drr-agent-plugin-presentation.md)**: 13-slide structured presentation ready to export directly to **PowerPoint (`.pptx`)** or **PDF** via Marp CLI (`npx @marp-team/marp-cli docs/presentation/drr-agent-plugin-presentation.md -o presentation.pptx`) or the VS Code Marp extension.
-* **[Featured Use Case: Southern Thailand Flood (Nov 2026)](docs/use-cases/thailand-flood-2026-simulation.md)**: Post-disaster hindcast validation of the 6–7 November 2026 flood across Yala, Songkhla, Pattani, and Narathiwat (Yala 20-year flood event), with point-in-polygon exposure, HAZUS damage math, CAP v1.2 XML alert, visual HTML SitRep, and DELTA push (`make thailand-flood`).
-* **[Visual Situation Report (HTML SitRep)](examples/thailand-flood-scenario/situation-report.html)**: Executive disaster situation report with embedded interactive GIS map featuring 100% offline Tactical Dark radar + online Basemap Switcher (Esri Street, Esri Satellite, OSM Voyager), pan/zoom navigation, Imhof collision-free label placement with cluster spiderfying, bidirectional table hover sync, and WCAG-compliant high-contrast print layout via `drr-tool sitrep --html` or `make thailand-flood`.
-
----
-
-## Architecture & Visual Data Pipeline
-
-```mermaid
-flowchart TD
-    subgraph Feeds["1. Multi-Source Hazard Telemetry"]
-        direction LR
-        GDACS["GDACS Live Feed<br/>(EQ, TC, FL, VO)"]
-        USGS["USGS FDSN-WS<br/>(Real-Time Seismic)"]
-        METEO["Open-Meteo Forecasts<br/>(ECMWF, GFS, ICON)"]
-    end
-
-    subgraph Engines["2. Deterministic Computational Core"]
-        direction TB
-        SPATIAL["Spatial Exposure Engine<br/>(Ray-Casting Point-in-Polygon & Buffers)"]
-        GMPE["Wald GMPE Ground Motion<br/>(MMI to PGA in g)"]
-        FRAGILITY["GEM & HAZUS Fragility Curves<br/>(Lognormal CDF & Mean Damage Ratio %)"]
-        SENDAI["Sendai Framework Loss Accounting<br/>(SFM Targets B, C, and D)"]
-    end
-
-    subgraph Dispatch["3. Multi-Agency Dispatch Layer"]
-        direction LR
-        CAP["OASIS CAP v1.2 XML<br/>(ITU-T X.1303 Broadcasts)"]
-        SITREP["Situation Reports<br/>(Markdown & Visual HTML)"]
-        DELTA["UNDRR DELTA Push<br/>(HIP Taxonomy Synced)"]
-        WEBHOOK["Universal Webhooks<br/>(Slack, Teams, Discord)"]
-    end
-
-    subgraph Runtimes["4. AI Agent Platforms & Ecosystem"]
-        direction LR
-        AGY["Google Antigravity"]
-        CURSOR["Cursor IDE"]
-        CLAUDE["Claude Code"]
-        COPILOT["GitHub Copilot"]
-        CLI["Terminal CLI & Docker"]
-    end
-
-    Feeds --> Engines
-    Engines --> Dispatch
-    Dispatch --> Runtimes
-```
+* **Programmatic Inventory**: See **[docs/tool-inventory.md](docs/tool-inventory.md)** (generated from registration code via `npm run generate:inventory`, referencing `origin/dev` commit `1d7600ce5cc50dcdea7b438ccbd59d28282793dd`).
+* **MCP & CLI Specification**: See **[docs/api-reference.md](docs/api-reference.md)** (29 MCP tools and 29 CLI commands).
+* **Scientific Methodology & Boundaries**: See **[docs/methodology.md](docs/methodology.md)**.
+* **Operational Playbook**: See **[docs/operational-playbook.md](docs/operational-playbook.md)**.
 
 ### Directory Structure & Layout
 
 ```text
 drr-agent-plugin/
-├── plugin.json                 # agent-plugins.org v1.0.0 manifest (v1.3.0)
+├── plugin.json                 # agent-plugins.org v1.0.0 manifest
 ├── mcp.json                    # Model Context Protocol stdio server declaration
-├── package.json                # Standalone Node package definition
+├── package.json                # Standalone Node package definition (0 external deps)
 ├── Makefile                    # Operational & configuration shortcuts
 ├── Dockerfile                  # Production Alpine container (~130MB, zero deps)
 ├── docker-compose.yml          # Autonomous daemon stack & volume persistence
-├── docker-entrypoint.sh        # Flexible container entrypoint dispatcher
 ├── .env.example                # Configuration template
 ├── alerts-config.example.json  # Declarative early warning threshold rules
 ├── README.md                   # Master documentation
 ├── LICENSE                     # Apache 2.0
 ├── bin/
-│   ├── mcp-server.js           # Zero-dependency Node.js MCP server (11 active tools)
-│   └── cli.js                  # Direct command-line interface for shell & CI/CD
-├── lib/                        # Deterministic computational engines
-│   ├── config.js               # Centralized configuration & lightweight .env loader
-│   ├── monitor.js              # Autonomous early warning monitoring & webhook dispatcher
-│   ├── gdacs.js                # GDACS feed parser & ingestor
-│   ├── usgs.js                 # USGS earthquake feed & MMI-to-PGA estimator
-│   ├── openmeteo.js            # Open-Meteo precipitation & flood risk engine
-│   ├── delta.js                # DELTA Resilience relational draft record writer
-│   ├── spatial.js              # Ray-casting point-in-polygon & spatial exposure joins
-│   ├── fragility.js            # GEM & HAZUS lognormal fragility curves
-│   ├── vulnerability.js        # Vulnerability matrix & Sendai Target B/C/D calculators
-│   ├── cap.js                  # OASIS CAP v1.2 XML generator & validator
-│   └── utils.js                # Math (erf, normal CDF, haversine distance)
-├── skills/                     # Reusable AI Agent Skills (SKILL.md)
+│   ├── mcp-server.js           # Zero-dependency Node.js MCP server (29 active tools)
+│   ├── cli.js                  # Direct CLI for shell & CI/CD (29 subcommands)
+│   └── serve.js                # Local static preview server
+├── lib/                        # Pure stdlib computational & governance modules (21 modules)
+│   ├── contracts.js            # Input contracts, unit conversions, C-03 provenance manifests (R-02/R-03)
+│   ├── registry.js             # Scientific method registry & illustrative vs production gate (R-04)
+│   ├── replay.js               # Frozen-input synthetic & hindcast replay validation (R-05)
+│   ├── security.js             # Approval tokens, channel/tenant/destination policy, XXE & text guard (R-06)
+│   ├── sendai.js               # Sendai Target B/C/D semantic & per-100k validator (R-08)
+│   ├── hips.js                 # Versioned UNDRR-ISC HIP taxonomy crosswalk & 2025 flags (R-09)
+│   ├── events.js               # Multi-source event identity, deduplication & reversible merges (R-10)
+│   ├── spatial.js              # Antimeridian/hole joins, validation, repair, CRS & raster stats (R-11)
+│   ├── hydro.js                # Basin rainfall aggregation, GloFAS discharge screening, grid ingest (R-12)
+│   ├── uncertainty.js          # Deterministic bounds, OAT sensitivity & seeded Monte Carlo (R-14)
+│   ├── appraisal.js            # Trapezoidal AEP Expected Annual Loss & Cost-Benefit Analysis (R-15)
+│   ├── fragility.js            # Registered illustrative GEM/HAZUS curves & unit normalization
+│   ├── vulnerability.js        # Composite loss matrix respecting C-01..C-03 & null unknowns
+│   ├── cap.js                  # OASIS CAP v1.2 XML generator, XXE-safe validator & pub adapter
+│   ├── delta.js                # DELTA relational writer, DTS schema validator & tenant guard
+│   ├── gdacs.js                # GDACS feed ingestor with untrusted-text sanitization & hashes
+│   ├── usgs.js                 # USGS seismic ingestor & Wald99 GMICE PGA conversion
+│   ├── openmeteo.js            # Open-Meteo rainfall screening & persistence/triggerPolicy gates
+│   ├── monitor.js              # Autonomous early warning monitor with deduplication & Draft CAP
+│   ├── config.js               # Centralized configuration & .env parser
+│   ├── utils.js                # Math, spherical geometry, boundary & antimeridian helpers
+│   └── index.js                # Unified barrel export
+├── scripts/
+│   ├── lint.js                 # Static AST, JSON, inline JS & stdlib-only verifier
+│   ├── generate-inventory.js   # Programmatic generator for docs/tool-inventory.md (R-01)
+│   └── install-git-hook.js     # Pre-commit hook installer
+├── skills/                     # 13 Reusable AI Agent Skills (SKILL.md)
+│   ├── cap-governance-and-approval/
 │   ├── delta-disaster-recording/
+│   ├── drr-data-quality-and-provenance/
 │   ├── early-warning-telemetry/
+│   ├── event-identity-and-linkage/
+│   ├── forecast-based-action-trigger-design/
+│   ├── gdacs-feed-ingestion/
 │   ├── hazard-exposure-modeling/
-│   ├── vulnerability-matrix/
 │   ├── oasis-cap-alerting/
-│   └── gdacs-feed-ingestion/
+│   ├── risk-reduction-options-appraisal/
+│   ├── sendai-indicator-accounting/
+│   ├── undrr-hip-hazard-classification/
+│   └── vulnerability-matrix/
 ├── examples/                   # Executable real-world scenarios & fixtures
-│   ├── earthquake-hazus-scenario/
-│   ├── flood-gdacs-exposure/
-│   ├── cyclone-emergency-brief/
-│   └── thailand-flood-scenario/# Real-world Nov 2026 Southern Thailand flood benchmark
-├── docs/                       # Comprehensive documentation
-│   ├── presentation/           # Executive & technical slide decks
-│   │   ├── drr-agent-plugin-presentation.md # Marp-compliant deck for PPTX/PDF
-│   │   └── slides.html         # Interactive web presentation deck
-│   ├── configuration.md        # Environment variables, proxy & settings guide
-│   ├── operational-playbook.md # Playbook: When & By Whom to run the plugin
-│   ├── api-reference.md        # MCP tool schemas & CLI options
-│   ├── methodology.md          # Scientific background & standards
-│   └── platforms/              # Per-platform installation guides
-│       ├── antigravity.md
-│       ├── cursor.md
-│       ├── claude-code.md
-│       ├── github-copilot.md
-│       └── opencode-cli.md
-└── tests/                      # Full automated test suite (11 test suites)
-    ├── test-config.js
-    ├── test-spatial.js
-    ├── test-fragility.js
-    ├── test-vulnerability.js
-    ├── test-cap.js
-    ├── test-usgs.js
-    ├── test-openmeteo.js
-    ├── test-delta.js
-    ├── test-monitor.js
-    ├── test-mcp-server.js
-    ├── test-hindcast-regression.js
+└── tests/                      # Full automated test suite (18 test suites)
     └── run-all-tests.sh
 ```
 
@@ -170,195 +96,65 @@ drr-agent-plugin/
 ## Quickstart
 
 ### Prerequisites
-* Node.js $\ge 18.0.0$ (Zero external npm packages required — pure standard library).
+* Node.js >= 18.0.0 (Zero external npm packages required — pure standard library).
 
-### 1. Run All Automated Tests
+### 1. Run Lint, Inventory & All Automated Tests
 ```bash
-bash tests/run-all-tests.sh
+npm run check
+npm run generate:inventory
 ```
 
-### 2. Operational & Configuration Shortcuts (Makefile)
-The plugin includes a dedicated `Makefile` providing shortcuts for day-to-day operations and configurations:
+### 2. Direct Command-Line Interface (CLI) Highlights
+For all 29 MCP tools and 29 CLI subcommands, see **[docs/api-reference.md](docs/api-reference.md)** and **[docs/tool-inventory.md](docs/tool-inventory.md)**.
 
 ```bash
-# Display help and available commands:
-make help
-
-# Initialize configuration files (.env and alerts-config.json):
-make config-init
-
-# Validate environment and configuration syntax:
-make config-check
-make config-show
-make alerts-validate
-
-# Run all 11 unit, MCP, and hindcast regression test suites:
-make test
-
-# Launch autonomous early warning monitoring daemon (local or one-shot scan):
-make monitor INTERVAL=60
-make monitor-once
-
-# Run disaster scenario pipelines:
-make scenario-earthquake
-make scenario-flood
-make scenario-cyclone
-make thailand-flood
-make scenarios
-```
-
-### 3. Lightweight Docker & Docker Compose Operations
-The plugin provides a secure, minimal container image based on `node:22-alpine` (~130MB total footprint, zero external npm dependencies, non-root user):
-
-```bash
-# Build the production Docker image:
-make docker-build
-
-# Start the autonomous monitoring daemon in the background:
-make docker-up
-
-# Check container status and follow logs:
-make docker-status
-make docker-logs
-
-# Run the 11-suite test suite inside the Alpine container:
-make docker-test
-
-# Run a one-shot feed scan inside the container:
-make docker-once
-
-# Stop the container:
-make docker-down
-```
-
-From the root project workspace, you can also run shortcuts directly via `make drr-help`, `make drr-test`, `make drr-monitor`, etc.
-
-### 4. Direct Command-Line Interface (CLI) Usage
-
-For the complete technical flag guide, see **[docs/api-reference.md](docs/api-reference.md)**.
-
-```bash
-# ---------------------------------------------------------
-# Live Real-Time Telemetry Queries
-# ---------------------------------------------------------
-
-# Query live USGS Earthquakes (M5.0+):
+# Real-time telemetry & screening
 node bin/cli.js usgs --min-mag 5.0 --limit 10
-
-# Query live Open-Meteo Anticipatory Action flood triggers:
 node bin/cli.js forecast --lat -6.2 --lon 106.8 --days 5
-
-# Query live GDACS disaster alerts (Orange and Red alerts):
 node bin/cli.js gdacs --min-level Orange
 
-# ---------------------------------------------------------
-# Autonomous Monitoring Engine
-# ---------------------------------------------------------
+# Contracts, registry, replay & Sendai semantics
+node bin/cli.js registry
+node bin/cli.js replay-validate --suite all
+node bin/cli.js hazard-crosswalk --query EQ --source GDACS
 
-# Run a one-shot scan across all live feeds:
-node bin/cli.js monitor --once
-
-# Run the continuous 24/7 monitoring daemon:
-node bin/cli.js monitor --interval 60 --config alerts-config.json
-
-# ---------------------------------------------------------
-# Two-Way DELTA Resilience Push
-# ---------------------------------------------------------
-
-# Push an evaluated assessment directly into DELTA:
-node bin/cli.js delta-push \
-  --hazard earthquake \
-  --event-id "usgs_live_001" \
-  --intensity "0.35" \
-  --notes "Live USGS Telemetry Event"
-
-# Query DELTA MCP 'docs' tool (data model & workflow reference):
-node bin/cli.js delta-docs
-
-# List live UNDRR/ISC HIP hazards directly from DELTA MCP:
-node bin/cli.js delta-hazards --limit 20
-
-# ---------------------------------------------------------
-# Deterministic Modeling & Alert Generation
-# ---------------------------------------------------------
-
-# Calculate earthquake fragility for Unreinforced Masonry (URM) at 0.40g PGA:
+# Deterministic fragility, spatial joins & CAP generation (defaults to Draft)
 node bin/cli.js fragility --hazard earthquake --intensity 0.40 --taxonomy URM
-
-# Run a deterministic spatial exposure join:
 node bin/cli.js spatial-join \
   --hazard examples/earthquake-hazus-scenario/input-hazard.json \
   --exposure examples/earthquake-hazus-scenario/input-exposure.json
-
-# Compute vulnerability matrix and Sendai Target B, C, D losses:
 node bin/cli.js vulnerability \
   --spatial examples/thailand-flood-scenario/spatial-report.json \
-  --hazard flood \
-  --intensity 2.2
-
-# Synthesize executive brief and interactive HTML SitRep with offline GIS map:
-node bin/cli.js sitrep \
-  --file examples/thailand-flood-scenario/vulnerability-report.json \
-  --spatial examples/thailand-flood-scenario/spatial-report.json \
-  --name "Southern Thailand Catastrophic Flood" \
-  --country "Southern Thailand" \
-  --severity Red \
-  --html \
-  --output examples/thailand-flood-scenario/situation-report.html
-
-# Generate an OASIS CAP v1.2 XML alert:
+  --hazard flood --intensity 2.2
 node bin/cli.js cap-generate \
   --headline "EARTHQUAKE WARNING: Mw 7.2 Mainshock" \
-  --severity Extreme \
-  --urgency Immediate \
-  --event "Major Earthquake Emergency Alert"
-
-# Validate a CAP XML file:
-node bin/cli.js cap-validate examples/earthquake-hazus-scenario/output-cap-alert.xml
+  --severity Extreme --urgency Immediate --event "Major Earthquake Emergency Alert"
 ```
 
 ---
 
-## MCP Server Tools (11 Tools)
+## MCP Server Tools (29 Tools)
 
-| Tool Name | Description | Source / Methodology |
-| :--- | :--- | :--- |
-| `drr_gdacs_fetch` | Query active global alerts by severity/type | GDACS GeoJSON API |
-| `drr_usgs_earthquake_fetch` | Ingest real-time seismic events & estimate PGA ($g$) | USGS FDSN-WS / Wald et al. GMPE |
-| `drr_openmeteo_forecast` | Weather forecast & Anticipatory Action flood triggers | Open-Meteo Multi-Model API |
-| `drr_spatial_exposure_join` | Deterministic point-in-polygon spatial exposure join | Ray-casting & BBox algorithms |
-| `drr_fragility_eval` | Damage state probabilities & Mean Damage Ratio (MDR) | GEM Taxonomy & HAZUS-MH 2.1 |
-| `drr_vulnerability_matrix_calc`| Composite vulnerability & Sendai Targets B, C, D | UNDRR SFM Loss Accounting |
-| `drr_cap_alert_generate_validate`| Generate & validate ITU-T X.1303 CAP XML / briefs | OASIS CAP v1.2 Specification |
-| `drr_delta_push_draft_record` | Push validated assessment to DELTA as a Draft record | DELTA Resilience API / MCP |
-| `drr_delta_fetch_exposure` | Query administrative divisions & exposure from DELTA | DELTA Resilience Data Layer |
-| `drr_delta_docs` | Query DELTA MCP 'docs' tool for data model & HIP taxonomy | DELTA MCP Service |
-| `drr_monitor_check` | Evaluate active feeds against declarative rules | Autonomous Alert Daemon Engine |
+The MCP server (`bin/mcp-server.js`) exposes **29 deterministic, provenance-aware tools**:
 
----
+| Category | MCP Tools |
+| :--- | :--- |
+| **Telemetry & Hydrology** | `drr_gdacs_fetch`, `drr_usgs_earthquake_fetch`, `drr_openmeteo_forecast`, `drr_basin_rainfall_aggregate`, `drr_river_discharge_screen`, `drr_monitor_check` |
+| **Contracts, Governance & Replay** | `drr_input_contract_validate`, `drr_source_provenance_manifest`, `drr_model_registry_list`, `drr_assessment_replay_validate` |
+| **Spatial, CRS & Raster** | `drr_spatial_exposure_join`, `drr_geojson_validate`, `drr_geometry_repair`, `drr_crs_transform`, `drr_raster_zonal_stats` |
+| **Fragility, Loss & Sendai** | `drr_fragility_eval`, `drr_vulnerability_matrix_calc`, `drr_sendai_validate` |
+| **Taxonomy & Event Identity** | `drr_hazard_crosswalk`, `drr_event_match_deduplicate` |
+| **CAP & DELTA Interoperability** | `drr_cap_alert_generate_validate`, `drr_cap_publish`, `drr_delta_push_draft_record`, `drr_delta_fetch_exposure`, `drr_delta_docs`, `drr_delta_schema_validate` |
+| **Uncertainty & Appraisal** | `drr_uncertainty_propagate`, `drr_expected_annual_loss`, `drr_mitigation_cost_benefit` |
 
-## Configuration & Environment Settings
-
-All API endpoints, network proxies, request timeouts, and operational modes are configurable via environment variables or a `.env` file.
-
-* **Configuration Template**: See [`.env.example`](.env.example) to copy and customize.
-* **Full Settings Reference**: See **[docs/configuration.md](docs/configuration.md)** for detailed documentation on:
-  * **National Country Scoping & DELTA Push Guard**: Restricting automated DELTA ingestion to national borders (`TARGET_COUNTRIES`, `DELTA_COUNTRY`, `bbox`)
-  * Overriding GDACS, USGS, and Open-Meteo API endpoints or mirrors
-  * Configuring commercial Open-Meteo API keys
-  * Setting up `HTTP_PROXY` / `HTTPS_PROXY` for UN / enterprise firewalls
-  * Enabling `DRR_OFFLINE_MODE` for air-gapped EOC centers
-  * Connecting to core DELTA Resilience via `DELTA_MCP_API_KEY`
+See **[docs/tool-inventory.md](docs/tool-inventory.md)** for auto-generated per-tool parameter schemas and test mappings.
 
 ---
 
-## Platform Installation Guides
+## Configuration & Platform Installation Guides
 
-* **[Google Antigravity Guide](docs/platforms/antigravity.md)**
-* **[Cursor IDE Guide](docs/platforms/cursor.md)**
-* **[Claude Code & Desktop Guide](docs/platforms/claude-code.md)**
-* **[GitHub Copilot & VS Code Guide](docs/platforms/github-copilot.md)**
-* **[OpenCode & Terminal CLI Guide](docs/platforms/opencode-cli.md)**
+* **[Configuration Reference](docs/configuration.md)** (`.env`, `TARGET_COUNTRIES`, `DELTA_COUNTRY_STRICT`, `DRR_ENABLE_PRODUCTION_PUBLISH`, `DRR_OFFLINE_MODE`)
+* **[Google Antigravity](docs/platforms/antigravity.md)** | **[Cursor IDE](docs/platforms/cursor.md)** | **[Claude Code](docs/platforms/claude-code.md)** | **[GitHub Copilot](docs/platforms/github-copilot.md)** | **[OpenCode CLI](docs/platforms/opencode-cli.md)**
 
 ---
 
@@ -367,5 +163,5 @@ All API endpoints, network proxies, request timeouts, and operational modes are 
 * **Package Standard**: [Agent Plugins v1.0.0](https://agent-plugins.org/) (`plugin.json`, `mcp.json`, `skills/`).
 * **Tool Protocol**: [Model Context Protocol (MCP)](https://modelcontextprotocol.io/) JSON-RPC 2.0 stdio transport (`2024-11-05`).
 * **Alerting Standard**: OASIS Common Alerting Protocol v1.2 / ITU-T Recommendation X.1303.
-* **Fragility Curves**: GEM Building Taxonomy v2.0 & FEMA HAZUS-MH 2.1 Multi-hazard Loss Methodology.
+* **Hazard Taxonomy**: UNDRR-ISC Hazard Information Profiles (HIP 2020 + 2025 revision flags).
 * **Disaster Loss Reporting**: UN Sendai Framework for Disaster Risk Reduction (2015–2030) Targets A, B, C, and D.

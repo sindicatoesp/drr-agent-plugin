@@ -27,7 +27,7 @@ jobs:
       - name: Run Static Lint & Syntax Check
         run: node scripts/lint.js
 
-      - name: Run All 11 Unit & MCP Test Suites
+      - name: Run All 19 Unit & MCP Test Suites
         run: bash tests/run-all-tests.sh
 
       - name: Run Southern Thailand Flood 2026 Benchmark

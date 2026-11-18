@@ -1,58 +1,35 @@
 ---
 name: oasis-cap-alerting
-description: Generates and validates ITU-T X.1303 / OASIS Common Alerting Protocol (CAP) v1.2 XML emergency alerts and synthesizes multi-agency emergency operations situation briefs. Use when drafting public warnings or validating CAP schemas.
+description: Generates XXE-hardened OASIS CAP v1.2 / ITU-T X.1303 XML emergency messages (defaulting to Draft status), verifies schema/profile/reference/scope rules, and routes publication through authorized approval tokens.
 ---
 
-# OASIS Common Alerting Protocol (CAP) v1.2 & Emergency Briefs
+# OASIS Common Alerting Protocol (CAP) v1.2 & Controlled Alerting
 
-## Overview
-The Common Alerting Protocol (CAP) is an international standard format for emergency alerts and public warnings (ITU-T Recommendation X.1303 / OASIS CAP v1.2). This skill guides agents in generating schema-compliant XML messages and synthesizing clear emergency briefs for National Disaster Management Agencies (NDMAs) and UN OCHA.
+## Triggers
+* User requests drafting or validating an OASIS CAP v1.2 XML message or synthesizing a situation brief (`generate_brief`).
 
----
+## Non-Goals
+* **MUST NOT** equate XML schema validity with warning authorization or public broadcast approval (C-07).
+* **MUST NOT** default generated CAP messages to `status: "Actual"` (all drafts default to `status: "Draft"` and UTC `+00:00` timestamps).
+* **MUST NOT** send `Draft`, `Test`, or `Exercise` alerts over `production` publication channels, or publish without a verified cryptographic `approvalToken` bound to exact `payloadHash` and `destination` (R-06 / R-07).
 
-## 1. CAP v1.2 Mandatory Schema Elements
+## Authoritative References & Versions
+* **OASIS Common Alerting Protocol Version 1.2** (`urn:oasis:names:tc:emergency:cap:1.2`) & **ITU-T Recommendation X.1303**. [S5]
+* **WMO CAP Validator Evaluation Note** (`World-Meteorological-Organization/capvalidator` for external XSD/XMLDSig verification when trust policy permits). [S6]
 
-All generated alerts must strictly adhere to `urn:oasis:names:tc:emergency:cap:1.2`:
+## Required Inputs
+* `mode` (`generate_xml`, `validate_xml`, `generate_brief`) plus `alertParams` / `xmlString` / `context`.
+* For `Update` / `Cancel` / `Ack`: valid CAP `<references>` (`sender,identifier,sent`). For `Private` scope: `<addresses>`.
 
-### Root `<alert>` Elements
-* **`<identifier>`**: Globally unique message identifier (e.g. `DELTA-CAP-20261109-001`).
-* **`<sender>`**: Originating authority email or URI (e.g. `ndma-alerts@gov.org`).
-* **`<sent>`**: ISO-8601 timestamp with timezone offset (`YYYY-MM-DDTHH:MM:SS+00:00`).
-* **`<status>`**: `Actual` | `Exercise` | `System` | `Test` | `Draft`.
-* **`<msgType>`**: `Alert` | `Update` | `Cancel` | `Ack` | `Error`.
-* **`<scope>`**: `Public` | `Restricted` | `Private`.
+## Allowed Executable Tools
+* `drr_cap_alert_generate_validate`
+* `drr_cap_publish` *(sandbox/production gated by `DRR_ENABLE_PRODUCTION_PUBLISH` & `approvalToken`)*
 
-### Sub-Element `<info>` Elements
-* **`<category>`**: `Geo` (Earthquake/Landslide/Tsunami), `Met` (Flood/Storm/Cyclone), `Safety`, `Fire`, `Health`, `Infra`.
-* **`<event>`**: Official event description (e.g. `Major Earthquake Warning`).
-* **`<urgency>`**: `Immediate` (< 1 hour), `Expected` (< 24 hours), `Future`, `Past`, `Unknown`.
-* **`<severity>`**: `Extreme` (Extraordinary threat to life/property), `Severe` (Significant threat), `Moderate`, `Minor`, `Unknown`.
-* **`<certainty>`**: `Observed` (Confirmed occurrence), `Likely` (p > ~50%), `Possible`, `Unlikely`, `Unknown`.
-* **`<headline>`**: Concise headline (< 160 characters).
-* **`<description>`**: Detailed narrative of hazard intensity and expected impact.
-* **`<instruction>`**: Clear, actionable protective directives for the public.
-* **`<area>`**:
-  * **`<areaDesc>`**: Text description of affected administrative territory.
-  * **`<polygon>`**: Space-delimited coordinates formatted strictly as **`lat,lon lat,lon ...`** (Notice latitude precedes longitude in CAP!).
+## Escalation Conditions
+* Escalate to authorized Duty Officer for cryptographic signing (`approvalToken`) prior to `drr_cap_publish` on `Actual` / `Public` channels.
+* Halt and escalate security alert if `validateCapXml` detects `<!DOCTYPE>` or `<!ENTITY>` (XXE attempt).
 
----
-
-## 2. Emergency Situation Brief Standard (SitRep)
-
-When synthesizing situation briefs for Emergency Operations Centers:
-1. **Header Block**: Alert Level (Green/Orange/Red), Timestamp, Geo-extent, Authority.
-2. **Executive Summary**: 2-3 sentences summarizing the event and total affected population.
-3. **Sendai Framework Metrics**:
-   - Target B: Exposed vs. displaced population.
-   - Target C: Asset value exposed vs. estimated direct losses.
-   - Target D: Compromised critical infrastructure (hospitals, schools, bridges).
-4. **Immediate Directives**: Actionable operational instructions (search & rescue, shelter activation, public advisories).
-
----
-
-## 3. Workflow for AI Agents
-
-1. Extract hazard, spatial exposure, and vulnerability outputs.
-2. Call `drr_cap_alert_generate_validate` with `mode: "generate_xml"` to produce the CAP XML.
-3. Verify that the output validation report returns `isValid: true`.
-4. If an operational summary is requested, call `drr_cap_alert_generate_validate` with `mode: "generate_brief"`.
+## Example Output & Failure Cases
+* **C-07 Separated Governance Block**:
+  `validation.governanceStates: { schemaValid: true, profileCompliant: true, authenticityVerified: false, issuerAuthorized: false, publicationApproved: false, deliveryStatus: "not_sent" }`.
+* **Publication Block**: Submitting a `Draft` alert to `channelType: "production"` is rejected deterministically.

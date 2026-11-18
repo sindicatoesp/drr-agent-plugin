@@ -4,108 +4,69 @@
  */
 
 const fs = require("fs");
-const path = require("path");
 const { ingestGdacsAlerts } = require("../lib/gdacs");
-const { spatialExposureJoin } = require("../lib/spatial");
+const {
+	spatialExposureJoin,
+	validateGeoJson,
+	repairGeoJsonGeometry,
+	transformCrs,
+	computeRasterZonalStats,
+} = require("../lib/spatial");
 const { evaluateSeismicFragility, evaluateFloodDamage, evaluateWindDamage } = require("../lib/fragility");
 const { evaluateVulnerabilityMatrix } = require("../lib/vulnerability");
 const { generateCapXml, validateCapXml, generateEmergencyBrief, generateVisualSitRepHtml } = require("../lib/cap");
 const { ingestUsgsEarthquakes } = require("../lib/usgs");
 const { fetchWeatherForecast } = require("../lib/openmeteo");
-const { pushDraftDisasterRecord, fetchExposureFromDelta, fetchDeltaDocs, fetchDeltaHazards } = require("../lib/delta");
-const { runMonitoringCycle, startMonitoringDaemon } = require("../lib/monitor");
+const { aggregateBasinRainfall, screenRiverDischarge } = require("../lib/hydro");
+const { pushDraftDisasterRecord, fetchDeltaDocs, fetchDeltaHazards, validateDeltaSchema } = require("../lib/delta");
+const { runOnce, runMonitoringCycle, startMonitoringDaemon } = require("../lib/monitor");
+const { validateInputContract } = require("../lib/contracts");
+const { listRegisteredMethods, checkDomainApplicability } = require("../lib/registry");
+const { runReplayValidation } = require("../lib/replay");
+const { validateSendaiSubmission } = require("../lib/sendai");
+const { crosswalkHazard } = require("../lib/hips");
+const { matchAndDeduplicateEvents } = require("../lib/events");
+const { propagateUncertainty } = require("../lib/uncertainty");
+const { calculateExpectedAnnualLoss, evaluateMitigationCostBenefit } = require("../lib/appraisal");
 
 function printHelp() {
 	console.log(`
-DRR Analytics & Agent Plugin CLI v1.3.0
-Disaster Risk Reduction Tools: GDACS, USGS, Open-Meteo, Spatial Joins, Fragility, CAP Alerts, DELTA & Monitoring
+DRR Analytics & Agent Plugin CLI v1.4.0
+Disaster Risk Reduction Tools: GDACS, USGS, Open-Meteo, Hydro, Spatial/CRS/Raster, Fragility, CAP Alerts, Sendai, DELTA, Uncertainty, Appraisal & Replay
 
 Usage:
   drr-tool <command> [options]
 
 Commands:
   gdacs                Fetch or parse GDACS active hazard alerts
-    --min-level <level>   Min alert score (Green, Orange, Red)
-    --type <code>         Event type (EQ, TC, FL, VO)
-    --file <path>         Local GeoJSON file instead of live fetch
-
-  usgs                 Query USGS Earthquake Hazards Program feeds
-    --min-mag <val>       Min magnitude threshold (default: 4.5)
-    --limit <num>         Number of events (default: 20)
-    --file <path>         Local USGS GeoJSON file instead of live fetch
-
-  forecast             Open-Meteo Anticipatory Action flood & weather risk
-    --lat <num>           Latitude (default: 23.8)
-    --lon <num>           Longitude (default: 90.4)
-    --days <num>          Forecast days (default: 5)
-    --file <path>         Local forecast JSON file instead of live fetch
-
-  fragility            Evaluate GEM/HAZUS structural fragility curves
-    --hazard <type>       earthquake, flood, or wind (default: earthquake)
-    --intensity <val>     PGA in g (e.g. 0.35), flood depth in m, or wind in km/h
-    --taxonomy <code>     Building class (URM, C1_PRE_CODE, C1_MODERATE_CODE, C2, S1, W1)
-
+  usgs                 Query USGS Earthquake Hazards Program (Wald99 GMICE PGA)
+  forecast             Open-Meteo Anticipatory Action rainfall-threshold screening
+  basin-rainfall       Aggregate rainfall forecasts (mm) across catchment polygon/points
+  river-discharge      Screen GloFAS / Open-Meteo river discharge (m^3/s)
+  fragility            Evaluate GEM/HAZUS structural fragility curves (requires --intensity)
   spatial-join         Perform deterministic spatial exposure join
-    --hazard <file>       Path to hazard footprint GeoJSON
-    --exposure <file>     Path to exposed assets GeoJSON FeatureCollection
-    --buffer <km>         Buffer radius around epicenter in km
-
-  vulnerability        Compute vulnerability matrix and Sendai Target B, C, D losses
-    --spatial <file>      Path to JSON report output from spatial-join
-    --hazard <type>       earthquake, flood, or wind
-    --intensity <val>     Hazard intensity metric
-
-  cap-generate         Generate OASIS CAP v1.2 XML Alert
-    --headline <text>     Alert headline
-    --severity <level>    Extreme, Severe, Moderate, Minor
-    --urgency <level>     Immediate, Expected, Future
-    --event <text>        Event name (e.g. "Earthquake Warning")
-    --area-desc <desc>    Geographic description
-    --output <file>       Write XML to file (default: stdout)
-
-  cap-validate         Validate a CAP XML file
-    <file>                Path to CAP XML file to validate
-
+  geojson-validate     Validate GeoJSON topology, winding, and antimeridian spans
+  geometry-repair      Opt-in GeoJSON ring closure & winding repair (--repair)
+  crs-transform        Transform GeoJSON/coordinates between EPSG:4326, EPSG:3857, UTM
+  raster-zonal-stats   Compute zonal stats for gridded count/density/continuous rasters
+  vulnerability        Compute vulnerability matrix & Sendai metrics (requires --intensity)
+  sendai-validate      Validate Sendai Target B/D/normalization semantics
+  hazard-crosswalk     Resolve UNDRR-ISC HIP code/alias or generate candidates
+  event-dedup          Match & deduplicate multi-source hazard event feeds
+  validate-input       Validate DRR assessment input contract & missing-data semantics
+  registry             List registered scientific models or check domain applicability
+  replay-validate      Run frozen-input reference & hindcast replay validation suite
+  uncertainty          Propagate deterministic bounds, OAT sensitivity, or seeded Monte Carlo
+  eal                  Integrate multi-return-period loss-exceedance curve (Expected Annual Loss)
+  cba                  Evaluate DRR mitigation Cost-Benefit Analysis (NPV, BCR, sensitivity)
+  cap-generate         Generate OASIS CAP v1.2 XML Alert (defaults to Draft status)
+  cap-validate         Validate CAP XML file (XXE-hardened + separated C-07 state check)
   sitrep               Synthesize executive Situation Brief or visual HTML SitRep
-    --file <path>         Path to assessment JSON or vulnerability report
-    --spatial <path>      Optional path to spatial report JSON (for exposed asset geometries)
-    --name <string>       Optional event headline/title
-    --country <string>    Optional target country or province region
-    --severity <level>    Optional alert severity (Red, Orange, Green)
-    --html                Output standalone visual HTML format (printable / web)
-    --output <file>       Write to file (e.g. sitrep.html or brief.md)
-
-  delta-push           Push a validated assessment to DELTA Resilience as a Draft record
-    --file <path>         Path to vulnerability report JSON
-    --name <string>       Optional event title
-    --mock                Dry-run simulation without making network requests
-
+  delta-validate       Validate DELTA relational schema & wire payload integrity
+  delta-push           Push schema-validated assessment to DELTA Resilience as Draft
   delta-docs           Query DELTA MCP 'docs' tool for data model & workflow reference
-    --mock                Dry-run simulation mode
-
-  delta-hazards        Retrieve live UNDRR/ISC HIP hazards list from DELTA MCP or in-code taxonomy
-    --search <query>      Search hazard name or code (e.g. "earthquake", "GH0001", "flood")
-    --local               Use in-code taxonomy directly (all 301 hazards offline)
-    --cluster <id>        Filter by cluster ID (e.g. 1068 for Seismogenic, 1072 for Flood)
-    --type <id>           Filter by type ID (e.g. 1041 for Geological, 1042 for Hydromet)
-    --page <num>          Page number (default: 1)
-    --limit <num>         Page size / limit (default: 50)
-    --dimensions          Use analytics_dimensions instead of hip-hazard_list
-    --mock                Dry-run simulation mode
-
+  delta-hazards        Retrieve UNDRR/ISC HIP hazards list
   monitor              Automated multi-source hazard telemetry monitor
-    --rules <path>        Path to alerts-config.json
-    --once                Run a single monitoring cycle and exit
-    --interval <min>      Daemon polling interval in minutes (default: 15)
-    --mock                Dry-run mode (does not write to live DELTA or webhook)
-
-Examples:
-  drr-tool usgs --min-mag 5.5
-  drr-tool monitor --once --mock
-  drr-tool monitor --rules alerts-config.example.json --interval 15
-  drr-tool delta-push --file vulnerability-report.json --mock
-  drr-tool fragility --hazard earthquake --intensity 0.40 --taxonomy URM
-  drr-tool cap-validate examples/earthquake-hazus-scenario/output-cap-alert.xml
 `);
 }
 
@@ -136,17 +97,21 @@ async function main() {
 	try {
 		switch (command) {
 			case "fragility": {
+				if (options.intensity === undefined || options.intensity === true) {
+					throw new Error("MISSING_REQUIRED_INPUT: --intensity <number> is required (silent defaults removed).");
+				}
 				const hazard = options.hazard || "earthquake";
-				const intensity = parseFloat(options.intensity || 0.3);
+				const intensity = parseFloat(options.intensity);
 				const taxonomy = options.taxonomy || "URM";
+				const opts = { unit: options.unit, mode: options.mode || "exploratory" };
 
 				let result;
 				if (hazard === "earthquake") {
-					result = evaluateSeismicFragility(taxonomy, intensity);
+					result = evaluateSeismicFragility(taxonomy, intensity, opts);
 				} else if (hazard === "flood") {
-					result = evaluateFloodDamage(intensity, options.occupancy);
+					result = evaluateFloodDamage(intensity, options.occupancy || "residential_1story", opts);
 				} else if (hazard === "wind") {
-					result = evaluateWindDamage(intensity);
+					result = evaluateWindDamage(intensity, opts);
 				} else {
 					throw new Error(`Unknown hazard type: ${hazard}`);
 				}
@@ -197,10 +162,21 @@ async function main() {
 				break;
 			}
 
+			case "basin-rainfall": {
+				const payload = JSON.parse(fs.readFileSync(options.file || options._file, "utf8"));
+				console.log(JSON.stringify(aggregateBasinRainfall(payload), null, 2));
+				break;
+			}
+
+			case "river-discharge": {
+				const payload = JSON.parse(fs.readFileSync(options.file || options._file, "utf8"));
+				console.log(JSON.stringify(screenRiverDischarge(payload), null, 2));
+				break;
+			}
+
 			case "spatial-join": {
 				if (!options.hazard || !options.exposure) {
-					console.error("Error: --hazard and --exposure files are required.");
-					process.exit(1);
+					throw new Error("Error: --hazard and --exposure files are required.");
 				}
 				const hazardGeoJSON = JSON.parse(fs.readFileSync(options.hazard, "utf8"));
 				const exposureGeoJSON = JSON.parse(fs.readFileSync(options.exposure, "utf8"));
@@ -211,23 +187,120 @@ async function main() {
 				break;
 			}
 
+			case "geojson-validate": {
+				const geojson = JSON.parse(fs.readFileSync(options.file || options._file, "utf8"));
+				const res = validateGeoJson(geojson, { crs: options.crs || "EPSG:4326" });
+				console.log(JSON.stringify(res, null, 2));
+				if (!res.valid) process.exit(1);
+				break;
+			}
+
+			case "geometry-repair": {
+				const geojson = JSON.parse(fs.readFileSync(options.file || options._file, "utf8"));
+				console.log(JSON.stringify(repairGeoJsonGeometry(geojson, { repairRequested: options.repair === true }), null, 2));
+				break;
+			}
+
+			case "crs-transform": {
+				const data = JSON.parse(fs.readFileSync(options.file || options._file, "utf8"));
+				console.log(JSON.stringify(transformCrs(data, options.from || "EPSG:4326", options.to || "EPSG:3857"), null, 2));
+				break;
+			}
+
+			case "raster-zonal-stats": {
+				const payload = JSON.parse(fs.readFileSync(options.file || options._file, "utf8"));
+				console.log(JSON.stringify(computeRasterZonalStats(payload.rasterGrid, payload.zoneGeoJSON, payload.options || {}), null, 2));
+				break;
+			}
+
 			case "vulnerability": {
 				if (!options.spatial) {
-					console.error("Error: --spatial report JSON file is required.");
-					process.exit(1);
+					throw new Error("Error: --spatial report JSON file is required.");
+				}
+				if (options.intensity === undefined || options.intensity === true) {
+					throw new Error("MISSING_REQUIRED_INPUT: --intensity <number> is required (silent defaults removed).");
 				}
 				const spatialReport = JSON.parse(fs.readFileSync(options.spatial, "utf8"));
 				const matrix = evaluateVulnerabilityMatrix(spatialReport, {
 					type: options.hazard || "earthquake",
-					intensity: parseFloat(options.intensity || 0.3),
+					intensity: parseFloat(options.intensity),
+					unit: options.unit,
 					defaultTaxonomy: options.taxonomy || "URM",
+					currency: options.currency || "USD",
+					valuationYear: options["valuation-year"] ? parseInt(options["valuation-year"], 10) : null,
 				});
 				console.log(JSON.stringify(matrix, null, 2));
 				break;
 			}
 
+			case "sendai-validate": {
+				const payload = JSON.parse(fs.readFileSync(options.file || options._file, "utf8"));
+				const res = validateSendaiSubmission(payload);
+				console.log(JSON.stringify(res, null, 2));
+				if (!res.valid) process.exit(1);
+				break;
+			}
+
+			case "hazard-crosswalk": {
+				const query = options.query || options._file;
+				console.log(JSON.stringify(crosswalkHazard(query, { sourceSystem: options.source }), null, 2));
+				break;
+			}
+
+			case "event-dedup": {
+				const payload = JSON.parse(fs.readFileSync(options.file || options._file, "utf8"));
+				console.log(JSON.stringify(matchAndDeduplicateEvents(payload.incomingEvents || [], payload.existingCatalog || []), null, 2));
+				break;
+			}
+
+			case "validate-input": {
+				const payload = JSON.parse(fs.readFileSync(options.file || options._file, "utf8"));
+				const res = validateInputContract(payload, { strictMissingData: options.strict === true });
+				console.log(JSON.stringify(res, null, 2));
+				if (!res.valid) process.exit(1);
+				break;
+			}
+
+			case "registry": {
+				if (options.method) {
+					console.log(JSON.stringify(checkDomainApplicability(options.method, {
+						value: options.value !== undefined ? parseFloat(options.value) : undefined,
+						assetClass: options.class,
+					}, { mode: options.mode || "exploratory" }), null, 2));
+				} else {
+					console.log(JSON.stringify({ methods: listRegisteredMethods() }, null, 2));
+				}
+				break;
+			}
+
+			case "replay-validate": {
+				const res = runReplayValidation({ suite: options.suite || "all" });
+				console.log(JSON.stringify(res, null, 2));
+				if (!res.valid) process.exit(1);
+				break;
+			}
+
+			case "uncertainty": {
+				const payload = JSON.parse(fs.readFileSync(options.file || options._file, "utf8"));
+				console.log(JSON.stringify(propagateUncertainty(payload), null, 2));
+				break;
+			}
+
+			case "eal": {
+				const payload = JSON.parse(fs.readFileSync(options.file || options._file, "utf8"));
+				console.log(JSON.stringify(calculateExpectedAnnualLoss(payload), null, 2));
+				break;
+			}
+
+			case "cba": {
+				const payload = JSON.parse(fs.readFileSync(options.file || options._file, "utf8"));
+				console.log(JSON.stringify(evaluateMitigationCostBenefit(payload), null, 2));
+				break;
+			}
+
 			case "cap-generate": {
 				const xml = generateCapXml({
+					status: options.status || "Draft",
 					info: {
 						headline: options.headline || "Disaster Alert",
 						severity: options.severity || "Severe",
@@ -248,8 +321,7 @@ async function main() {
 			case "cap-validate": {
 				const filePath = options.file || options._file;
 				if (!filePath) {
-					console.error("Error: Please provide a CAP XML file path to validate.");
-					process.exit(1);
+					throw new Error("Please provide a CAP XML file path to validate.");
 				}
 				const xmlContent = fs.readFileSync(filePath, "utf8");
 				const res = validateCapXml(xmlContent);
@@ -261,12 +333,9 @@ async function main() {
 			case "sitrep": {
 				const filePath = options.file || options._file;
 				if (!filePath) {
-					console.error("Error: --file <path-to-assessment.json> is required.");
-					process.exit(1);
+					throw new Error("--file <path-to-assessment.json> is required.");
 				}
 				const raw = JSON.parse(fs.readFileSync(filePath, "utf8"));
-
-				// 1. Resolve spatial data (file option or embedded)
 				let spatialData = raw.spatialReport || raw.spatial || {};
 				if (options.spatial && fs.existsSync(options.spatial)) {
 					try {
@@ -274,17 +343,15 @@ async function main() {
 					} catch (_) {}
 				}
 
-				// 2. Resolve vulnerability & sendai metrics
 				const vulnerability = raw.vulnerabilityReport || raw.vulnerability || raw;
 				const sendai = vulnerability.sendaiFrameworkMetrics || raw.sendaiFrameworkMetrics;
 
-				// 3. Resolve hazard characteristics
 				const detectedHazardType = options.hazard
 					|| raw.hazard?.hazardType
 					|| raw.hazardAssessment?.hazardType
 					|| raw.event?.hazardType
 					|| raw.hazardType
-					|| (vulnerability.hazardAssessment?.hazardType)
+					|| vulnerability.hazardAssessment?.hazardType
 					|| "flood";
 
 				const detectedIntensity = options.intensity
@@ -292,8 +359,8 @@ async function main() {
 					|| raw.hazardAssessment?.hazardIntensity
 					|| raw.event?.intensity
 					|| raw.intensity
-					|| (vulnerability.hazardAssessment?.hazardIntensity)
-					|| "High";
+					|| vulnerability.hazardAssessment?.hazardIntensity
+					|| "Unavailable";
 
 				const detectedAlertLevel = options.severity
 					|| options["alert-level"]
@@ -308,9 +375,7 @@ async function main() {
 					|| raw.hazard?.eventName
 					|| raw.event?.title
 					|| raw.event?.eventName
-					|| (detectedHazardType === "flood"
-						? "Catastrophic Flash & Fluvial Flood Warning"
-						: `${detectedHazardType.charAt(0).toUpperCase() + detectedHazardType.slice(1)} Event`);
+					|| `${detectedHazardType.charAt(0).toUpperCase() + detectedHazardType.slice(1)} Event`;
 
 				const detectedCountry = options.country
 					|| options.region
@@ -357,58 +422,36 @@ async function main() {
 				break;
 			}
 
+			case "delta-validate": {
+				const payload = JSON.parse(fs.readFileSync(options.file || options._file, "utf8"));
+				const res = validateDeltaSchema(payload);
+				console.log(JSON.stringify(res, null, 2));
+				if (!res.valid) process.exit(1);
+				break;
+			}
+
 			case "delta-push": {
-				let assessment;
-				if (options.file) {
-					assessment = JSON.parse(fs.readFileSync(options.file, "utf8"));
-				} else {
-					// Dynamically construct assessment bundle from CLI flags
-					const hazardType = options.hazard || "earthquake";
-					const eventId = options["event-id"] || options.eventId || `cli_${Date.now()}`;
-					const intensity = parseFloat(options.intensity || 0.35);
-					const country = options.country || options.place || null;
-
-					assessment = {
-						eventId,
-						name: options.name || `${hazardType.toUpperCase()} Telemetry Assessment (${eventId})`,
-						country,
-						locationDesc: options.place || options.location || country || "Assessment Geographic Zone",
-						notes: options.notes || `Live ${hazardType} assessment ingested via drr CLI`,
-						hazardAssessment: {
-							hazardType,
-							hazardIntensity: intensity,
-						},
-						hipHazardId: options["hip-hazard-id"] || options.hipHazardId || null,
-						hipClusterId: options["hip-cluster-id"] || options.hipClusterId || null,
-						hipTypeId: options["hip-type-id"] || options.hipTypeId || null,
-						sendaiFrameworkMetrics: {
-							targetB_AffectedPeople: {
-								totalExposedPopulation: parseInt(options.exposed || options.population || 5000, 10),
-								estimatedDisplacedPopulation: parseInt(options.displaced || 1200, 10),
-							},
-							targetC_DirectEconomicLoss: {
-								estimatedDirectEconomicLossUsd: parseFloat(options.loss || options.lossUsd || 2500000),
-							},
-						},
-					};
+				if (!options.file) {
+					throw new Error("Error: --file <path-to-vulnerability-report.json> is required for delta-push (synthetic CLI fallback removed).");
 				}
-
-				const result = await pushDraftDisasterRecord(assessment, {
-					mock: options.mock === true,
-				});
+				const assessment = JSON.parse(fs.readFileSync(options.file, "utf8"));
+				const result = await pushDraftDisasterRecord(
+					{
+						...assessment,
+						...(options.name ? { name: options.name } : {}),
+						...(options.notes ? { notes: options.notes } : {}),
+					},
+					{ mock: options.mock === true },
+				);
 				console.log(JSON.stringify(result, null, 2));
 				break;
 			}
 
 			case "delta-docs": {
 				const docs = await fetchDeltaDocs({ mock: options.mock === true });
-				if (typeof docs === "string") {
-					console.log(docs);
-				} else if (docs.text) {
-					console.log(docs.text);
-				} else {
-					console.log(JSON.stringify(docs, null, 2));
-				}
+				if (typeof docs === "string") console.log(docs);
+				else if (docs.text) console.log(docs.text);
+				else console.log(JSON.stringify(docs, null, 2));
 				break;
 			}
 
@@ -433,21 +476,77 @@ async function main() {
 			}
 
 			case "monitor": {
-				const configPath = options.rules || options.file;
+				const configPath = options.config || options.rules || options.file;
 				const isMock = options.mock === true;
 				if (options.once) {
-					const summary = await runMonitoringCycle({
-						configPath,
-						mock: isMock,
-					});
-					console.log(JSON.stringify(summary, null, 2));
+					const cliAbort = new AbortController();
+					const onSig = () => cliAbort.abort();
+					process.once("SIGINT", onSig);
+					process.once("SIGTERM", onSig);
+					try {
+						const readOnly =
+							options["read-only"] !== undefined
+								? options["read-only"] !== "false" && options["read-only"] !== false
+								: true;
+						const summary = await runOnce(
+							{
+								configPath,
+								mode: "single-run",
+								readOnly,
+								mock: isMock,
+								scopeId: options.scope || options["scope-id"] || process.env.DRR_MONITOR_SCOPE_ID || "global",
+								stateBackend:
+									options["state-backend"] ||
+									process.env.DRR_STATE_BACKEND ||
+									"cas-file-store",
+								stateStorageDir:
+									options["state-dir"] ||
+									process.env.DRR_STATE_DIR ||
+									undefined,
+								runDeadlineMs: options["deadline-ms"]
+									? parseInt(options["deadline-ms"], 10)
+									: process.env.DRR_RUN_DEADLINE_MS
+										? parseInt(process.env.DRR_RUN_DEADLINE_MS, 10)
+										: undefined,
+								requestTimeoutMs: options["request-timeout-ms"]
+									? parseInt(options["request-timeout-ms"], 10)
+									: undefined,
+								maxAttempts: options["max-attempts"]
+									? parseInt(options["max-attempts"], 10)
+									: undefined,
+								overlapWindowMs: options["overlap-window-ms"]
+									? parseInt(options["overlap-window-ms"], 10)
+									: undefined,
+								retentionPolicy:
+									options["retention-policy"] ||
+									process.env.DRR_RETENTION_POLICY ||
+									undefined,
+								summaryOutputPath:
+									options["summary-out"] ||
+									process.env.DRR_SUMMARY_OUT ||
+									undefined,
+								markdownSummaryPath:
+									options["markdown-out"] ||
+									process.env.DRR_MARKDOWN_OUT ||
+									undefined,
+								skippedExitCode: options["skipped-exit-code"]
+									? parseInt(options["skipped-exit-code"], 10)
+									: 0,
+							},
+							{},
+							cliAbort.signal,
+						);
+						console.log(JSON.stringify(summary, null, 2));
+						if (summary.exitCode && summary.exitCode !== 0) {
+							process.exit(summary.exitCode);
+						}
+					} finally {
+						process.removeListener("SIGINT", onSig);
+						process.removeListener("SIGTERM", onSig);
+					}
 				} else {
 					const intervalMinutes = options.interval ? parseInt(options.interval, 10) : undefined;
-					startMonitoringDaemon({
-						configPath,
-						intervalMinutes,
-						mock: isMock,
-					});
+					startMonitoringDaemon({ configPath, intervalMinutes, mock: isMock });
 				}
 				break;
 			}

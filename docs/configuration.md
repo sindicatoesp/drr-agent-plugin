@@ -253,3 +253,32 @@ When an event from outside the target country is evaluated, the plugin logs:
 [DELTA Country Filter] Skipped pushing event "Offshore Maule, Chile":
 Country "Chile" does not match national DELTA instance ["Indonesia", "ID", "IDN"].
 ```
+
+---
+
+## 6. Scheduled Single-Run Shadow Monitoring & Durable Persistence Contract
+
+When operating via scheduled workflows (e.g. `.github/workflows/scheduled-monitor.yml`) or `drr-tool monitor --once`, the monitor executes a bounded single-run pipeline (`runOnce`) in **read-only shadow mode** (`readOnly: true` by default).
+
+### Configuration Contract Fields (`validateMonitorConfig`)
+
+| Field | CLI Flag / Env | Meaning & Validation |
+| :--- | :--- | :--- |
+| **`mode`** | `--once` | `'single-run'` or `'daemon'`. Validated against explicit allowed values. |
+| **`readOnly`** | `--read-only` | Default `true` for single-run shadow mode. Blocks public CAP (`Actual`), webhooks, and DELTA writes. |
+| **`scopeId`** | `--scope` / `DRR_MONITOR_SCOPE_ID` | Validated namespace (`^[A-Za-z0-9][A-Za-z0-9._-]{0,63}$`) for state checkpoints and storage leases. |
+| **`runDeadlineMs`** | `--deadline-ms` / `DRR_RUN_DEADLINE_MS` | Positive overall application budget strictly below `workflowJobTimeoutMs`. |
+| **`requestTimeoutMs`** | `--request-timeout-ms` | Per-attempt request budget strictly below `runDeadlineMs`. |
+| **`maxAttempts`** | `--max-attempts` | Bounded integer in `[1, 10]` including first request. |
+| **`backoffBaseMs`**, **`backoffCapMs`** | Config object | Exponential backoff with jitter; positive with `backoffCapMs >= backoffBaseMs`. |
+| **`overlapWindowMs`** | `--overlap-window-ms` | Non-negative late-update reconciliation window (default `900000` ms / 15m). |
+| **`leaseTtlMs`**, **`leaseRenewMs`** | Config object | Atomic storage lease lifecycle; `leaseRenewMs` strictly below `leaseTtlMs`. |
+| **`stateBackend`** | `--state-backend` / `DRR_STATE_BACKEND` | `'cas-file-store'` (transactional manifest/pointer CAS), `'memory-cas-store'`, or `'stateless'`. |
+| **`retentionPolicy`** | `--retention-policy` / `DRR_RETENTION_POLICY` | Approved policy identifier: `'standard-30d'`, `'audit-90d'`, or `'minimal-7d'`. |
+
+### Structured Exit Code Semantics (`mapOutcomeToExitCode`)
+- **`0` (`success`)**: All enabled feeds succeeded and remained fresh (`complete_coverage`, `no_matching_events_in_covered_scope`, or `hazards_detected_and_assessed`).
+- **`2` (`degraded`)**: Partial feed failure, stale feed issue time (`STALE_SOURCE_DATA`), or deferred batch (`partial_source_coverage_degraded` / `stale_or_deferred_coverage_degraded`).
+- **`1` (`failed`)**: Configuration error, unavailable/corrupt state backend (`STATE_BACKEND_UNAVAILABLE` / `STATE_CORRUPT`), fencing rejection, or all feeds unavailable (`no_usable_data`).
+- **`skipped` (`lock_held`)**: Emits structured `status: "skipped", skipReason: "lock_held"` with configurable `--skipped-exit-code` (default `0`).
+
