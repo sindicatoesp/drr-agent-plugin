@@ -15,7 +15,7 @@ const { ingestUsgsEarthquakes } = require("../lib/usgs");
 const { fetchWeatherForecast } = require("../lib/openmeteo");
 const { aggregateBasinRainfall, screenRiverDischarge } = require("../lib/hydro");
 const { pushDraftDisasterRecord, fetchExposureFromDelta, fetchDeltaDocs, validateDeltaSchema } = require("../lib/delta");
-const { runMonitoringCycle } = require("../lib/monitor");
+const { runOnce, runMonitoringCycle } = require("../lib/monitor");
 const { validateInputContract, createProvenanceManifest } = require("../lib/contracts");
 const { listRegisteredMethods, checkDomainApplicability } = require("../lib/registry");
 const { runReplayValidation } = require("../lib/replay");
@@ -356,7 +356,7 @@ const TOOLS = [
 	{
 		name: "drr_monitor_check",
 		description:
-			"Execute an automated monitoring cycle against multi-source disaster feeds (USGS, GDACS, Open-Meteo) using alerts-config.json rules, event deduplication, and Draft CAP/DELTA artifacts.",
+			"Execute a bounded single-run monitoring cycle against multi-source disaster feeds (USGS, GDACS, Open-Meteo) using alerts-config.json rules, durable CAS state/leases, event deduplication, and read-only shadow mode protection.",
 		inputSchema: {
 			type: "object",
 			properties: {
@@ -367,6 +367,23 @@ const TOOLS = [
 				mock: {
 					type: "boolean",
 					description: "Set to true to run in dry-run mode",
+				},
+				readOnly: {
+					type: "boolean",
+					description: "Blocks consequential outbound actions (default true for shadow runs)",
+				},
+				scopeId: {
+					type: "string",
+					description: "State/lease namespace identifier (default: global)",
+				},
+				stateBackend: {
+					type: "string",
+					enum: ["cas-file-store", "memory-cas-store", "stateless"],
+					description: "Authoritative persistence adapter",
+				},
+				runDeadlineMs: {
+					type: "number",
+					description: "Overall application budget in milliseconds",
 				},
 			},
 		},
@@ -763,6 +780,10 @@ async function handleToolCall(name, args) {
 			return runMonitoringCycle({
 				configPath: safeConfigPath,
 				mock: args.mock !== undefined ? args.mock : false,
+				readOnly: args.readOnly,
+				scopeId: args.scopeId,
+				stateBackend: args.stateBackend,
+				runDeadlineMs: args.runDeadlineMs,
 			});
 		}
 

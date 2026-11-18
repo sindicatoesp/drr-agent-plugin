@@ -24,7 +24,9 @@ node "$DIR/test-delta-uncertainty-appraisal.js"
 node "$DIR/test-mcp-server.js"
 node "$DIR/test-hindcast-regression.js"
 node "$DIR/test-cli-inventory.js"
+node "$DIR/test-scheduled-monitoring.js"
 
 echo "=================================================="
-echo " 🎉 ALL 18 TEST SUITES PASSED SUCCESSFULLY!"
+echo " 🎉 ALL 19 TEST SUITES PASSED SUCCESSFULLY!"
 echo "=================================================="
+

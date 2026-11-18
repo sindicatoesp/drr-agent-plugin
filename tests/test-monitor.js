@@ -204,6 +204,7 @@ async function testCountryFilter() {
 	assert.strictEqual(vanuatuAlert.deltaRecord.success, true, "Vanuatu quake should be pushed to DELTA");
 
 	fs.unlinkSync(tempConfigPath);
+	fs.rmSync(path.join(__dirname, "alerts"), { recursive: true, force: true });
 	fs.rmSync(path.join(__dirname, "..", "alerts"), { recursive: true, force: true });
 	console.log("✅ Country filtering and DELTA push guard tests passed!");
 }

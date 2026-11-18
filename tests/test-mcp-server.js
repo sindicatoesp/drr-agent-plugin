@@ -351,6 +351,8 @@ async function run() {
 	const errRes = await waitForResponse(99);
 	assert(errRes.error && errRes.error.message.includes("SINGLE_EVENT_CANNOT_ESTABLISH_EAL"));
 
+	const fs = require("fs");
+	fs.rmSync(path.join(__dirname, "../alerts"), { recursive: true, force: true });
 	child.kill();
 	console.log("✅ MCP Server Stdio tests passed (29 tools + error handling verified)!");
 }
