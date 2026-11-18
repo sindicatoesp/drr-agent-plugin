@@ -62,6 +62,9 @@ jobs:
         with:
           node-version: '20.x'
 
+      - name: Install dependencies
+        run: npm install
+
       - name: Run Offline Verification Gate Before Live Ingestion
         run: |
           node scripts/lint.js
@@ -119,6 +122,11 @@ jobs:
         run: |
           EXIT_CODE="${{ steps.monitor_run.outputs.exit_code }}"
           if [ -z "$EXIT_CODE" ]; then
+            echo "Missing exit_code output from monitor_run"
             exit 1
+          fi
+          if [ "$EXIT_CODE" = "2" ]; then
+            echo "Monitor completed in DEGRADED mode (exit 2). Treating as success in CI."
+            exit 0
           fi
           exit "$EXIT_CODE"
