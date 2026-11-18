@@ -131,10 +131,10 @@ alerts-validate: ## Validate declarative alert rules in alerts-config.json
 lint: ## Run zero-dependency static lint & syntax checker (node --check, vm.Script, JSON)
 	@node scripts/lint.js
 
-test: ## Run the complete 11-suite unit and MCP test suite
+test: ## Run the complete 18-suite unit and MCP test suite
 	@bash tests/run-all-tests.sh
 
-check: lint test ## Run full pre-commit gate (linting + all 11 test suites)
+check: lint test ## Run full pre-commit gate (linting + all 18 test suites)
 
 pre-commit-install: ## Install automatic Git pre-commit hook into .git/hooks
 	@node scripts/install-git-hook.js
@@ -222,7 +222,7 @@ docker-ps: docker-status ## Alias for docker-status
 docker-logs: ## Follow live logs from the monitoring daemon container
 	docker compose logs -f drr-monitor
 
-docker-test: ## Run the full 11-suite test runner inside the Alpine container
+docker-test: ## Run the full 18-suite test runner inside the Alpine container
 	docker compose run --rm drr-cli test
 
 docker-once: ## Run a single monitor scan inside the Alpine container

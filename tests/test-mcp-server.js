@@ -56,7 +56,7 @@ async function run() {
 	send({ jsonrpc: "2.0", id: 2, method: "tools/list", params: {} });
 	const listRes = await waitForResponse(2);
 	assert(listRes, "Expected tools/list response");
-	assert.strictEqual(listRes.result.tools.length, 11);
+	assert.strictEqual(listRes.result.tools.length, 29);
 
 	// 3. tools/call: drr_fragility_eval
 	send({
@@ -130,7 +130,7 @@ async function run() {
 	const meteoParsed = JSON.parse(meteoRes.result.content[0].text);
 	assert.strictEqual(meteoParsed.anticipatoryAction.alertColor, "Red");
 
-	// 6. tools/call: drr_delta_push_draft_record (mock: true)
+	// 6. tools/call: drr_delta_push_draft_record (mock: true, forwarding name & notes)
 	send({
 		jsonrpc: "2.0",
 		id: 6,
@@ -139,6 +139,8 @@ async function run() {
 			name: "drr_delta_push_draft_record",
 			arguments: {
 				mock: true,
+				name: "MCP Forwarded Quake Title",
+				notes: "MCP Forwarded Audit Note",
 				assessment: {
 					hazardAssessment: { hazardType: "flood", hazardIntensity: 1.5 },
 					sendaiFrameworkMetrics: {
@@ -155,6 +157,8 @@ async function run() {
 	assert.strictEqual(deltaParsed.success, true);
 	assert.strictEqual(deltaParsed.record.status, "draft");
 	assert.strictEqual(deltaParsed.record.source, "drr-agent-plugin");
+	assert(deltaParsed.record.locationDesc.includes("MCP Forwarded Quake Title"), "name arg must forward to locationDesc");
+	assert(deltaParsed.record.assessmentModes.includes("MCP Forwarded Audit Note"), "notes arg must forward to assessmentModes");
 
 	// 6b. tools/call: drr_delta_docs
 	send({
@@ -194,6 +198,7 @@ async function run() {
 	assert(capRes, "Expected CAP generation response");
 	const capParsed = JSON.parse(capRes.result.content[0].text);
 	assert(capParsed.validation.isValid, "Generated CAP alert must be valid");
+	assert(capParsed.xml.includes("<status>Draft</status>"), "CAP default status must be Draft");
 
 	// 8. tools/call: drr_monitor_check
 	send({
@@ -212,8 +217,142 @@ async function run() {
 	const monParsed = JSON.parse(monRes.result.content[0].text);
 	assert(monParsed.timestamp, "Timestamp must be present in monitor output");
 
+	// 9. New R-02..R-15 MCP Tools Coverage over Stdio
+	async function callTool(id, toolName, argumentsObj) {
+		send({
+			jsonrpc: "2.0",
+			id,
+			method: "tools/call",
+			params: { name: toolName, arguments: argumentsObj },
+		});
+		const res = await waitForResponse(id);
+		assert(res && !res.error, `Tool ${toolName} returned RPC error: ${JSON.stringify(res?.error)}`);
+		return JSON.parse(res.result.content[0].text);
+	}
+
+	const inputVal = await callTool(9, "drr_input_contract_validate", {
+		input: { hazardType: "flood", intensity: 250, intensityUnit: "mm" },
+	});
+	assert.strictEqual(inputVal.valid, false);
+	assert.strictEqual(inputVal.errors[0].code, "UNIT_MISMATCH");
+
+	const provRes = await callTool(10, "drr_source_provenance_manifest", {
+		sourceIds: ["usgs:test"],
+		evidenceBasis: "modelled",
+		approvalStatus: "approved", // must stay draft without verified approval ref
+	});
+	assert.strictEqual(provRes.governance.approvalStatus, "draft");
+
+	const regList = await callTool(11, "drr_model_registry_list", {});
+	assert(Array.isArray(regList.methods) && regList.methods.length >= 7);
+
+	const replayRes = await callTool(12, "drr_assessment_replay_validate", { suite: "synthetic_reference" });
+	assert.strictEqual(replayRes.valid, true);
+
+	const sendaiRes = await callTool(13, "drr_sendai_validate", {
+		payload: { targetB: { b1DerivedFromDisplacementOnly: true, b1DirectlyAffected: 100, estimatedDisplacedPopulation: 100 } },
+	});
+	assert.strictEqual(sendaiRes.valid, false);
+
+	const cwRes = await callTool(14, "drr_hazard_crosswalk", { query: "EQ", sourceSystem: "GDACS" });
+	assert.strictEqual(cwRes.status, "resolved_exact");
+	assert.strictEqual(cwRes.mapping.code, "GH0001");
+
+	const dedupRes = await callTool(15, "drr_event_match_deduplicate", {
+		incomingEvents: [{ source: "USGS", externalId: "ev1", hazardType: "earthquake", coordinates: [100, 10], timestamp: "2026-11-10T00:00:00Z" }],
+		existingCatalog: [],
+	});
+	assert.strictEqual(dedupRes.decisions[0].classification, "unique_new_event");
+
+	const geoValRes = await callTool(16, "drr_geojson_validate", {
+		geojson: { type: "Polygon", coordinates: [[[0, 0], [1, 0], [1, 1], [0, 1], [0, 0]]] },
+	});
+	assert.strictEqual(geoValRes.valid, true);
+
+	const repairRes = await callTool(17, "drr_geometry_repair", {
+		geojson: { type: "Polygon", coordinates: [[[0, 0], [0, 1], [1, 1], [1, 0]]] },
+		repairRequested: true,
+	});
+	assert.strictEqual(repairRes.repaired, true);
+
+	const crsRes = await callTool(18, "drr_crs_transform", {
+		input: [100.5, 13.7],
+		fromCrs: "EPSG:4326",
+		toCrs: "EPSG:3857",
+	});
+	assert.strictEqual(crsRes.transformed.length, 2);
+
+	const rasterRes = await callTool(19, "drr_raster_zonal_stats", {
+		rasterGrid: { crs: "EPSG:4326", bbox: [0, 0, 2, 2], width: 2, height: 2, valueSemantics: "count", values: [1, 2, 3, 4] },
+		zoneGeoJSON: { type: "Polygon", coordinates: [[[0, 0], [2, 0], [2, 2], [0, 2], [0, 0]]] },
+	});
+	assert.strictEqual(rasterRes.stats.integratedTotal, 10);
+
+	const basinRes = await callTool(20, "drr_basin_rainfall_aggregate", {
+		stationsOrGrid: [{ id: "s1", dailyPrecipMm: [25, 35] }],
+	});
+	assert.strictEqual(basinRes.depthStatus, "depth_unavailable");
+
+	const dischRes = await callTool(21, "drr_river_discharge_screen", {
+		dailyDischargeM3s: [300, 900],
+		returnPeriodThresholds: { q2: 500, q5: 800 },
+	});
+	assert.strictEqual(dischRes.unit, "m^3/s");
+	assert.strictEqual(dischRes.depthStatus, "depth_unavailable");
+
+	const capPubRes = await callTool(22, "drr_cap_publish", {
+		xmlString: capParsed.xml,
+		channelType: "production",
+		destination: "https://cap.example.org/ingest",
+	});
+	assert.strictEqual(capPubRes.blocked, true);
+
+	const deltaSchemaRes = await callTool(23, "drr_delta_schema_validate", {
+		payload: { eventId: "ev_s1", hazardAssessment: { hazardType: "earthquake", hazardIntensity: 0.3 } },
+	});
+	assert.strictEqual(deltaSchemaRes.valid, true);
+
+	const uncRes = await callTool(24, "drr_uncertainty_propagate", {
+		mode: "deterministic_bounds",
+		hazardType: "earthquake",
+		intensity: 0.35,
+		exposedValueUsd: 1000000,
+	});
+	assert(uncRes.sensitivityRanking.length === 3);
+
+	const ealRes = await callTool(25, "drr_expected_annual_loss", {
+		points: [{ returnPeriodYears: 10, loss: 100 }, { returnPeriodYears: 100, loss: 500 }],
+		currency: "USD",
+		valuationYear: 2026,
+	});
+	assert(ealRes.expectedAnnualLoss > 0);
+
+	const cbaRes = await callTool(26, "drr_mitigation_cost_benefit", {
+		baselineEal: 500000,
+		mitigatedEal: 150000,
+		capex: 2000000,
+		discountRate: 0.05,
+		horizonYears: 20,
+		currency: "USD",
+		valuationYear: 2026,
+	});
+	assert(cbaRes.quantitativeMetrics.benefitCostRatio > 1);
+
+	// 10. Error propagation verification for invalid input
+	send({
+		jsonrpc: "2.0",
+		id: 99,
+		method: "tools/call",
+		params: {
+			name: "drr_expected_annual_loss",
+			arguments: { points: [{ returnPeriodYears: 50, loss: 1000 }], currency: "USD", valuationYear: 2026 },
+		},
+	});
+	const errRes = await waitForResponse(99);
+	assert(errRes.error && errRes.error.message.includes("SINGLE_EVENT_CANNOT_ESTABLISH_EAL"));
+
 	child.kill();
-	console.log("✅ MCP Server Stdio tests passed!");
+	console.log("✅ MCP Server Stdio tests passed (29 tools + error handling verified)!");
 }
 
 run().catch((err) => {

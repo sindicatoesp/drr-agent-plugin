@@ -1,37 +1,35 @@
 ---
 name: delta-disaster-recording
-description: Two-way synchronization with UNDRR DELTA Resilience. Queries baseline exposure and administrative divisions, and pushes validated post-disaster assessments as Draft records with full Sendai Target B, C, D metrics.
+description: Schema-validated, tenant-isolated, draft-only interoperability with UNDRR DELTA Resilience retaining C-03 governance metadata, HIP triad completeness, and idempotency keys.
 ---
 
-# DELTA Resilience Two-Way Synchronization
+# UNDRR DELTA Resilience Interoperability
 
-## Overview
-This skill guides AI agents in establishing two-way interoperability with the **UNDRR DELTA Resilience** disaster tracking platform. It enforces audit standards, multi-tenant isolation, and automated draft recording of disaster losses.
+## Triggers
+* User requests fetching DELTA exposure/divisions/HIP catalogs, inspecting DTS schema rules, validating a relational bundle, or pushing a draft disaster record.
 
----
+## Non-Goals
+* **MUST NOT** push non-draft records directly into production or mutate `evidenceBasis: "modelled"` into `"observed"` (C-03).
+* **MUST NOT** invent unverified DELTA schema endpoints or bypass `validateDeltaSchema` / tenant isolation (`tenantContext`).
+* **MUST NOT** execute live production writes unless `DRR_ENABLE_PRODUCTION_PUBLISH=true` and `mock !== true`.
 
-## 1. Principles of Two-Way Integration
+## Authoritative References & Versions
+* **UNDRR DELTA Resilience / DTS Data Model** (`drr_delta_docs` & `validateDeltaSchema`, PostGIS SRID 4326 spatial footprints, HIP triad `typeId`/`clusterId`/`hazardId`).
 
-### 1.1 Non-Destructive Ingestion (Draft Status)
-The agent must **never** publish or finalize records directly into the operational database. All created records must have:
-* `status: "draft"`
-* `source: "drr-agent-plugin"`
-* An automated audit note detailing timestamp, hazard intensity, and model parameters.
+## Required Inputs
+* Validated vulnerability/loss assessment JSON (`assessment`), `mock` flag (`true` for dry-run sandbox validation), `tenantContext`, and optional sanitized `name` / `notes`.
 
-### 1.2 Multi-Tenancy & Scoped Permissions
-DELTA requires strict `countryAccountsId` scoping:
-* Authenticate using a dedicated service key with `read_write` permissions bound to the designated country account.
-* Use `drr_delta_fetch_exposure` to query division boundaries (`division_list`) and verify that asset coordinates match the tenant's administrative territory.
+## Allowed Executable Tools
+* `drr_delta_docs`
+* `drr_delta_fetch_exposure`
+* `drr_delta_schema_validate`
+* `drr_delta_push_draft_record`
 
----
+## Escalation Conditions
+* Escalate to national DELTA focal point if `drr_delta_schema_validate` fails DTS contract or HIP triad checks.
+* Escalate on cross-tenant mismatch (`actorTenant !== targetTenant`) or missing live write authorization.
 
-## 2. Standard Workflow for AI Agents
-
-1. **Conduct Rapid Assessment**:
-   Ingest hazard data (GDACS, USGS, or Open-Meteo), execute `drr_spatial_exposure_join`, and compute `drr_vulnerability_matrix_calc`.
-2. **Review Assessment Summary**:
-   Confirm that Sendai Framework Target B (displaced population), Target C (direct economic losses), and Target D (critical facilities) metrics are populated.
-3. **Execute Draft Ingestion**:
-   Call `drr_delta_push_draft_record` passing the assessment object.
-4. **Notify Duty Officer**:
-   Provide the created draft record ID and link to the DELTA web interface so the national focal point can review, edit, and approve the event.
+## Example Output & Failure Cases
+* **Expected Draft Output**:
+  `{ success: true, record: { status: "draft", source: "drr-agent-plugin", apiImportId: ... }, governanceMetadata: { evidenceBasis, verificationStatus, approvalStatus, reportingEligibility } }`.
+* **Production Gate**: Calling live push while `DRR_ENABLE_PRODUCTION_PUBLISH !== "true"` is blocked cleanly unless `mock: true`.

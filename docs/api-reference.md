@@ -1,377 +1,381 @@
 # MCP Tools & CLI Technical Reference
 
-Complete technical specification of all 10 MCP tools provided by `bin/mcp-server.js` and the standalone Command-Line Interface (`bin/cli.js`).
+Complete technical specification of all **29 MCP tools** provided by `bin/mcp-server.js` and the **29 CLI commands** in `bin/cli.js`.
+
+> **Inventory Note (R-01)**: Historically at baseline commit `1d7600ce5cc50dcdea7b438ccbd59d28282793dd` (`origin/dev`), `bin/mcp-server.js` registered 11 tools (including `drr_delta_docs`) while this reference listed 10. Both `docs/api-reference.md` and `docs/tool-inventory.md` are now reconciled with the full **29-tool** registration source.
 
 ---
 
-# Part 1: Model Context Protocol (MCP) Tools (10 Tools)
-Ingests and filters active GDACS alerts by severity, hazard type, or country.
+# Part 1: Model Context Protocol (MCP) Tools (29 Tools)
 
-### Input Schema
+## 1. `drr_gdacs_fetch`
+Ingests and filters active GDACS alerts by severity, hazard type (`EQ`, `TC`, `FL`, `VO`, `DR`), or country, with untrusted feed sanitization (`promptInjectionFlagged`), `sourceIssuedAt`, `retrievedAt`, and `payloadHash`.
+
 ```json
 {
-  "minAlertLevel": "Green" | "Orange" | "Red",
-  "eventType": "EQ" | "TC" | "FL" | "VO" | "DR" | "WF",
+  "minAlertLevel": "Green | Orange | Red",
+  "eventType": "EQ | TC | FL | VO | DR",
   "country": "string",
   "samplePayload": {}
 }
 ```
 
----
-
 ## 2. `drr_usgs_earthquake_fetch`
-Queries real-time seismic events from the USGS Earthquake Hazards Program and estimates Peak Ground Acceleration (PGA in $g$) from Instrumental Intensity (MMI) via Wald et al. (1999) ground motion equations.
+Queries real-time seismic events from the USGS Earthquake Hazards Program and converts MMI to Peak Ground Acceleration (PGA in $g$) via **Wald et al. (1999) GMICE** (`REG_WALD99_GMICE`), recording empirical applicability (MMI V–VIII) and extrapolation flags.
 
-### Input Schema
 ```json
 {
-  "minMagnitude": 5.0,     // Minimum earthquake magnitude (e.g. 4.5, 6.0)
-  "limit": 20,             // Maximum number of events
-  "samplePayload": {}      // Optional offline GeoJSON fixture
+  "minMagnitude": 5.0,
+  "limit": 20,
+  "samplePayload": {}
 }
 ```
-
-### Output Example
-```json
-{
-  "totalEvents": 1,
-  "earthquakes": [
-    {
-      "id": "usgs_us7000m8v7",
-      "usgsId": "us7000m8v7",
-      "title": "M 6.8 - 15 km SW of Port-Vila, Vanuatu",
-      "place": "15 km SW of Port-Vila, Vanuatu",
-      "magnitude": 6.8,
-      "coordinates": [168.21, -17.85],
-      "depthKm": 35.0,
-      "mmi": 7.2,
-      "estimatedPgaG": 0.2642,
-      "alertLevel": "orange",
-      "tsunamiAlert": false,
-      "url": "https://earthquake.usgs.gov/earthquakes/eventpage/us7000m8v7"
-    }
-  ]
-}
-```
-
----
 
 ## 3. `drr_openmeteo_forecast`
-Queries Open-Meteo multi-model weather forecasts and evaluates Anticipatory Action triggers for flash floods and extreme wind.
+Queries Open-Meteo multi-model weather forecasts for **Anticipatory Action rainfall-threshold screening only** (never derives or fabricates inundation depth from rainfall alone — returns `estimatedInundationDepthMeters: null` and `depthStatus: "depth_unavailable"`). Enforces optional approved `triggerPolicy` and distinct-run `previousRuns` persistence checks.
 
-### Input Schema
 ```json
 {
-  "latitude": 23.8,        // Target latitude
-  "longitude": 90.4,       // Target longitude
-  "days": 5,               // Forecast window in days
-  "samplePayload": {}      // Optional offline payload
+  "latitude": 23.8,
+  "longitude": 90.4,
+  "days": 5,
+  "triggerPolicy": { "policyId": "bgd-fbf-2026", "approved": true, "requirePersistence": false },
+  "previousRuns": [],
+  "samplePayload": {}
 }
 ```
-
-### Output Example
-```json
-{
-  "totalForecastPrecipitationMm": 268.7,
-  "peakDailyPrecipitationMm": 115.0,
-  "peakPrecipitationDate": "2026-08-11",
-  "peakWindSpeedKmh": 68.0,
-  "anticipatoryAction": {
-    "riskLevel": "Extreme Flash Flood & River Inundation Trigger",
-    "alertColor": "Red",
-    "triggerThresholdMet": true,
-    "estimatedInundationDepthMeters": 1.84,
-    "recommendedEarlyAction": "Pre-position water purification units and trigger evacuation advisories for low-lying settlements."
-  }
-}
-```
-
----
 
 ## 4. `drr_spatial_exposure_join`
-Performs deterministic point-in-polygon and buffer spatial joins between hazard footprints and exposure assets.
+Executes deterministic, hole-aware, boundary-inclusive, antimeridian-safe point-in-polygon and geodesic buffer spatial joins between hazard footprints and exposed assets.
 
-### Input Schema
 ```json
 {
-  "hazardGeoJSON": {},       // Feature or FeatureCollection (Polygon/MultiPolygon)
-  "exposureGeoJSON": {},     // FeatureCollection (Points or Polygons)
-  "epicenter": [125.15, 6.85], // Optional [lon, lat]
-  "bufferKm": 25.0           // Optional buffer in km
+  "hazardGeoJSON": {},
+  "exposureGeoJSON": {},
+  "epicenter": [125.15, 6.85],
+  "bufferKm": 25.0
 }
 ```
-
----
 
 ## 5. `drr_fragility_eval`
-Evaluates GEM and HAZUS lognormal damage state probabilities.
+Evaluates illustrative GEM/HAZUS lognormal damage state probabilities and Mean Damage Ratio (MDR) registered in `MODEL_REGISTRY`. Enforces explicit unit conversion (`g`, `m/s2`, `m`, `ft`, `km/h`, `m/s`, `kt`), distinct flood occupancies (`residential_1story`, `residential_2story`, `commercial`), zero-intensity invariance, and production blocking for uncalibrated illustrative curves.
 
-### Input Schema
 ```json
 {
-  "hazardType": "earthquake" | "flood" | "wind",
-  "intensity": 0.35,        // PGA in g, flood depth in m, or wind in km/h
-  "taxonomy": "URM" | "C1_PRE_CODE" | "C1_MODERATE_CODE" | "C2" | "S1" | "W1",
-  "occupancy": "residential_1story" | "residential_2story" | "commercial"
+  "hazardType": "earthquake | flood | wind",
+  "intensity": 0.35,
+  "unit": "g",
+  "taxonomy": "URM | C1_PRE_CODE | C1_MODERATE_CODE | C2 | S1 | W1",
+  "occupancy": "residential_1story | residential_2story | commercial",
+  "mode": "exploratory | production"
 }
 ```
-
----
 
 ## 6. `drr_vulnerability_matrix_calc`
-Computes composite losses, displacement, and Sendai Framework metrics (Targets B, C, D).
+Computes composite vulnerability matrices with C-01..C-03 compliance: preserves unknown population/value as `null`, separates modelled displacement (`estimatedDisplaced`) from Sendai `B-1` directly affected (`b1DirectlyAffected: null` unless direct evidence exists), separates physical facility damage (`D-2`..`D-4`) from service disruption (`D-6`..`D-8`), and preserves currency/valuationYear.
 
-### Input Schema
 ```json
 {
-  "spatialReport": {},       // Output from drr_spatial_exposure_join
-  "hazardType": "earthquake" | "flood" | "wind",
+  "spatialReport": {},
+  "hazardType": "earthquake | flood | wind",
   "intensity": 0.35,
-  "defaultTaxonomy": "URM"
+  "unit": "g",
+  "defaultTaxonomy": "URM",
+  "currency": "USD",
+  "valuationYear": 2026
 }
 ```
-
----
 
 ## 7. `drr_cap_alert_generate_validate`
-Generates and validates ITU-T X.1303 / OASIS CAP v1.2 XML alerts or synthesizes situation briefs.
+Generates and validates ITU-T X.1303 / OASIS CAP v1.2 XML alerts or synthesizes emergency situation briefs. Defaults generated alerts to `status: "Draft"` and UTC `+00:00` timestamps; blocks XXE/DOCTYPE injections; validates `<references>` on `Update`/`Cancel`/`Ack` and `<addresses>` on `Private` scope alerts; separates schema/profile validity from authenticity, issuer authorization, publication approval, and delivery status.
 
-### Input Schema
 ```json
 {
-  "mode": "generate_xml" | "validate_xml" | "generate_brief",
-  "alertParams": { ... },
+  "mode": "generate_xml | validate_xml | generate_brief",
+  "alertParams": {},
   "xmlString": "<?xml ...>",
-  "context": { ... }
+  "context": {}
+}
+```
+
+## 8. `drr_cap_publish`
+Controlled CAP publication adapter enforcing XML validity, channel safety (blocks `Draft`/`Test`/`Exercise` alerts from production channels, disables live production publish unless `DRR_ENABLE_PRODUCTION_PUBLISH === 'true'`), destination allowlists, idempotency replay checks, and signed `approvalToken` verification bound to payload hash and destination.
+
+```json
+{
+  "xmlString": "<?xml ...>",
+  "channelType": "sandbox | production",
+  "destination": "https://sandbox.cap.example.org/ingest",
+  "permissionScope": "publish_cap",
+  "approvalToken": {},
+  "idempotencyKey": "cap-dispatch-001"
+}
+```
+
+## 9. `drr_delta_push_draft_record`
+Pushes a schema-validated assessment to DELTA Resilience as a Draft (`status: "draft"`, `source: "drr-agent-plugin"`). Forwards sanitized `name` and `notes`, validates DTS schema (`validateDeltaSchema`), enforces tenant isolation (`tenantContext`), and preserves C-03 governance metadata.
+
+```json
+{
+  "assessment": {},
+  "name": "string",
+  "notes": "string",
+  "mock": true,
+  "tenantContext": { "actorTenant": "THA", "targetTenant": "THA" }
+}
+```
+
+## 10. `drr_delta_fetch_exposure`
+Queries baseline administrative divisions, sector assets, HIP catalogs, or historical disaster records from DELTA via MCP.
+
+```json
+{
+  "entity": "division | disaster-record | disaster-event | organization | hip-hazard | hip-cluster | hip-type | sector",
+  "filter": { "page": 1, "pageSize": 50 },
+  "mock": true
+}
+```
+
+## 11. `drr_delta_docs`
+Queries the DELTA Resilience MCP `docs` tool for DTS system documentation, entity relationships, workflows, and HIP taxonomy reference.
+
+```json
+{
+  "mock": true
+}
+```
+
+## 12. `drr_delta_schema_validate`
+Validates a DELTA relational bundle or assessment against DTS `fieldsDefApi` contracts, HIP triad completeness, wire sanitization, PostGIS SRID 4326 spatial footprints, and Sendai relations.
+
+```json
+{
+  "payload": {}
+}
+```
+
+## 13. `drr_monitor_check`
+Executes an automated monitoring cycle against `alerts-config.json` rules using geodesic circular buffers (`createGeodesicBuffer`), hazard-appropriate intensity mapping (no cross-hazard seismic PGA fallback for tropical cyclones), cross-source event deduplication (`matchAndDeduplicateEvents`), and `Draft`-status CAP alert artifacts.
+
+```json
+{
+  "configPath": "alerts-config.json",
+  "mock": true
+}
+```
+
+## 14. `drr_input_contract_validate`
+Validates assessment input contracts (intensity units, coordinate order `[lon, lat]`, temporal intervals, ISO-4217 currency, `valuationYear`, and missing-data preservation where `null` != `0`).
+
+```json
+{
+  "input": {},
+  "strictMissingData": false
+}
+```
+
+## 15. `drr_source_provenance_manifest`
+Generates a secret-sanitized provenance and independent C-03 governance manifest (`evidenceBasis`, `verificationStatus`, `approvalStatus`, `reportingEligibility`, and SHA-256 `snapshotHash`).
+
+```json
+{
+  "sourceIds": ["usgs:us7000"],
+  "method": { "id": "REG_WALD99_GMICE", "version": "1999.1" },
+  "inputsSnapshot": {},
+  "evidenceBasis": "modelled",
+  "verificationStatus": "unreviewed",
+  "approvalStatus": "draft",
+  "seed": 42
+}
+```
+
+## 16. `drr_model_registry_list`
+Lists all registered scientific methods in `MODEL_REGISTRY` or checks domain applicability for a given `methodId`, `value`, `assetClass`, and `mode`.
+
+```json
+{
+  "methodId": "REG_WALD99_GMICE",
+  "value": 6.5,
+  "assetClass": "URM",
+  "mode": "exploratory | production"
+}
+```
+
+## 17. `drr_assessment_replay_validate`
+Executes deterministic frozen-input replay validation across `synthetic_reference` and `hindcast_benchmark` test vectors (`R-05`).
+
+```json
+{
+  "suite": "all | synthetic_reference | hindcast_benchmark"
+}
+```
+
+## 18. `drr_sendai_validate`
+Validates Sendai Framework Monitor (SFM) semantics (`R-08`): blocks unreviewed modelled statistics from official reporting, separates displacement from `B-1`, rejects overlapping population sums without deduplication methodology, distinguishes physical damage (`D-2`..`D-4`) from service disruption (`D-6`..`D-8`), and requires explicit `populationDenominator` for per-100,000 metrics.
+
+```json
+{
+  "payload": {},
+  "requireCalibratedMethodology": false
+}
+```
+
+## 19. `drr_hazard_crosswalk`
+Versioned UNDRR-ISC HIP hazard crosswalk (`UNDRR-ISC-HIP-2020-DELTA-v1`) with deterministic exact resolution on IDs/codes/aliases, human-reviewed candidate ranking for free-text queries, explicit `unresolved` handling for unknown codes, and 2025 HIP revision flags (`R-09`).
+
+```json
+{
+  "query": "EQ",
+  "sourceSystem": "GDACS",
+  "candidateLimit": 5
+}
+```
+
+## 20. `drr_event_match_deduplicate`
+Multi-source event identity & deduplication engine (`R-10`) distinguishing exact external-ID matches (`exact_match_idempotent`), source updates (`revision_update`), ambiguous same-family spatio-temporal overlaps (`possible_duplicate` held for human review), and different-hazard co-occurrences (`cascading_candidate`, never inferring `triggered_by` automatically).
+
+```json
+{
+  "incomingEvents": [],
+  "existingCatalog": [],
+  "spatialRadiusKm": 50,
+  "timeWindowHours": 48
+}
+```
+
+## 21. `drr_geojson_validate`
+Validates GeoJSON Feature/FeatureCollection geometry topology: coordinate ranges, ring closure, zero-area degeneracy, RFC 7946 winding order, antimeridian spans, and segment self-intersections.
+
+```json
+{
+  "geojson": {},
+  "crs": "EPSG:4326"
+}
+```
+
+## 22. `drr_geometry_repair`
+Opt-in auditable GeoJSON repair (`repairRequested: true` required) performing ring closure, duplicate vertex removal, and RFC 7946 winding orientation while preserving `originalGeometry` and reporting `areaSqKmDelta`.
+
+```json
+{
+  "geojson": {},
+  "repairRequested": true
+}
+```
+
+## 23. `drr_crs_transform`
+Reprojects `[x, y]` points or full GeoJSON geometries across `EPSG:4326` (WGS84), `EPSG:3857` (Web Mercator), and WGS84 UTM zones (`EPSG:32601`–`EPSG:32660`, `EPSG:32701`–`EPSG:32760`).
+
+```json
+{
+  "input": {},
+  "fromCrs": "EPSG:4326",
+  "toCrs": "EPSG:3857"
+}
+```
+
+## 24. `drr_raster_zonal_stats`
+Computes zonal statistics for gridded rasters inside vector zone polygons, enforcing CRS alignment, `nodata` exclusion, and explicit `quantityType` semantics (`count` sum, `density_per_sqkm` area-integrated count, or `continuous` min/max/mean).
+
+```json
+{
+  "rasterGrid": {},
+  "zoneGeoJSON": {},
+  "zoneCrs": "EPSG:4326",
+  "boundaryDataset": "GAUL",
+  "boundaryVersion": "2024"
+}
+```
+
+## 25. `drr_basin_rainfall_aggregate`
+Aggregates gauge/grid precipitation forecasts (mm) over a catchment polygon or station array (`arithmetic_mean` or `weighted`), preserving `depthStatus: "depth_unavailable"`.
+
+```json
+{
+  "basinId": "BASIN-01",
+  "basinName": "Lower Chao Phraya",
+  "basinGeoJSON": {},
+  "stationsOrGrid": [],
+  "dates": [],
+  "method": "weighted"
+}
+```
+
+## 26. `drr_river_discharge_screen`
+Screens GloFAS / Open-Meteo daily river discharge ($\text{m}^3/\text{s}$) against local return-period thresholds with river-cell suitability checks (`gridResolutionKm`, `upstreamDrainageAreaSqKm`, `isRiverCell`), never labelled inundation depth.
+
+```json
+{
+  "dailyDischargeM3s": [420, 950, 1280],
+  "dates": ["2026-11-01", "2026-11-02", "2026-11-03"],
+  "returnPeriodThresholds": { "q2": 600, "q5": 1000, "q10": 1250, "q20": 1500 },
+  "gridResolutionKm": 5,
+  "upstreamDrainageAreaSqKm": 2500,
+  "isRiverCell": true
+}
+```
+
+## 27. `drr_uncertainty_propagate`
+Propagates input/parameter uncertainty using deterministic `min`/`central`/`max` intervals and one-at-a-time sensitivity ranking, or reproducible seeded Monte Carlo (`seed`, distribution provenance check, correlation warnings, split-half convergence check).
+
+```json
+{
+  "mode": "deterministic_bounds | monte_carlo",
+  "hazardType": "earthquake | flood | wind",
+  "intensity": 0.35,
+  "exposedValueUsd": 1000000,
+  "taxonomy": "URM",
+  "seed": 42,
+  "iterations": 1000,
+  "allowIllustrativeDistributions": false
+}
+```
+
+## 28. `drr_expected_annual_loss`
+Integrates multi-return-period exceedance probability vs. loss points via trapezoidal $\text{AEP} = 1/T$ integration. Rejects single-event scenario losses from masquerading as EAL and requires explicit `currency` and `valuationYear`.
+
+```json
+{
+  "points": [
+    { "returnPeriodYears": 10, "loss": 1000000 },
+    { "returnPeriodYears": 50, "loss": 5000000 },
+    { "returnPeriodYears": 100, "loss": 9000000 }
+  ],
+  "currency": "USD",
+  "valuationYear": 2026,
+  "tailHandling": "truncate | flat_extrapolation"
+}
+```
+
+## 29. `drr_mitigation_cost_benefit`
+Evaluates DRR prevention/mitigation options via discounted Cost-Benefit Analysis (NPV, BCR, residual risk EAL, CapEx/OpEx, sensitivity matrix across discount rates and benefits), explicitly separating quantitative economic evidence from policy judgements.
+
+```json
+{
+  "optionName": "Flood Levee Upgrade",
+  "baselineEal": 500000,
+  "mitigatedEal": 150000,
+  "capex": 2000000,
+  "annualOpex": 25000,
+  "annualCoBenefits": 10000,
+  "discountRate": 0.05,
+  "horizonYears": 25,
+  "currency": "USD",
+  "valuationYear": 2026
 }
 ```
 
 ---
 
-## 8. `drr_delta_push_draft_record`
-Pushes a validated post-disaster assessment into DELTA Resilience as a Draft record with `status: "draft"`, `source: "drr-agent-plugin"`, and full Sendai Targets B, C, D accounting.
+# Part 2: Command-Line Interface (CLI) Reference (29 Subcommands)
 
-### Input Schema
-```json
-{
-  "assessment": {},         // Output from drr_vulnerability_matrix_calc
-  "name": "string",         // Optional event title
-  "notes": "string",        // Context / audit trail notes
-  "mock": false             // Set true for local dry-run validation
-}
-```
+Run `node bin/cli.js --help` (or `drr-tool --help`) for usage.
 
-### Output Example
-```json
-{
-  "success": true,
-  "record": {
-    "name": "Mw 7.2 Mainshock Emergency Assessment",
-    "status": "draft",
-    "source": "drr-agent-plugin",
-    "sendaiMetrics": {
-      "totalExposedPopulation": 11495,
-      "estimatedDisplaced": 9585,
-      "estimatedDirectLossUsd": 49428050,
-      "damagedCriticalFacilities": 3
-    }
-  }
-}
-```
-
----
-
-## 9. `drr_delta_fetch_exposure`
-Queries baseline administrative divisions, sector assets, or historical disaster records from DELTA via MCP.
-
-### Input Schema
-```json
-{
-  "entity": "division" | "disaster-record" | "organization",
-  "filter": {
-    "page": 1,
-    "pageSize": 50
-  },
-  "mock": false
-}
-```
-
----
-
-## 10. `drr_monitor_check`
-Executes an automated monitoring cycle against multi-source telemetry feeds using thresholds defined in `alerts-config.json`, triggering spatial joins, DELTA draft records, and CAP warnings.
-
-### Input Schema
-```json
-{
-  "configPath": "alerts-config.json", // Optional custom path
-  "mock": false                       // Set true for dry-run simulation
-}
-```
-
-### Output Example
-```json
-{
-  "timestamp": "2026-11-09T00:00:00.000Z",
-  "eventsChecked": 12,
-  "qualifyingEventsTriggered": 1,
-  "alerts": [
-    {
-      "eventId": "usgs_us7000m8v7",
-      "processed": true,
-      "filesCreated": {
-        "capXml": "alerts/usgs_us7000m8v7.cap.xml",
-        "brief": "alerts/usgs_us7000m8v7.brief.md",
-        "assessment": "alerts/usgs_us7000m8v7.assessment.json"
-      },
-      "deltaRecord": {
-        "success": true,
-        "action": "created_new_relational_draft",
-        "recordId": "rec_1730000000000"
-      },
-      "webhook": { "dispatched": true }
-    }
-  ]
-}
-```
-
----
-
-# Part 2: Command-Line Interface (CLI) Reference
-
-The CLI binary is located at `bin/cli.js` (aliased as `drr-tool`). It operates with zero external dependencies and provides direct access to scientific models, live feed ingestion, and DELTA integration.
-
-```text
-Usage:
-  node bin/cli.js <command> [options]
-```
-
-### 1. `usgs` — Query Real-Time USGS Earthquakes
-Queries the live USGS FDSN-WS feed and computes Wald et al. (1999) Peak Ground Acceleration (PGA in $g$) from MMI:
-
-```bash
-# Query live M5.0+ earthquakes:
-node bin/cli.js usgs --min-mag 5.0 --limit 10
-
-# Options:
-#   --min-mag <val>   Minimum magnitude threshold (default: 4.5)
-#   --limit <num>     Maximum number of events (default: 20)
-#   --file <path>     Offline GeoJSON fixture instead of live fetch
-```
-
-### 2. `forecast` — Open-Meteo Flood & Weather Risk
-Queries global numerical weather models (ECMWF, GFS, ICON) and evaluates Anticipatory Action cumulative rainfall triggers:
-
-```bash
-# Fetch 5-day precipitation forecast for Jakarta, Indonesia (-6.2, 106.8):
-node bin/cli.js forecast --lat -6.2 --lon 106.8 --days 5
-
-# Options:
-#   --lat <num>       Target latitude (default: 23.8)
-#   --lon <num>       Target longitude (default: 90.4)
-#   --days <num>      Forecast duration in days (default: 5)
-#   --file <path>     Offline forecast JSON fixture
-```
-
-### 3. `gdacs` — UN OCHA / DG ECHO Disaster Alerts
-Fetches active global disaster alerts for earthquakes (`EQ`), cyclones (`TC`), floods (`FL`), or volcanoes (`VO`):
-
-```bash
-# Query active Orange and Red disaster alerts:
-node bin/cli.js gdacs --min-level Orange
-
-# Query active tropical cyclones:
-node bin/cli.js gdacs --type TC --min-level Orange
-
-# Options:
-#   --min-level <lvl> Minimum alert score (Green, Orange, Red)
-#   --type <code>     Hazard type (EQ, TC, FL, VO)
-#   --file <path>     Offline GeoJSON fixture
-```
-
-### 4. `monitor` — Autonomous Early Warning Engine
-Evaluates live telemetry feeds against declarative threshold rules in `alerts-config.json`, running spatial exposure joins, fragility modeling, CAP XML generation, universal webhook dispatching, and DELTA draft record ingestion:
-
-```bash
-# Run a one-shot scan across all live feeds:
-node bin/cli.js monitor --once
-
-# Run continuous 24/7 background monitoring daemon:
-node bin/cli.js monitor --interval 60 --config alerts-config.json
-
-# Options:
-#   --once            Execute a single scan and exit
-#   --interval <sec>  Daemon polling interval in seconds (default: 60)
-#   --config <path>   Custom path to declarative rules file
-```
-
-### 5. `delta-push` — Ingest Disaster Records into DELTA
-Pushes an evaluated hazard assessment directly into a running DELTA Resilience instance (`http://localhost:3000/en/api/mcp`):
-
-```bash
-# Push an earthquake draft record with PGA intensity:
-node bin/cli.js delta-push \
-  --hazard earthquake \
-  --event-id "usgs_us7000m8v7" \
-  --intensity "0.32" \
-  --notes "Live USGS Telemetry: M6.8 in Vanuatu"
-
-# Options:
-#   --hazard <type>   earthquake, flood, or wind (default: earthquake)
-#   --event-id <id>   External event identifier (used for idempotent apiImportId)
-#   --intensity <val> Hazard intensity (PGA in g, flood depth in m, wind in km/h)
-#   --notes <text>    Audit notes attached to the draft disaster record
-```
-
-### 6. `fragility` — GEM & HAZUS Physical Fragility Curves
-Calculates exceedance and discrete damage state probabilities (Slight, Moderate, Extensive, Complete) and Mean Damage Ratio (MDR):
-
-```bash
-# Evaluate Unreinforced Masonry (URM) at 0.40g PGA:
-node bin/cli.js fragility --hazard earthquake --intensity 0.40 --taxonomy URM
-
-# Evaluate Non-Ductile Pre-Code Concrete (C1_PRE_CODE) at 0.35g PGA:
-node bin/cli.js fragility --hazard earthquake --intensity 0.35 --taxonomy C1_PRE_CODE
-
-# Evaluate Flood Depth-Damage at 1.8m inundation:
-node bin/cli.js fragility --hazard flood --intensity 1.8
-
-# Options:
-#   --hazard <type>   earthquake, flood, or wind
-#   --intensity <val> Numerical hazard intensity
-#   --taxonomy <code> Building class (URM, C1_PRE_CODE, C1_MODERATE_CODE, C2, S1, W1)
-```
-
-### 7. `spatial-join` — Deterministic Spatial Exposure Join
-Performs ray-casting point-in-polygon queries intersecting hazard impact boundaries with exposed population, health clinics, and schools:
-
-```bash
-node bin/cli.js spatial-join \
-  --hazard examples/earthquake-hazus-scenario/input-hazard.json \
-  --exposure examples/earthquake-hazus-scenario/input-exposure.json
-```
-
-### 8. `vulnerability` — Sendai Framework Loss Accounting
-Calculates Sendai Targets B (displaced), Target C (direct economic loss in USD), and Target D (critical infrastructure disruption):
-
-```bash
-node bin/cli.js vulnerability \
-  --spatial spatial-report.json \
-  --hazard earthquake \
-  --intensity 0.42
-```
-
-### 9. `cap-generate` & `cap-validate` — OASIS CAP Alerting
-Generates and validates ITU-T Recommendation X.1303 / OASIS CAP v1.2 XML emergency alerts:
-
-```bash
-# Generate CAP alert XML:
-node bin/cli.js cap-generate \
-  --headline "EARTHQUAKE WARNING: Mw 7.2 Mainshock" \
-  --severity Extreme \
-  --urgency Immediate \
-  --event "Major Earthquake Emergency Alert"
-
-# Validate CAP XML against specification:
-node bin/cli.js cap-validate alerts/alert.cap.xml
-```
+* **Telemetry & Hydro**: `gdacs`, `usgs`, `forecast`, `basin-rainfall`, `river-discharge`, `monitor`
+* **Contracts, Registry & Replay**: `validate-input`, `registry`, `replay-validate`
+* **Spatial, CRS & Raster**: `spatial-join`, `geojson-validate`, `geometry-repair`, `crs-transform`, `raster-zonal-stats`
+* **Fragility, Vulnerability & Sendai**: `fragility` *(requires `--intensity`)*, `vulnerability` *(requires `--spatial` and `--intensity`)*, `sendai-validate`
+* **Taxonomy & Event Identity**: `hazard-crosswalk`, `event-dedup`
+* **Uncertainty & Appraisal**: `uncertainty`, `eal`, `cba`
+* **CAP & SitRep**: `cap-generate` *(defaults to `--status Draft`)*, `cap-validate`, `sitrep`
+* **DELTA Interoperability**: `delta-validate`, `delta-push` *(requires `--file`)*, `delta-docs`, `delta-hazards`
