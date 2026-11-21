@@ -1,12 +1,12 @@
 # MCP Tools & CLI Technical Reference
 
-Complete technical specification of all **32 MCP tools** provided by `bin/mcp-server.js` and the **32 CLI commands** in `bin/cli.js`.
+Complete technical specification of all **33 MCP tools** provided by `bin/mcp-server.js` and the **33 CLI commands** in `bin/cli.js`.
 
-> **Inventory Note (R-01)**: Historically at baseline commit `1d7600ce5cc50dcdea7b438ccbd59d28282793dd` (`origin/dev`), `bin/mcp-server.js` registered 11 tools (including `drr_delta_docs`) while this reference listed 10. Both `docs/api-reference.md` and `docs/tool-inventory.md` are now reconciled with the full **32-tool** registration source.
+> **Inventory Note (R-01)**: Historically at baseline commit `1d7600ce5cc50dcdea7b438ccbd59d28282793dd` (`origin/dev`), `bin/mcp-server.js` registered 11 tools (including `drr_delta_docs`) while this reference listed 10. Both `docs/api-reference.md` and `docs/tool-inventory.md` are now reconciled with the full **33-tool** registration source.
 
 ---
 
-# Part 1: Model Context Protocol (MCP) Tools (32 Tools)
+# Part 1: Model Context Protocol (MCP) Tools (33 Tools)
 
 ## 1. `drr_gdacs_fetch`
 Ingests and filters active GDACS alerts by severity, hazard type (`EQ`, `TC`, `FL`, `VO`, `DR`), or country, with untrusted feed sanitization (`promptInjectionFlagged`), `sourceIssuedAt`, `retrievedAt`, and `payloadHash`.
@@ -419,15 +419,29 @@ Ingests custom national **FDSN-WS** seismic events (BMKG, PHIVOLCS, JMA, EMSC, G
 }
 ```
 
+## 33. `drr_critical_infra_overlay`
+Groups critical infrastructure assets by the **9 UNDRR Sendai Framework Target D sectors** (`health`, `education`, `water`, `transportation`, `telecommunications`, `energy`, `waste_management`, `protective_infrastructure`, `other_essential`; registered method `overlay.sendai.critical_infra_v1`), ingests layers via **OGC API – Features** (`OGC 17-069r4`) or GeoJSON, overlays onto hazard footprints, separates direct physical exposure (`D-2..D-4`) from cascading lifeline disruption risk (`D-6..D-8` via `dependsOn`), and enforces CIP sensitivity redaction when `audience: "public"`.
+
+```json
+{
+  "endpointUrl": "https://gis.agency.gov/ogcapi",
+  "collection": "critical-infrastructure",
+  "infraGeoJSON": {},
+  "hazardGeoJSON": {},
+  "sectors": ["health", "energy", "water", "protective_infrastructure"],
+  "audience": "eoc_internal | public"
+}
+```
+
 ---
 
-# Part 2: Command-Line Interface (CLI) Reference (32 Subcommands)
+# Part 2: Command-Line Interface (CLI) Reference (33 Subcommands)
 
 Run `node bin/cli.js --help` (or `drr-tool --help`) for usage.
 
 * **Telemetry & Hydro**: `gdacs`, `usgs`, `fdsn-shakemap`, `forecast`, `sensorthings`, `stac-hazard`, `basin-rainfall`, `river-discharge`, `monitor`
 * **Contracts, Registry & Replay**: `validate-input`, `registry`, `replay-validate`
-* **Spatial, CRS & Raster**: `spatial-join`, `geojson-validate`, `geometry-repair`, `crs-transform`, `raster-zonal-stats`
+* **Spatial, CRS, Overlay & Raster**: `spatial-join`, `infra-overlay`, `geojson-validate`, `geometry-repair`, `crs-transform`, `raster-zonal-stats`
 * **Fragility, Vulnerability & Sendai**: `fragility` *(requires `--intensity`)*, `vulnerability` *(requires `--spatial` and `--intensity`)*, `sendai-validate`
 * **Taxonomy & Event Identity**: `hazard-crosswalk`, `event-dedup`
 * **Uncertainty & Appraisal**: `uncertainty`, `eal`, `cba`

@@ -32,8 +32,8 @@ assert(helpOut.includes("replay-validate"), "CLI --help must list new commands")
 assert(helpOut.includes("sendai-validate"), "CLI --help must list sendai-validate");
 
 const cliCmds = extractCliCommands();
-assert.strictEqual(TOOLS.length, 32, "MCP server must expose 32 tools");
-assert.strictEqual(cliCmds.length, 32, "CLI must register 32 subcommands");
+assert.strictEqual(TOOLS.length, 33, "MCP server must expose 33 tools");
+assert.strictEqual(cliCmds.length, 33, "CLI must register 33 subcommands");
 
 const invMd = generateInventoryMarkdown();
 for (const tool of TOOLS) {
@@ -52,7 +52,7 @@ assert.strictEqual(fragOut.method.productionStatus, "illustrative_baseline");
 runCli(["fragility", "--hazard", "earthquake"], true);
 
 const regOut = JSON.parse(runCli(["registry"]));
-assert(Array.isArray(regOut.methods) && regOut.methods.length >= 10);
+assert(Array.isArray(regOut.methods) && regOut.methods.length >= 11);
 
 const replayOut = JSON.parse(runCli(["replay-validate", "--suite", "all"]));
 assert.strictEqual(replayOut.valid, true);
@@ -99,5 +99,17 @@ const shakeOut = JSON.parse(
 );
 assert.strictEqual(shakeOut.replacesWald99Gmice, true);
 assert.strictEqual(shakeOut.summary.peakObservedPgaG, 0.528);
+
+const infraOut = JSON.parse(
+	runCli([
+		"infra-overlay",
+		"--file",
+		"examples/critical-infra-overlay/sample-sendai-infra.json",
+		"--hazard",
+		"examples/thailand-flood-scenario/input-hazard.json",
+	]),
+);
+assert.strictEqual(infraOut.summary.totalFacilities, 10);
+assert.strictEqual(infraOut.summary.cascadingServiceRiskCount, 2);
 
 console.log("✅ CLI subcommands & programmatic inventory tests passed!");

@@ -56,7 +56,7 @@ async function run() {
 	send({ jsonrpc: "2.0", id: 2, method: "tools/list", params: {} });
 	const listRes = await waitForResponse(2);
 	assert(listRes, "Expected tools/list response");
-	assert.strictEqual(listRes.result.tools.length, 32);
+	assert.strictEqual(listRes.result.tools.length, 33);
 
 	// 3. tools/call: drr_fragility_eval
 	send({
@@ -382,6 +382,26 @@ async function run() {
 	assert.strictEqual(shakeRes.summary.peakObservedPgaG, 0.528);
 	assert.strictEqual(shakeRes.geojson.type, "FeatureCollection");
 
+	const infraSample = JSON.parse(
+		fs.readFileSync(
+			path.join(__dirname, "../examples/critical-infra-overlay/sample-sendai-infra.json"),
+			"utf8",
+		),
+	);
+	const thaiHazard = JSON.parse(
+		fs.readFileSync(
+			path.join(__dirname, "../examples/thailand-flood-scenario/input-hazard.json"),
+			"utf8",
+		),
+	);
+	const infraRes = await callTool(30, "drr_critical_infra_overlay", {
+		infraGeoJSON: infraSample,
+		hazardGeoJSON: thaiHazard,
+		audience: "eoc_internal",
+	});
+	assert.strictEqual(infraRes.summary.totalFacilities, 10);
+	assert.strictEqual(infraRes.summary.cascadingServiceRiskCount, 2);
+
 	// 10. Error propagation verification for invalid input
 	send({
 		jsonrpc: "2.0",
@@ -397,7 +417,7 @@ async function run() {
 
 	fs.rmSync(path.join(__dirname, "../alerts"), { recursive: true, force: true });
 	child.kill();
-	console.log("✅ MCP Server Stdio tests passed (32 tools + error handling verified)!");
+	console.log("✅ MCP Server Stdio tests passed (33 tools + error handling verified)!");
 }
 
 run().catch((err) => {

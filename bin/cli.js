@@ -31,11 +31,12 @@ const { calculateExpectedAnnualLoss, evaluateMitigationCostBenefit } = require("
 const { ingestSensorThings, toSensorGeoJSON } = require("../lib/sensorthings");
 const { ingestStacHazardCatalog, toStacFootprintGeoJSON } = require("../lib/stac");
 const { ingestFdsnShakeMap, toShakeMapGeoJSON } = require("../lib/shakemap");
+const { ingestCriticalInfraOverlay } = require("../lib/infra-overlay");
 
 function printHelp() {
 	console.log(`
 DRR Analytics & Agent Plugin CLI v1.4.0
-Disaster Risk Reduction Tools: GDACS, USGS, FDSN-WS/ShakeMap, Open-Meteo, OGC SensorThings, STAC EO Grids, Hydro, Spatial/CRS/Raster, Fragility, CAP Alerts, Sendai, DELTA, Uncertainty, Appraisal & Replay
+Disaster Risk Reduction Tools: GDACS, USGS, FDSN-WS/ShakeMap, Open-Meteo, OGC SensorThings, STAC EO Grids, Sendai Infra Overlay, Hydro, Spatial/CRS/Raster, Fragility, CAP Alerts, Sendai, DELTA, Uncertainty, Appraisal & Replay
 
 Usage:
   drr-tool <command> [options]
@@ -47,6 +48,7 @@ Commands:
   forecast             Open-Meteo Anticipatory Action rainfall-threshold screening
   sensorthings         Ingest custom government/private OGC SensorThings API v1.1 gauges
   stac-hazard          Ingest STAC v1.0.0 EO catalogs & validated flood depth grids (C-05)
+  infra-overlay        Group & overlay Sendai Target D 9-sector critical infrastructure (OGC API - Features / GeoJSON)
   basin-rainfall       Aggregate rainfall forecasts (mm) across catchment polygon/points
   river-discharge      Screen GloFAS / Open-Meteo river discharge (m^3/s)
   fragility            Evaluate GEM/HAZUS structural fragility curves (requires --intensity)
@@ -652,6 +654,34 @@ async function main() {
 							? "contours"
 							: null;
 				const output = geoMode ? toShakeMapGeoJSON(report, geoMode) : report;
+				console.log(JSON.stringify(output, null, 2));
+				break;
+			}
+
+			case "infra-overlay": {
+				const infraGeoJSON = options.file
+					? JSON.parse(fs.readFileSync(options.file, "utf8"))
+					: undefined;
+				const hazardGeoJSON = options.hazard
+					? JSON.parse(fs.readFileSync(options.hazard, "utf8"))
+					: undefined;
+				const sectors = options.sectors
+					? options.sectors.split(",").map((s) => s.trim()).filter(Boolean)
+					: undefined;
+				const bbox = options.bbox
+					? options.bbox.split(",").map((n) => parseFloat(n.trim()))
+					: undefined;
+				const report = await ingestCriticalInfraOverlay({
+					endpointUrl: options.url,
+					collection: options.collection,
+					bbox,
+					limit: options.limit ? parseInt(options.limit, 10) : undefined,
+					infraGeoJSON,
+					hazardGeoJSON,
+					sectors,
+					audience: options.audience || "eoc_internal",
+				});
+				const output = options["as-geojson"] ? report.overlayGeoJSON : report;
 				console.log(JSON.stringify(output, null, 2));
 				break;
 			}

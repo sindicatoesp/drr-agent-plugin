@@ -37,6 +37,9 @@ A template configuration is provided in [`drr-agent-plugin/.env.example`](../.en
 | **`FDSN_API_URL`** | *None (empty)* | Default custom national FDSN-WS event service root or `/query` endpoint (e.g., BMKG, PHIVOLCS, JMA, EMSC, GeoNet). |
 | **`FDSN_API_KEY`** | *None (empty)* | Optional API key sent when querying authenticated FDSN-WS endpoints (redacted from logs and provenance hashes). |
 | **`FDSN_API_KEY_HEADER`** | `X-API-Key` | HTTP header name used to transmit `FDSN_API_KEY` (e.g., `X-API-Key` or `Authorization`). |
+| **`OGC_FEATURES_API_URL`** | *None (empty)* | Default OGC API – Features (OGC 17-069r4) root or `/items` endpoint for national/municipal critical infrastructure overlays. |
+| **`OGC_FEATURES_API_KEY`** | *None (empty)* | Optional API key sent when querying authenticated OGC API – Features endpoints (redacted from logs and provenance hashes). |
+| **`OGC_FEATURES_API_KEY_HEADER`** | `X-API-Key` | HTTP header name used to transmit `OGC_FEATURES_API_KEY` (e.g., `X-API-Key` or `Authorization`). |
 | **`DELTA_API_URL`** | `http://localhost:3000/en/api/mcp` | Target endpoint for connecting to DELTA Resilience core application MCP server. |
 | **`DELTA_MCP_API_KEY`** | *None (empty)* | Secret API token passed in `X-Auth` header to authenticate against DELTA's database. |
 | **`TARGET_COUNTRIES`** | `*` (all) | Comma-separated list of target country names or ISO-2/3 codes (e.g. `Indonesia,ID,IDN`). Foreign events are excluded from DELTA push. |

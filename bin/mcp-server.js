@@ -28,6 +28,7 @@ const { sanitizeUntrustedFeedText } = require("../lib/security");
 const { ingestSensorThings, toSensorGeoJSON } = require("../lib/sensorthings");
 const { ingestStacHazardCatalog, toStacFootprintGeoJSON } = require("../lib/stac");
 const { ingestFdsnShakeMap, toShakeMapGeoJSON } = require("../lib/shakemap");
+const { ingestCriticalInfraOverlay } = require("../lib/infra-overlay");
 
 const SERVER_NAME = "drr-analytics-mcp";
 const SERVER_VERSION = "1.4.0";
@@ -804,10 +805,85 @@ const TOOLS = [
 			},
 		},
 	},
+	{
+		name: "drr_critical_infra_overlay",
+		description:
+			"Group critical infrastructure assets by the 9 UNDRR Sendai Framework Target D sectors (health, education, water, transportation, telecommunications, energy, waste_management, protective_infrastructure, other_essential), ingest via OGC API - Features or GeoJSON, overlay onto hazard footprints, evaluate lifeline dependency cascades (D-6..D-8 separate from D-2..D-4), and enforce CIP sensitivity redaction.",
+		inputSchema: {
+			type: "object",
+			properties: {
+				endpointUrl: {
+					type: "string",
+					description: "Optional OGC API - Features (OGC 17-069r4) root or /items URL (SSRF-guarded)",
+				},
+				collection: {
+					type: "string",
+					description: "Optional OGC API - Features collection ID (e.g. 'critical-infrastructure')",
+				},
+				bbox: {
+					type: "array",
+					items: { type: "number" },
+					description: "Optional bounding box [minLon, minLat, maxLon, maxLat]",
+				},
+				limit: {
+					type: "number",
+					description: "Maximum features to fetch from OGC API - Features (default: 200, max: 1000)",
+				},
+				infraGeoJSON: {
+					type: "object",
+					description: "Offline Critical Infrastructure GeoJSON FeatureCollection",
+				},
+				infraLayers: {
+					type: "array",
+					items: { type: "object" },
+					description: "Optional array of separate per-sector GeoJSON FeatureCollections to merge and group",
+				},
+				hazardGeoJSON: {
+					type: "object",
+					description: "Optional hazard footprint GeoJSON (e.g. ShakeMap contour, STAC flood footprint, GDACS polygon) to overlay against",
+				},
+				epicenter: {
+					type: "array",
+					items: { type: "number" },
+					description: "Optional [lon, lat] epicenter for geodesic buffer overlay when no polygon is supplied",
+				},
+				bufferKm: {
+					type: "number",
+					description: "Optional geodesic buffer radius in km paired with epicenter",
+				},
+				sectors: {
+					type: "array",
+					items: { type: "string" },
+					description: "Optional filter to include only specific Sendai Target D sector keys (e.g. ['health', 'energy', 'water'])",
+				},
+				audience: {
+					type: "string",
+					enum: ["eoc_internal", "public"],
+					description: "Redaction mode: 'eoc_internal' (default) retains restricted assets; 'public' strips sensitivity='restricted' and redistributionAllowed=false assets",
+				},
+			},
+		},
+	},
 ];
 
 async function handleToolCall(name, args) {
 	switch (name) {
+		case "drr_critical_infra_overlay": {
+			return ingestCriticalInfraOverlay({
+				endpointUrl: args.endpointUrl,
+				collection: args.collection,
+				bbox: args.bbox,
+				limit: args.limit,
+				infraGeoJSON: args.infraGeoJSON,
+				infraLayers: args.infraLayers,
+				hazardGeoJSON: args.hazardGeoJSON,
+				epicenter: args.epicenter,
+				bufferKm: args.bufferKm,
+				sectors: args.sectors,
+				audience: args.audience,
+			});
+		}
+
 		case "drr_fdsn_shakemap_fetch": {
 			const report = await ingestFdsnShakeMap({
 				endpointUrl: args.endpointUrl,
