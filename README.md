@@ -35,7 +35,8 @@ drr-agent-plugin/
 ├── plugin.json                 # agent-plugins.org v1.0.0 manifest
 ├── mcp.json                    # Model Context Protocol stdio server declaration
 ├── package.json                # Standalone Node package definition (0 external deps)
-├── Makefile                    # Operational & configuration shortcuts
+├── Makefile                    # Operational & configuration shortcuts (Linux/macOS)
+├── make.bat                    # Windows CMD/PowerShell equivalent of Makefile (e.g. make run, make check)
 ├── Dockerfile                  # Production Alpine container (~130MB, zero deps)
 ├── docker-compose.yml          # Autonomous daemon stack & volume persistence
 ├── .env.example                # Configuration template
