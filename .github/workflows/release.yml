@@ -102,6 +102,37 @@ jobs:
             echo "should_release=true" >> "$GITHUB_OUTPUT"
           fi
 
+      - name: Sync package.json, plugin.json & Tool Inventory
+        id: sync
+        if: steps.check.outputs.should_release == 'true'
+        run: |
+          VERSION="${{ steps.semver.outputs.version }}"
+          TAG="${{ steps.semver.outputs.tag }}"
+
+          node scripts/sync-version.js --version "$VERSION" --inventory
+
+          if [ -n "$(git status --porcelain package.json plugin.json docs/tool-inventory.md)" ]; then
+            git config user.name "github-actions[bot]"
+            git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+            git add package.json plugin.json docs/tool-inventory.md
+            git commit -m "chore(release): sync manifests to $TAG [skip ci]"
+
+            if git push origin HEAD:main; then
+              echo "manifests_pushed=true" >> "$GITHUB_OUTPUT"
+              # Best-effort fast-forward sync back to dev so manifests stay aligned
+              git fetch origin dev:refs/remotes/origin/dev || true
+              if git merge-base --is-ancestor origin/dev HEAD 2>/dev/null; then
+                git push origin HEAD:dev || echo "::warning::Could not fast-forward dev with release version bump."
+              fi
+            else
+              echo "::warning::Direct push to main blocked (likely branch protection). Resetting working tree and tagging merged HEAD."
+              git reset --hard HEAD~1
+              echo "manifests_pushed=false" >> "$GITHUB_OUTPUT"
+            fi
+          else
+            echo "manifests_pushed=already_synced" >> "$GITHUB_OUTPUT"
+          fi
+
       - name: Create GitHub Release & SemVer Tag
         if: steps.check.outputs.should_release == 'true'
         run: |
@@ -132,5 +163,6 @@ jobs:
             echo "- **SemVer Increment**: \`${{ steps.semver.outputs.bump }}\`"
             echo "- **Reason**: ${{ steps.semver.outputs.reason }}"
             echo "- **Commits Analyzed**: ${{ steps.semver.outputs.commits_analyzed }}"
+            echo "- **Manifests Synced & Pushed**: \`${{ steps.sync.outputs.manifests_pushed || 'skipped' }}\`"
             echo "- **Release Created**: \`${{ steps.check.outputs.should_release }}\`"
           } >> "$GITHUB_STEP_SUMMARY"

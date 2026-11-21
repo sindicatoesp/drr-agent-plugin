@@ -30,8 +30,10 @@ const { ingestStacHazardCatalog, toStacFootprintGeoJSON } = require("../lib/stac
 const { ingestFdsnShakeMap, toShakeMapGeoJSON } = require("../lib/shakemap");
 const { ingestCriticalInfraOverlay } = require("../lib/infra-overlay");
 
+const pkg = require("../package.json");
+
 const SERVER_NAME = "drr-analytics-mcp";
-const SERVER_VERSION = "1.4.0";
+const SERVER_VERSION = pkg.version;
 const PROTOCOL_VERSION = "2024-11-05";
 
 const TOOLS = [
