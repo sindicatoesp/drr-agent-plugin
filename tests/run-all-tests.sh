@@ -25,8 +25,9 @@ node "$DIR/test-mcp-server.js"
 node "$DIR/test-hindcast-regression.js"
 node "$DIR/test-cli-inventory.js"
 node "$DIR/test-scheduled-monitoring.js"
+node "$DIR/test-release-version.js"
 
 echo "=================================================="
-echo " 🎉 ALL 19 TEST SUITES PASSED SUCCESSFULLY!"
+echo " 🎉 ALL 20 TEST SUITES PASSED SUCCESSFULLY!"
 echo "=================================================="
 
