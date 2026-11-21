@@ -1,0 +1,172 @@
+{
+  "@iot.count": 3,
+  "value": [
+    {
+      "@iot.id": 101,
+      "name": "Pattani River Bridge — Water Level Gauge",
+      "description": "National Hydrological Service radar stage sensor at Yala municipal bridge",
+      "unitOfMeasurement": {
+        "name": "foot",
+        "symbol": "ft",
+        "definition": "http://qudt.org/vocab/unit/FT"
+      },
+      "properties": {
+        "providerType": "government",
+        "license": "CC-BY-4.0",
+        "redistributionAllowed": true
+      },
+      "Thing": {
+        "@iot.id": "TH-HYDRO-YALA-01",
+        "name": "Yala Bridge Telemetry Station",
+        "Locations": [
+          {
+            "@iot.id": "LOC-YALA-01",
+            "name": "Pattani River Bridge",
+            "encodingType": "application/vnd.geo+json",
+            "location": {
+              "type": "Point",
+              "coordinates": [101.2815, 6.5411]
+            }
+          }
+        ]
+      },
+      "Sensor": {
+        "@iot.id": "SENS-RADAR-01",
+        "name": "Ott RLS Radar Level Sensor",
+        "encodingType": "application/pdf",
+        "properties": {
+          "calibrationDate": "2026-06-15"
+        }
+      },
+      "ObservedProperty": {
+        "@iot.id": "PROP-WL",
+        "name": "Water Level",
+        "definition": "http://vocab.nerc.ac.uk/collection/P01/current/ASLVZZ01/"
+      },
+      "Observations": [
+        {
+          "@iot.id": 9001,
+          "phenomenonTime": "2026-11-21T12:00:00Z",
+          "resultTime": "2026-11-21T12:01:00Z",
+          "result": 8.53,
+          "parameters": { "qcFlag": "good" }
+        },
+        {
+          "@iot.id": 9000,
+          "phenomenonTime": "2026-11-21T11:45:00Z",
+          "resultTime": "2026-11-21T11:46:00Z",
+          "result": 7.80,
+          "parameters": { "qcFlag": "good" }
+        }
+      ]
+    },
+    {
+      "@iot.id": 202,
+      "name": "Private AgroMet — Hourly Precipitation Gauge",
+      "description": "Commercial tipping-bucket rain gauge network (restricted redistribution)",
+      "unitOfMeasurement": {
+        "name": "millimeter",
+        "symbol": "mm",
+        "definition": "http://qudt.org/vocab/unit/MilliM"
+      },
+      "properties": {
+        "providerType": "private",
+        "license": "Commercial-Internal-EOC-Only",
+        "redistributionAllowed": false
+      },
+      "Thing": {
+        "@iot.id": "PRIV-RAIN-09",
+        "name": "Songkhla Industrial Park Rain Station",
+        "Locations": [
+          {
+            "@iot.id": "LOC-SGK-09",
+            "location": {
+              "type": "Point",
+              "coordinates": [100.5951, 7.1898]
+            }
+          }
+        ]
+      },
+      "Sensor": {
+        "@iot.id": "SENS-TB-09",
+        "name": "Private Tipping Bucket v2",
+        "properties": {
+          "calibrationDate": "2026-09-01"
+        }
+      },
+      "ObservedProperty": {
+        "@iot.id": "PROP-RAIN",
+        "name": "Precipitation",
+        "definition": "http://vocab.nerc.ac.uk/collection/P07/current/CFSN0452/"
+      },
+      "Observations": [
+        {
+          "@iot.id": 9102,
+          "phenomenonTime": "2026-11-21T12:05:00Z",
+          "resultTime": "2026-11-21T12:05:30Z",
+          "result": 68.5,
+          "parameters": { "qcFlag": 1 }
+        }
+      ]
+    },
+    {
+      "@iot.id": 303,
+      "name": "Upstream Headwater — Faulty Gauge Example",
+      "description": "Demonstrates QARTOD bad QC spike exclusion and missing value preservation",
+      "unitOfMeasurement": {
+        "name": "meter",
+        "symbol": "m",
+        "definition": "http://qudt.org/vocab/unit/M"
+      },
+      "properties": {
+        "providerType": "government",
+        "license": "CC-BY-4.0",
+        "redistributionAllowed": true
+      },
+      "Thing": {
+        "@iot.id": "TH-HYDRO-HEAD-03",
+        "name": "Betong Headwater Station",
+        "Locations": [
+          {
+            "@iot.id": "LOC-BET-03",
+            "location": {
+              "type": "Point",
+              "coordinates": [101.0725, 5.7743]
+            }
+          }
+        ]
+      },
+      "Sensor": {
+        "@iot.id": "SENS-PRES-03",
+        "name": "Pressure Transducer"
+      },
+      "ObservedProperty": {
+        "@iot.id": "PROP-WL",
+        "name": "Water Level"
+      },
+      "Observations": [
+        {
+          "@iot.id": 9203,
+          "phenomenonTime": "2026-11-21T12:00:00Z",
+          "resultTime": "2026-11-21T12:01:00Z",
+          "result": 99.9,
+          "parameters": { "qcFlag": "bad" }
+        },
+        {
+          "@iot.id": 9202,
+          "phenomenonTime": "2026-11-21T11:30:00Z",
+          "resultTime": "2026-11-21T11:31:00Z",
+          "result": null,
+          "parameters": { "qcFlag": "missing" }
+        },
+        {
+          "@iot.id": 9201,
+          "phenomenonTime": "2026-11-21T11:00:00Z",
+          "resultTime": "2026-11-21T11:01:00Z",
+          "result": 1.45,
+          "parameters": { "qcFlag": "good" }
+        }
+      ]
+    }
+  ]
+}

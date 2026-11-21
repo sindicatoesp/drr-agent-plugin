@@ -1,6 +1,6 @@
 # DRR Agent Plugin — End-User Skills & Prompting Guide
 
-This guide explains how end users—**EOC Duty Officers, Anticipatory Action Leads, UN OCHA Analysts, National Sendai/DELTA Focal Points, and Resilience Engineers**—can prompt AI assistants (Google Antigravity, Claude Code/Desktop, Cursor, GitHub Copilot, OpenCode) to invoke each of the **13 DRR Domain Skills** using realistic, specific disaster risk reduction use cases.
+This guide explains how end users—**EOC Duty Officers, Anticipatory Action Leads, UN OCHA Analysts, National Sendai/DELTA Focal Points, and Resilience Engineers**—can prompt AI assistants (Google Antigravity, Claude Code/Desktop, Cursor, GitHub Copilot, OpenCode) to invoke each of the **14 DRR Domain Skills** using realistic, specific disaster risk reduction use cases.
 
 ---
 
@@ -8,7 +8,7 @@ This guide explains how end users—**EOC Duty Officers, Anticipatory Action Lea
 
 Each skill in `skills/<skill-name>/SKILL.md` provides your AI assistant with:
 1. **Domain Methodology & Guardrails** (what is scientifically valid and what is strictly forbidden, such as fabricating flood depths from rainfall or auto-publishing live CAP sirens).
-2. **Exact Tool Orchestration** (which of the **29 deterministic MCP tools** to call instead of letting the LLM guess numbers).
+2. **Exact Tool Orchestration** (which of the **30 deterministic MCP tools** to call instead of letting the LLM guess numbers).
 3. **Escalation & Governance Rules** (when the assistant must stop and ask a human Duty Officer, Hydrologist, or National Focal Point for review or approval).
 
 ### Tips for Effective Prompts
@@ -19,7 +19,7 @@ Each skill in `skills/<skill-name>/SKILL.md` provides your AI assistant with:
 
 ---
 
-## Quick Reference: All 13 DRR Skills
+## Quick Reference: All 14 DRR Skills
 
 | # | Skill Name | Primary Persona | Specific Use Case Example Below | Core MCP Tools |
 | :---: | :--- | :--- | :--- | :--- |
@@ -36,6 +36,7 @@ Each skill in `skills/<skill-name>/SKILL.md` provides your AI assistant with:
 | 11 | [`event-identity-and-linkage`](#11-event-identity-and-linkage) | Multi-Feed Watchstander | Deduplicating overlapping USGS + GDACS events & separating tsunami cascades | `drr_event_match_deduplicate`, `drr_monitor_check` |
 | 12 | [`drr-data-quality-and-provenance`](#12-drr-data-quality-and-provenance) | DRR Data Steward / Auditor | Pre-flight validation, SHA-256 provenance manifest & replay verification | `drr_input_contract_validate`, `drr_source_provenance_manifest`, `drr_model_registry_list`, `drr_assessment_replay_validate`, `drr_uncertainty_propagate` |
 | 13 | [`risk-reduction-options-appraisal`](#13-risk-reduction-options-appraisal) | Municipal Economist / Planner | Coastal flood levee vs. drainage Expected Annual Loss (EAL) & CBA appraisal | `drr_expected_annual_loss`, `drr_mitigation_cost_benefit`, `drr_uncertainty_propagate` |
+| 14 | [`ogc-sensorthings-telemetry`](#14-ogc-sensorthings-telemetry) | Hydro-Met / EOC Sensor Lead | Municipal river-level & private rain gauge ingestion via OGC SensorThings v1.1 | `drr_sensorthings_fetch`, `drr_spatial_exposure_join`, `drr_input_contract_validate`, `drr_source_provenance_manifest` |
 
 ---
 
@@ -430,6 +431,39 @@ event to drr_expected_annual_loss is rejected rather than misreported as EAL.
 **Expected Behavior & Guardrails:**
 * Calls `drr_expected_annual_loss`, `drr_mitigation_cost_benefit`, `drr_uncertainty_propagate`.
 * Rejects single-event EAL calculations and cleanly separates `quantitativeMetrics` from `policyJudgements`.
+
+---
+
+### 14. `ogc-sensorthings-telemetry`
+**Skill file:** [`skills/ogc-sensorthings-telemetry/SKILL.md`](../skills/ogc-sensorthings-telemetry/SKILL.md)
+
+**Specific Use Case — Municipal Flood Gauge & Private Rain Sensor Integration (Hydro-Met / EOC Sensor Lead):**
+A national EOC integrates its government river-level radar gauges (reporting in feet) alongside a commercial agro-met rain gauge network (`redistributionAllowed: false`) via **OGC SensorThings API v1.1** to get ground-truth flood alerts without being fooled by a faulty sensor spike.
+
+#### Prompt Example A (Offline Gauge Fixture, Unit Normalization, QC & Licensing Audit)
+```text
+Using the ogc-sensorthings-telemetry skill, ingest
+examples/ogc-sensorthings-gauges/sample-datastreams.json with water-level thresholds
+{ warning: 2.0, critical: 2.5, unit: "m" } and asGeoJSON: true.
+Confirm that:
+1. The Yala bridge gauge (8.53 ft) normalizes to meters (~2.60 m) and triggers "critical"
+   with evidenceBasis: "observed",
+2. The Betong faulty 99.9 m reading (qcFlag: "bad") and null reading are excluded from
+   threshold breaches (preserving null, never coercing to 0),
+3. Any private sensor with redistributionAllowed: false is flagged before public alerting.
+```
+
+#### Prompt Example B (Live Custom Government OGC SensorThings Endpoint)
+```text
+Using ogc-sensorthings-telemetry, query our national hydrological OGC SensorThings v1.1 server
+at endpointUrl "https://sensors.agency.gov/v1.1" (observedProperty: "River Discharge",
+maxAgeMinutes: 60) with thresholds { warning: 1000, critical: 1500, unit: "m3/s" }.
+Flag any stale stations or QARTOD suspect/bad readings for the hydrological engineer.
+```
+
+**Expected Behavior & Guardrails:**
+* Calls `drr_sensorthings_fetch` (registered method `telemetry.ogc.sensorthings_v1_1`).
+* Normalizes units across DRR domains (`ft`/`cm`→`m`, `in`→`mm`, `cfs`→`m3/s`, `m/s`/`kt`→`km/h`, `gal`→`g`), excludes `bad`/`missing` QC readings from triggers, enforces SSRF host blocking, and flags restricted private redistribution.
 
 ---
 

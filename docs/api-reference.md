@@ -1,12 +1,12 @@
 # MCP Tools & CLI Technical Reference
 
-Complete technical specification of all **29 MCP tools** provided by `bin/mcp-server.js` and the **29 CLI commands** in `bin/cli.js`.
+Complete technical specification of all **30 MCP tools** provided by `bin/mcp-server.js` and the **30 CLI commands** in `bin/cli.js`.
 
-> **Inventory Note (R-01)**: Historically at baseline commit `1d7600ce5cc50dcdea7b438ccbd59d28282793dd` (`origin/dev`), `bin/mcp-server.js` registered 11 tools (including `drr_delta_docs`) while this reference listed 10. Both `docs/api-reference.md` and `docs/tool-inventory.md` are now reconciled with the full **29-tool** registration source.
+> **Inventory Note (R-01)**: Historically at baseline commit `1d7600ce5cc50dcdea7b438ccbd59d28282793dd` (`origin/dev`), `bin/mcp-server.js` registered 11 tools (including `drr_delta_docs`) while this reference listed 10. Both `docs/api-reference.md` and `docs/tool-inventory.md` are now reconciled with the full **30-tool** registration source.
 
 ---
 
-# Part 1: Model Context Protocol (MCP) Tools (29 Tools)
+# Part 1: Model Context Protocol (MCP) Tools (30 Tools)
 
 ## 1. `drr_gdacs_fetch`
 Ingests and filters active GDACS alerts by severity, hazard type (`EQ`, `TC`, `FL`, `VO`, `DR`), or country, with untrusted feed sanitization (`promptInjectionFlagged`), `sourceIssuedAt`, `retrievedAt`, and `payloadHash`.
@@ -369,13 +369,30 @@ Evaluates DRR prevention/mitigation options via discounted Cost-Benefit Analysis
 }
 ```
 
+## 30. `drr_sensorthings_fetch`
+Ingests and normalizes custom government or private in-situ sensor observations via **OGC SensorThings API v1.1** (`OGC 18-088`, registered method `telemetry.ogc.sensorthings_v1_1`) with DRR unit normalization (`ft`/`cm`→`m`, `in`→`mm`, `cfs`→`m3/s`, `m/s`/`kt`/`mph`→`km/h`, `m/s2`/`gal`→`g`), WMO/QARTOD quality-control filtering (`bad`/`missing` excluded from threshold triggers), null preservation, staleness checks, SSRF protection, prompt-injection sanitization, private redistribution licensing metadata, and optional GeoJSON export.
+
+```json
+{
+  "endpointUrl": "https://sensors.agency.gov/v1.1",
+  "observedProperty": "Water Level",
+  "top": 50,
+  "observationsTop": 5,
+  "thresholds": { "warning": 2.0, "critical": 2.5, "unit": "m" },
+  "maxAgeMinutes": 180,
+  "excludeSuspect": false,
+  "asGeoJSON": true,
+  "samplePayload": {}
+}
+```
+
 ---
 
-# Part 2: Command-Line Interface (CLI) Reference (29 Subcommands)
+# Part 2: Command-Line Interface (CLI) Reference (30 Subcommands)
 
 Run `node bin/cli.js --help` (or `drr-tool --help`) for usage.
 
-* **Telemetry & Hydro**: `gdacs`, `usgs`, `forecast`, `basin-rainfall`, `river-discharge`, `monitor`
+* **Telemetry & Hydro**: `gdacs`, `usgs`, `forecast`, `sensorthings`, `basin-rainfall`, `river-discharge`, `monitor`
 * **Contracts, Registry & Replay**: `validate-input`, `registry`, `replay-validate`
 * **Spatial, CRS & Raster**: `spatial-join`, `geojson-validate`, `geometry-repair`, `crs-transform`, `raster-zonal-stats`
 * **Fragility, Vulnerability & Sendai**: `fragility` *(requires `--intensity`)*, `vulnerability` *(requires `--spatial` and `--intensity`)*, `sendai-validate`

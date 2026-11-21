@@ -32,8 +32,8 @@ assert(helpOut.includes("replay-validate"), "CLI --help must list new commands")
 assert(helpOut.includes("sendai-validate"), "CLI --help must list sendai-validate");
 
 const cliCmds = extractCliCommands();
-assert.strictEqual(TOOLS.length, 29, "MCP server must expose 29 tools");
-assert.strictEqual(cliCmds.length, 29, "CLI must register 29 subcommands");
+assert.strictEqual(TOOLS.length, 30, "MCP server must expose 30 tools");
+assert.strictEqual(cliCmds.length, 30, "CLI must register 30 subcommands");
 
 const invMd = generateInventoryMarkdown();
 for (const tool of TOOLS) {
@@ -52,7 +52,7 @@ assert.strictEqual(fragOut.method.productionStatus, "illustrative_baseline");
 runCli(["fragility", "--hazard", "earthquake"], true);
 
 const regOut = JSON.parse(runCli(["registry"]));
-assert(Array.isArray(regOut.methods) && regOut.methods.length >= 7);
+assert(Array.isArray(regOut.methods) && regOut.methods.length >= 8);
 
 const replayOut = JSON.parse(runCli(["replay-validate", "--suite", "all"]));
 assert.strictEqual(replayOut.valid, true);
@@ -63,5 +63,21 @@ assert.strictEqual(crosswalkOut.mapping.code, "GH0001");
 
 const capOut = runCli(["cap-generate", "--headline", "CLI Test Alert"]);
 assert(capOut.includes("<status>Draft</status>"), "CLI cap-generate must default to Draft status");
+
+const stOut = JSON.parse(
+	runCli([
+		"sensorthings",
+		"--file",
+		"examples/ogc-sensorthings-gauges/sample-datastreams.json",
+		"--warning",
+		"2.0",
+		"--critical",
+		"2.5",
+		"--unit",
+		"m",
+	]),
+);
+assert.strictEqual(stOut.summary.datastreamCount, 3);
+assert.strictEqual(stOut.summary.criticalCount, 1);
 
 console.log("✅ CLI subcommands & programmatic inventory tests passed!");

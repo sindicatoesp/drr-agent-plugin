@@ -25,6 +25,7 @@ const { matchAndDeduplicateEvents } = require("../lib/events");
 const { propagateUncertainty } = require("../lib/uncertainty");
 const { calculateExpectedAnnualLoss, evaluateMitigationCostBenefit } = require("../lib/appraisal");
 const { sanitizeUntrustedFeedText } = require("../lib/security");
+const { ingestSensorThings, toSensorGeoJSON } = require("../lib/sensorthings");
 
 const SERVER_NAME = "drr-analytics-mcp";
 const SERVER_VERSION = "1.4.0";
@@ -639,10 +640,78 @@ const TOOLS = [
 			},
 		},
 	},
+	{
+		name: "drr_sensorthings_fetch",
+		description:
+			"Ingest and normalize custom government or private in-situ sensor observations via OGC SensorThings API v1.1 (OGC 18-088) with unit conversion, WMO/QARTOD QC filtering, staleness checks, licensing/redistribution metadata, and optional threshold screening.",
+		inputSchema: {
+			type: "object",
+			properties: {
+				endpointUrl: {
+					type: "string",
+					description: "OGC SensorThings API v1.1 root or /Datastreams URL (SSRF-guarded; optional if samplePayload or OGC_SENSORTHINGS_URL is set)",
+				},
+				observedProperty: {
+					type: "string",
+					description: "Optional ObservedProperty name filter (e.g. 'Water Level', 'Precipitation', 'River Discharge', 'PGA')",
+				},
+				filter: {
+					type: "string",
+					description: "Optional OGC SensorThings $filter expression",
+				},
+				top: {
+					type: "number",
+					description: "Maximum number of Datastreams to retrieve (default: 50, max: 200)",
+				},
+				observationsTop: {
+					type: "number",
+					description: "Maximum observations per Datastream ordered newest-first (default: 5, max: 100)",
+				},
+				thresholds: {
+					type: "object",
+					description: "Optional threshold rules: { warning?: number, critical?: number, unit?: string }",
+				},
+				maxAgeMinutes: {
+					type: "number",
+					description: "Maximum observation age in minutes before flagging stale (default: 180)",
+				},
+				excludeSuspect: {
+					type: "boolean",
+					description: "When true, excludes QARTOD 'suspect' observations from threshold evaluation (default: false)",
+				},
+				asGeoJSON: {
+					type: "boolean",
+					description: "When true, includes a GeoJSON FeatureCollection of stations and latest readings",
+				},
+				samplePayload: {
+					type: "object",
+					description: "Optional offline/test OGC SensorThings v1.1 JSON payload to parse instead of fetching live network",
+				},
+			},
+		},
+	},
 ];
 
 async function handleToolCall(name, args) {
 	switch (name) {
+		case "drr_sensorthings_fetch": {
+			const report = await ingestSensorThings({
+				endpointUrl: args.endpointUrl,
+				observedProperty: args.observedProperty,
+				filter: args.filter,
+				top: args.top,
+				observationsTop: args.observationsTop,
+				thresholds: args.thresholds,
+				maxAgeMinutes: args.maxAgeMinutes,
+				excludeSuspect: args.excludeSuspect,
+				samplePayload: args.samplePayload,
+			});
+			if (args.asGeoJSON) {
+				return { ...report, geojson: toSensorGeoJSON(report) };
+			}
+			return report;
+		}
+
 		case "drr_gdacs_fetch": {
 			const events = await ingestGdacsAlerts(args.samplePayload || null, {
 				minAlertLevel: args.minAlertLevel,
