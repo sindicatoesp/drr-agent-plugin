@@ -32,26 +32,40 @@ In the root of your project, create or edit `.cursor/mcp.json`:
 
 ---
 
-## 2. Mounting the Domain Skills in Cursor
+## 2. Mounting All 13 Domain Skills in Cursor
 
-To enable Cursor's agent to read the DRR methodologies:
-1. In `.cursorrules` or `.cursor/rules/`, add a reference to the plugin skills:
+Once connected, Cursor exposes all **29 deterministic DRR MCP tools**. To enable Cursor's agent to follow the DRR methodologies and governance rules, add references to `.cursorrules` or `.cursor/rules/`:
 
 ```markdown
 # Disaster Risk Reduction Guidelines
-When performing disaster loss modeling or alert generation, follow the methodologies in:
+When performing disaster telemetry, exposure modeling, loss estimation, alerting, or appraisal,
+follow the relevant skill in `drr-agent-plugin/skills/`:
+- `drr-agent-plugin/skills/early-warning-telemetry/SKILL.md`
+- `drr-agent-plugin/skills/gdacs-feed-ingestion/SKILL.md`
+- `drr-agent-plugin/skills/forecast-based-action-trigger-design/SKILL.md`
 - `drr-agent-plugin/skills/hazard-exposure-modeling/SKILL.md`
 - `drr-agent-plugin/skills/vulnerability-matrix/SKILL.md`
 - `drr-agent-plugin/skills/oasis-cap-alerting/SKILL.md`
+- `drr-agent-plugin/skills/cap-governance-and-approval/SKILL.md`
+- `drr-agent-plugin/skills/sendai-indicator-accounting/SKILL.md`
+- `drr-agent-plugin/skills/delta-disaster-recording/SKILL.md`
+- `drr-agent-plugin/skills/undrr-hip-hazard-classification/SKILL.md`
+- `drr-agent-plugin/skills/event-identity-and-linkage/SKILL.md`
+- `drr-agent-plugin/skills/drr-data-quality-and-provenance/SKILL.md`
+- `drr-agent-plugin/skills/risk-reduction-options-appraisal/SKILL.md`
 ```
 
 ---
 
 ## 3. Example Cursor Commands & Chat Prompts
 
+> See **[docs/skills-guide.md](../skills-guide.md)** for prompt examples across all **13 DRR skills**.
+
 In Cursor Composer (`Ctrl + I` or `Cmd + I`):
 
 ```text
-@drr-analytics Run an exposure join between hazard-footprint.json and critical-facilities.json.
-Calculate the economic loss under 0.40g PGA for Unreinforced Masonry (URM) and Concrete Frames (C1).
+@drr-analytics Using hazard-exposure-modeling and vulnerability-matrix, validate and join
+examples/earthquake-hazus-scenario/input-hazard.json against input-exposure.json.
+Calculate illustrative economic loss (USD, 2026) under 0.40 g PGA for URM and C1_PRE_CODE
+in exploratory mode, preserving any null asset values.
 ```

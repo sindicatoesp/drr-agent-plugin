@@ -22,7 +22,8 @@ This plugin equips AI coding assistants and autonomous agents with sourced domai
 
 ## Authoritative Inventory & Governance
 
-* **Programmatic Inventory**: See **[docs/tool-inventory.md](docs/tool-inventory.md)** (generated from registration code via `npm run generate:inventory`, referencing `origin/dev` commit `1d7600ce5cc50dcdea7b438ccbd59d28282793dd`).
+* **End-User Skills & Prompting Guide**: See **[docs/skills-guide.md](docs/skills-guide.md)** (ready-to-use prompt examples & specific DRR use cases for all **13 domain skills**, plus multi-skill chains).
+* **Programmatic Inventory**: See **[docs/tool-inventory.md](docs/tool-inventory.md)** (generated directly from executable registration sources via `npm run generate:inventory`).
 * **MCP & CLI Specification**: See **[docs/api-reference.md](docs/api-reference.md)** (29 MCP tools and 29 CLI commands).
 * **Scientific Methodology & Boundaries**: See **[docs/methodology.md](docs/methodology.md)**.
 * **Operational Playbook**: See **[docs/operational-playbook.md](docs/operational-playbook.md)**.
@@ -45,13 +46,14 @@ drr-agent-plugin/
 │   ├── mcp-server.js           # Zero-dependency Node.js MCP server (29 active tools)
 │   ├── cli.js                  # Direct CLI for shell & CI/CD (29 subcommands)
 │   └── serve.js                # Local static preview server
-├── lib/                        # Pure stdlib computational & governance modules (21 modules)
+├── lib/                        # Pure stdlib computational & governance modules (24 JS modules + HIP data)
 │   ├── contracts.js            # Input contracts, unit conversions, C-03 provenance manifests (R-02/R-03)
 │   ├── registry.js             # Scientific method registry & illustrative vs production gate (R-04)
 │   ├── replay.js               # Frozen-input synthetic & hindcast replay validation (R-05)
 │   ├── security.js             # Approval tokens, channel/tenant/destination policy, XXE & text guard (R-06)
 │   ├── sendai.js               # Sendai Target B/C/D semantic & per-100k validator (R-08)
 │   ├── hips.js                 # Versioned UNDRR-ISC HIP taxonomy crosswalk & 2025 flags (R-09)
+│   ├── hips-data.json          # Bundled UNDRR-ISC HIP taxonomy crosswalk dataset
 │   ├── events.js               # Multi-source event identity, deduplication & reversible merges (R-10)
 │   ├── spatial.js              # Antimeridian/hole joins, validation, repair, CRS & raster stats (R-11)
 │   ├── hydro.js                # Basin rainfall aggregation, GloFAS discharge screening, grid ingest (R-12)
@@ -64,14 +66,25 @@ drr-agent-plugin/
 │   ├── gdacs.js                # GDACS feed ingestor with untrusted-text sanitization & hashes
 │   ├── usgs.js                 # USGS seismic ingestor & Wald99 GMICE PGA conversion
 │   ├── openmeteo.js            # Open-Meteo rainfall screening & persistence/triggerPolicy gates
-│   ├── monitor.js              # Autonomous early warning monitor with deduplication & Draft CAP
+│   ├── monitor.js              # Autonomous & scheduled single-run shadow monitor with deduplication
+│   ├── retry.js                # Bounded exponential backoff with jitter & deadline enforcement
+│   ├── state-store.js          # Transactional CAS state persistence & storage lease fencing
 │   ├── config.js               # Centralized configuration & .env parser
 │   ├── utils.js                # Math, spherical geometry, boundary & antimeridian helpers
 │   └── index.js                # Unified barrel export
 ├── scripts/
 │   ├── lint.js                 # Static AST, JSON, inline JS & stdlib-only verifier
 │   ├── generate-inventory.js   # Programmatic generator for docs/tool-inventory.md (R-01)
-│   └── install-git-hook.js     # Pre-commit hook installer
+│   ├── install-git-hook.js     # Pre-commit hook installer
+│   └── next-version.js         # Automated SemVer calculator for dev -> main releases
+├── docs/
+│   ├── skills-guide.md         # End-user prompt examples & specific use cases for all 13 skills
+│   ├── api-reference.md        # 29 MCP tools & 29 CLI subcommands specification
+│   ├── tool-inventory.md       # Programmatically generated capability & test inventory
+│   ├── methodology.md          # Scientific equations, bounds & C-01..C-08 governance
+│   ├── operational-playbook.md # Personas, timelines & operational workflows
+│   ├── configuration.md        # Environment variables, proxies, country scoping & shadow monitor
+│   └── platforms/              # Platform setup guides (Antigravity, Claude, Cursor, Copilot, OpenCode)
 ├── skills/                     # 13 Reusable AI Agent Skills (SKILL.md)
 │   ├── cap-governance-and-approval/
 │   ├── delta-disaster-recording/
@@ -87,7 +100,7 @@ drr-agent-plugin/
 │   ├── undrr-hip-hazard-classification/
 │   └── vulnerability-matrix/
 ├── examples/                   # Executable real-world scenarios & fixtures
-└── tests/                      # Full automated test suite (18 test suites)
+└── tests/                      # Full automated test suite (20 test suites)
     └── run-all-tests.sh
 ```
 
@@ -148,6 +161,18 @@ The MCP server (`bin/mcp-server.js`) exposes **29 deterministic, provenance-awar
 | **Uncertainty & Appraisal** | `drr_uncertainty_propagate`, `drr_expected_annual_loss`, `drr_mitigation_cost_benefit` |
 
 See **[docs/tool-inventory.md](docs/tool-inventory.md)** for auto-generated per-tool parameter schemas and test mappings.
+
+---
+
+## Domain Skills & Prompting Guide (13 Skills)
+
+Each skill in `skills/*/SKILL.md` encodes DRR scientific guardrails, tool orchestration, and governance escalation rules. See **[docs/skills-guide.md](docs/skills-guide.md)** for ready-to-use end-user prompts applying specific real-world use cases to every skill:
+
+* **Telemetry & Early Warning**: [`early-warning-telemetry`](docs/skills-guide.md#1-early-warning-telemetry), [`gdacs-feed-ingestion`](docs/skills-guide.md#2-gdacs-feed-ingestion), [`forecast-based-action-trigger-design`](docs/skills-guide.md#3-forecast-based-action-trigger-design)
+* **Spatial, Fragility & Impact**: [`hazard-exposure-modeling`](docs/skills-guide.md#4-hazard-exposure-modeling), [`vulnerability-matrix`](docs/skills-guide.md#5-vulnerability-matrix)
+* **Alerting & Broadcast Governance**: [`oasis-cap-alerting`](docs/skills-guide.md#6-oasis-cap-alerting), [`cap-governance-and-approval`](docs/skills-guide.md#7-cap-governance-and-approval)
+* **Sendai, DELTA & Taxonomy**: [`sendai-indicator-accounting`](docs/skills-guide.md#8-sendai-indicator-accounting), [`delta-disaster-recording`](docs/skills-guide.md#9-delta-disaster-recording), [`undrr-hip-hazard-classification`](docs/skills-guide.md#10-undrr-hip-hazard-classification), [`event-identity-and-linkage`](docs/skills-guide.md#11-event-identity-and-linkage)
+* **Quality, Provenance & Appraisal**: [`drr-data-quality-and-provenance`](docs/skills-guide.md#12-drr-data-quality-and-provenance), [`risk-reduction-options-appraisal`](docs/skills-guide.md#13-risk-reduction-options-appraisal)
 
 ---
 

@@ -41,3 +41,18 @@ description: Multi-source disaster telemetry ingestion and rainfall/seismic scre
   `anticipatoryAction.estimatedInundationDepthMeters: null`, `depthStatus: "depth_unavailable"`, `triggerEvaluation: { evaluated: true, policyApproved: false, triggerActivated: false }`.
 * **USGS Outside Empirical Range (C-04)**:
   `estimatedPgaDetail: { pgaG: ..., extrapolated: true, rangeWarning: "MMI outside calibrated California Wald99 range [5, 8]" }`.
+
+## Example End-User Prompts
+* **Use Case — Mindanao M6.9 Earthquake Rapid PGA Screening (EOC Watchstander)**:
+  ```text
+  Using the early-warning-telemetry skill, query USGS for M6.0+ earthquakes (limit 10).
+  For the strongest event, report its hypocenter, MMI, and Wald et al. (1999) GMICE estimated PGA (g),
+  explicitly flagging whether MMI is outside the empirical V–VIII range.
+  ```
+* **Use Case — Dhaka 5-Day Monsoon Rainfall Screening**:
+  ```text
+  Fetch a 5-day Open-Meteo rainfall forecast for Dhaka (lat 23.8, lon 90.4) using early-warning-telemetry.
+  Evaluate meteorological thresholds without fabricating any flood inundation depth.
+  ```
+* See [`docs/skills-guide.md`](../../docs/skills-guide.md#1-early-warning-telemetry) for additional examples.
+

@@ -86,7 +86,7 @@ node drr-agent-plugin/bin/cli.js vulnerability \
   --intensity 0.40 > vulnerability-report.json
 ```
 
-#### 7. Generate OASIS CAP v1.2 XML Alerts
+#### 7. Generate Draft OASIS CAP v1.2 XML Alerts
 ```bash
 node drr-agent-plugin/bin/cli.js cap-generate \
   --headline "FLASH FLOOD EMERGENCY WARNING" \
@@ -97,7 +97,28 @@ node drr-agent-plugin/bin/cli.js cap-generate \
   --output flood-alert.xml
 ```
 
-#### 8. Validate CAP XML Conformance
+#### 8. Validate CAP XML Conformance (XXE-Hardened)
 ```bash
 node drr-agent-plugin/bin/cli.js cap-validate flood-alert.xml
 ```
+
+#### 9. Governance, Taxonomy, Replay & Shadow Monitoring
+```bash
+# Inspect registered scientific models & empirical bounds
+node drr-agent-plugin/bin/cli.js registry
+
+# Run frozen-input scientific replay validation suite
+node drr-agent-plugin/bin/cli.js replay-validate --suite all
+
+# Crosswalk GDACS/USGS hazard codes to UNDRR-ISC HIP
+node drr-agent-plugin/bin/cli.js hazard-crosswalk --query EQ --source GDACS
+
+# Validate Sendai Framework Targets B/C/D semantics
+node drr-agent-plugin/bin/cli.js sendai-validate --file examples/thailand-flood-scenario/vulnerability-report.json
+
+# Run a bounded single-run shadow monitor check (read-only by default)
+node drr-agent-plugin/bin/cli.js monitor --once --read-only true --config alerts-config.example.json
+```
+
+> For all **29 MCP tools** and **29 CLI subcommands**, see **[docs/api-reference.md](../api-reference.md)**.  
+> For end-user prompt examples covering all **13 DRR skills**, see **[docs/skills-guide.md](../skills-guide.md)**.
