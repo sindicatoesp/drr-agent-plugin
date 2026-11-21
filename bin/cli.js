@@ -30,11 +30,12 @@ const { propagateUncertainty } = require("../lib/uncertainty");
 const { calculateExpectedAnnualLoss, evaluateMitigationCostBenefit } = require("../lib/appraisal");
 const { ingestSensorThings, toSensorGeoJSON } = require("../lib/sensorthings");
 const { ingestStacHazardCatalog, toStacFootprintGeoJSON } = require("../lib/stac");
+const { ingestFdsnShakeMap, toShakeMapGeoJSON } = require("../lib/shakemap");
 
 function printHelp() {
 	console.log(`
 DRR Analytics & Agent Plugin CLI v1.4.0
-Disaster Risk Reduction Tools: GDACS, USGS, Open-Meteo, OGC SensorThings, STAC EO Grids, Hydro, Spatial/CRS/Raster, Fragility, CAP Alerts, Sendai, DELTA, Uncertainty, Appraisal & Replay
+Disaster Risk Reduction Tools: GDACS, USGS, FDSN-WS/ShakeMap, Open-Meteo, OGC SensorThings, STAC EO Grids, Hydro, Spatial/CRS/Raster, Fragility, CAP Alerts, Sendai, DELTA, Uncertainty, Appraisal & Replay
 
 Usage:
   drr-tool <command> [options]
@@ -42,6 +43,7 @@ Usage:
 Commands:
   gdacs                Fetch or parse GDACS active hazard alerts
   usgs                 Query USGS Earthquake Hazards Program (Wald99 GMICE PGA)
+  fdsn-shakemap        Ingest custom national FDSN-WS events & ShakeMap PGA/Vs30 contours/grids (C-04 upgrade)
   forecast             Open-Meteo Anticipatory Action rainfall-threshold screening
   sensorthings         Ingest custom government/private OGC SensorThings API v1.1 gauges
   stac-hazard          Ingest STAC v1.0.0 EO catalogs & validated flood depth grids (C-05)
@@ -609,6 +611,47 @@ async function main() {
 					samplePayload,
 				});
 				const output = options["as-geojson"] ? toStacFootprintGeoJSON(report) : report;
+				console.log(JSON.stringify(output, null, 2));
+				break;
+			}
+
+			case "fdsn-shakemap": {
+				const samplePayload = options.file
+					? JSON.parse(fs.readFileSync(options.file, "utf8"))
+					: undefined;
+				const shakemapContours = options["contours-file"]
+					? JSON.parse(fs.readFileSync(options["contours-file"], "utf8"))
+					: undefined;
+				const shakemapStations = options["stations-file"]
+					? JSON.parse(fs.readFileSync(options["stations-file"], "utf8"))
+					: undefined;
+				const shakemapPgaGrid = options["grid-file"]
+					? JSON.parse(fs.readFileSync(options["grid-file"], "utf8"))
+					: undefined;
+				const bbox = options.bbox
+					? options.bbox.split(",").map((n) => parseFloat(n.trim()))
+					: undefined;
+				const report = await ingestFdsnShakeMap({
+					endpointUrl: options.url,
+					agency: options.agency,
+					minMagnitude: options["min-mag"] ? parseFloat(options["min-mag"]) : undefined,
+					startTime: options["start-time"],
+					endTime: options["end-time"],
+					bbox,
+					limit: options.limit ? parseInt(options.limit, 10) : undefined,
+					minPgaG: options["min-pga-g"] ? parseFloat(options["min-pga-g"]) : undefined,
+					shakemapContours,
+					shakemapStations,
+					shakemapPgaGrid,
+					samplePayload,
+				});
+				const geoMode =
+					options["as-geojson"] === "stations"
+						? "stations"
+						: options["as-geojson"]
+							? "contours"
+							: null;
+				const output = geoMode ? toShakeMapGeoJSON(report, geoMode) : report;
 				console.log(JSON.stringify(output, null, 2));
 				break;
 			}

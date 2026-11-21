@@ -7,20 +7,20 @@
 - **Package**: `@sindicatoesp/drr-agent-plugin` v1.3.2
 - **Plugin Manifest**: `drr-analytics` v1.3.2
 - **MCP Server**: `drr-analytics-mcp` v1.4.0 (protocol `2024-11-05`)
-- **Git Branch**: `feat/stac-hazard-adapter`
+- **Git Branch**: `feat/fdsn-shakemap-adapter`
 - **Reference Baseline Commit (`origin/dev`)**: `4d4c55c10a5c020e7f729836a12ff528e4fa4d63`
-- **Current HEAD Commit**: `03aba8adc3cac2aa75fa226d2e13e68eb90b997e`
-- **Registered MCP Tools**: 31
-- **Registered CLI Subcommands**: 31
-- **Library Modules (`lib/*.js`)**: 26
-- **Public Exports (`lib/index.js`)**: 189
-- **Skills (`skills/*/SKILL.md`)**: 15
-- **Test Suites (`tests/test-*.js`)**: 22
+- **Current HEAD Commit**: `3cc996f373e05b6045ebda8097ccd8584b052792`
+- **Registered MCP Tools**: 32
+- **Registered CLI Subcommands**: 32
+- **Library Modules (`lib/*.js`)**: 27
+- **Public Exports (`lib/index.js`)**: 199
+- **Skills (`skills/*/SKILL.md`)**: 16
+- **Test Suites (`tests/test-*.js`)**: 23
 
 ### Documentation Reconciliation Note
 - **Historical 10-vs-11 discrepancy (`origin/dev`)**: `bin/mcp-server.js` registered 11 tools (including `drr_delta_docs`), whereas `docs/api-reference.md` documented 10 tools and omitted `drr_delta_docs`. Both `docs/api-reference.md` and `README.md` are now reconciled with the expanded registration baseline of **29 MCP tools**.
 
-## Registered MCP Tools (31)
+## Registered MCP Tools (32)
 
 | # | Tool Name | Required Args | Optional Args | Test Mapping | Description |
 | :---: | :--- | :--- | :--- | :--- | :--- |
@@ -55,8 +55,9 @@
 | 29 | `drr_mitigation_cost_benefit` | `baselineEal`, `mitigatedEal`, `capex`, `discountRate`, `horizonYears`, `currency`, `valuationYear` | `optionName`, `annualOpex`, `annualCoBenefits` | `tests/test-delta-uncertainty-appraisal.js, tests/test-mcp-server.js` | Evaluate DRR mitigation option Cost-Benefit Analysis (NPV, BCR, residual risk EAL, CapEx/OpEx discounting, sensitivity matrix) separating quantitative metrics from policy judgements. |
 | 30 | `drr_sensorthings_fetch` | — | `endpointUrl`, `observedProperty`, `filter`, `top`, `observationsTop`, `thresholds`, `maxAgeMinutes`, `excludeSuspect`, `asGeoJSON`, `samplePayload` | `tests/test-sensorthings.js, tests/test-mcp-server.js` | Ingest and normalize custom government or private in-situ sensor observations via OGC SensorThings API v1.1 (OGC 18-088) with unit conversion, WMO/QARTOD QC filtering, staleness checks, licensing/redistribution metadata, and optional threshold screening. |
 | 31 | `drr_stac_hazard_fetch` | — | `endpointUrl`, `bbox`, `datetime`, `collections`, `limit`, `maxCloudCover`, `sampleDepthGrid`, `asGeoJSON`, `samplePayload` | `tests/test-stac.js, tests/test-mcp-server.js` | Ingest STAC v1.0.0 Earth Observation catalogs (Copernicus EMS, Sentinel-1 SAR, ICEYE, Floodbase) and validate flood depth grids via ingestValidatedInundationGrid (C-05/R-12), separating flood extent from depth and enforcing commercial licensing, cloud cover, and SSRF guards. |
+| 32 | `drr_fdsn_shakemap_fetch` | — | `endpointUrl`, `agency`, `minMagnitude`, `startTime`, `endTime`, `bbox`, `limit`, `minPgaG`, `shakemapContours`, `shakemapStations`, `shakemapPgaGrid`, `asGeoJSON`, `samplePayload` | `tests/test-shakemap.js, tests/test-mcp-server.js` | Ingest custom national FDSN-WS seismic events (BMKG, PHIVOLCS, JMA, EMSC, GeoNet, USGS) and ShakeMap v4 PGA/PGV/Vs30 contours, instrumented station lists, and gridded PGA rasters (upgrading C-04 beyond Wald99 GMICE). |
 
-## Registered CLI Subcommands (31)
+## Registered CLI Subcommands (32)
 
 - `drr-tool fragility`
 - `drr-tool gdacs`
@@ -89,8 +90,9 @@
 - `drr-tool monitor`
 - `drr-tool sensorthings`
 - `drr-tool stac-hazard`
+- `drr-tool fdsn-shakemap`
 
-## Library Modules (26)
+## Library Modules (27)
 
 - `lib/appraisal.js`
 - `lib/cap.js`
@@ -111,6 +113,7 @@
 - `lib/security.js`
 - `lib/sendai.js`
 - `lib/sensorthings.js`
+- `lib/shakemap.js`
 - `lib/spatial.js`
 - `lib/stac.js`
 - `lib/state-store.js`
@@ -119,13 +122,14 @@
 - `lib/utils.js`
 - `lib/vulnerability.js`
 
-## Knowledge Skills (15)
+## Knowledge Skills (16)
 
 - `skills/cap-governance-and-approval/SKILL.md`
 - `skills/delta-disaster-recording/SKILL.md`
 - `skills/drr-data-quality-and-provenance/SKILL.md`
 - `skills/early-warning-telemetry/SKILL.md`
 - `skills/event-identity-and-linkage/SKILL.md`
+- `skills/fdsn-shakemap-seismic/SKILL.md`
 - `skills/forecast-based-action-trigger-design/SKILL.md`
 - `skills/gdacs-feed-ingestion/SKILL.md`
 - `skills/hazard-exposure-modeling/SKILL.md`
@@ -137,7 +141,7 @@
 - `skills/undrr-hip-hazard-classification/SKILL.md`
 - `skills/vulnerability-matrix/SKILL.md`
 
-## Automated Test Suites (22)
+## Automated Test Suites (23)
 
 - `tests/test-cap.js`
 - `tests/test-cli-inventory.js`
@@ -156,12 +160,13 @@
 - `tests/test-security-cap.js`
 - `tests/test-sendai-replay.js`
 - `tests/test-sensorthings.js`
+- `tests/test-shakemap.js`
 - `tests/test-spatial-hydro.js`
 - `tests/test-spatial.js`
 - `tests/test-stac.js`
 - `tests/test-usgs.js`
 - `tests/test-vulnerability.js`
 
-## Public Exports from `lib/index.js` (189)
+## Public Exports from `lib/index.js` (199)
 
-`APPROVAL_STATUS_VALUES`, `APPROVED_RETENTION_POLICIES`, `ActionPolicyGuard`, `AuthoritativeStateStore`, `CAP_XMLNS`, `CASCADING_HAZARD_PAIRS`, `COMMON_ALIASES`, `CONFIG`, `CONTRACT_SCHEMA_VERSION`, `DAMAGE_RATIO_WEIGHTS`, `DEFAULT_FRESHNESS_THRESHOLDS_MS`, `DEFAULT_POLICY_GUARD`, `EVIDENCE_BASIS_VALUES`, `EXTERNAL_SYSTEM_CROSSWALK`, `FileCasStateStore`, `GDACS_FEED_URL`, `HIP_CLUSTERS`, `HIP_CROSSWALK_VERSION`, `HIP_HAZARDS`, `HIP_HAZARD_MAP`, `HIP_TAXONOMY_VERSION`, `HIP_TYPES`, `HTTPS_KEEPALIVE_AGENT`, `HTTP_KEEPALIVE_AGENT`, `INTENSITY_UNIT_SPECS`, `InMemoryCasStateStore`, `MODEL_REGISTRY`, `MONITOR_SUMMARY_SCHEMA_VERSION`, `OPENMETEO_API_URL`, `POLICY_VERSION`, `ProviderBudgetTracker`, `REPORTING_ELIGIBILITY_VALUES`, `RETRY_SCHEMA_VERSION`, `SEISMIC_FRAGILITY_PARAMS`, `SENDAI_CRITICAL_INFRASTRUCTURE`, `SENDAI_REFERENCE`, `SENSORTHINGS_METHOD_ID`, `STAC_METHOD_ID`, `STATE_SCHEMA_VERSION`, `SUPPORTED_SCHEMA_VERSIONS`, `USGS_API_URL`, `VALID_B_SUBINDICATORS`, `VALID_CATEGORIES`, `VALID_CERTAINTIES`, `VALID_D_DAMAGE_INDICATORS`, `VALID_D_DISRUPTION_INDICATORS`, `VALID_FLOOD_OCCUPANCIES`, `VALID_MSG_TYPES`, `VALID_SCOPES`, `VALID_SEVERITIES`, `VALID_STATUSES`, `VALID_URGENCIES`, `VERIFICATION_STATUS_VALUES`, `aggregateBasinRainfall`, `analyzeFloodRisk`, `buildRelationalRecordBundle`, `buildSensorThingsUrl`, `buildStacSearchUrl`, `calculateBBox`, `calculateExpectedAnnualLoss`, `callDeltaMcp`, `checkDomainApplicability`, `checkForecastPersistence`, `classifyError`, `classifyStacAssets`, `computeAssessmentKey`, `computeBackoffDelayMs`, `computeCanonicalEventHash`, `computeEventIdentity`, `computePayloadHash`, `computeRasterZonalStats`, `computeRingAreaSqKm`, `computeSnapshotHash`, `createAssessmentEnvelope`, `createEmptyLedgerState`, `createGeodesicBuffer`, `createProvenanceManifest`, `createSeededRng`, `createStateStore`, `crosswalkHazard`, `dispatchWebhook`, `enforceTenantIsolation`, `erf`, `escapeXml`, `estimatePgaFromMmi`, `estimatePgaFromMmiDetailed`, `evaluateActionPolicy`, `evaluateFloodDamage`, `evaluateMitigationCostBenefit`, `evaluateSeismicFragility`, `evaluateSourceFreshness`, `evaluateVulnerabilityMatrix`, `evaluateWindDamage`, `executeWithRetry`, `fetchDeltaDimensions`, `fetchDeltaDocs`, `fetchDeltaHazards`, `fetchExposureFromDelta`, `fetchJsonWithConfig`, `fetchWeatherForecast`, `findHipHazards`, `formatCapTimestamp`, `formatMonitorMarkdownSummary`, `generateCapXml`, `generateEmergencyBrief`, `generateVisualSitRepHtml`, `geojsonToCapPolygon`, `getAllHipClusters`, `getAllHipHazards`, `getAllHipTypes`, `getHipHierarchy`, `getRegisteredMethod`, `haversineDistance`, `ingestGdacsAlerts`, `ingestSensorThings`, `ingestStacHazardCatalog`, `ingestUsgsEarthquakes`, `ingestValidatedInundationGrid`, `isBlockedWebhookHost`, `isEventInCountry`, `isPointInGeometry`, `issueApprovalToken`, `listRegisteredMethods`, `loadEnv`, `loadMonitoringRules`, `lognormalCdf`, `lookupHip`, `mapAssetCategoryToSector`, `mapEventType`, `mapHazardToHip`, `mapOutcomeToExitCode`, `matchAndDeduplicateEvents`, `migrateStateSchema`, `normalCdf`, `normalizeDepthValuesToMeters`, `normalizeHazardFamily`, `normalizeHazardIntensity`, `normalizeLongitude`, `normalizeQcFlag`, `parseEnvContent`, `parseGdacsFeed`, `parseRetryAfterMs`, `parseSensorThingsPayload`, `parseStacCatalogPayload`, `parseUsgsFeed`, `pointInPolygonRing`, `pointOnSegment`, `prepareCapPublication`, `processQualifyingEvent`, `propagateUncertainty`, `pushDraftDisasterRecord`, `redactSensitiveObject`, `redactUrlSecrets`, `repairGeoJsonGeometry`, `resolveSensorUnit`, `revertEventDecision`, `ringCrossesAntimeridian`, `runMonitoringCycle`, `runOnce`, `runReplayValidation`, `sanitizeForProvenanceHash`, `sanitizeUntrustedFeedText`, `screenRiverDischarge`, `segmentsIntersect`, `signedRingArea`, `spatialExposureJoin`, `startMonitoringDaemon`, `stripVolatileEventFields`, `summarizeDepthGrid`, `toSensorGeoJSON`, `toStacFootprintGeoJSON`, `toUtcIsoWithOffset`, `transformCrs`, `transitionGovernanceState`, `unwrapAntimeridianRing`, `validateCapXml`, `validateCoordinatePair`, `validateDeltaSchema`, `validateDestination`, `validateGeoJson`, `validateInputContract`, `validateLedgerStateSchema`, `validateMonitorConfig`, `validateRunRecord`, `validateSendaiSubmission`, `validateStacDepthGrid`, `validateTemporalInterval`, `validateXmlSafety`, `verifyApprovalToken`
+`APPROVAL_STATUS_VALUES`, `APPROVED_RETENTION_POLICIES`, `ActionPolicyGuard`, `AuthoritativeStateStore`, `CAP_XMLNS`, `CASCADING_HAZARD_PAIRS`, `COMMON_ALIASES`, `CONFIG`, `CONTRACT_SCHEMA_VERSION`, `DAMAGE_RATIO_WEIGHTS`, `DEFAULT_FRESHNESS_THRESHOLDS_MS`, `DEFAULT_POLICY_GUARD`, `EVIDENCE_BASIS_VALUES`, `EXTERNAL_SYSTEM_CROSSWALK`, `FileCasStateStore`, `GDACS_FEED_URL`, `HIP_CLUSTERS`, `HIP_CROSSWALK_VERSION`, `HIP_HAZARDS`, `HIP_HAZARD_MAP`, `HIP_TAXONOMY_VERSION`, `HIP_TYPES`, `HTTPS_KEEPALIVE_AGENT`, `HTTP_KEEPALIVE_AGENT`, `INTENSITY_UNIT_SPECS`, `InMemoryCasStateStore`, `MODEL_REGISTRY`, `MONITOR_SUMMARY_SCHEMA_VERSION`, `OPENMETEO_API_URL`, `POLICY_VERSION`, `ProviderBudgetTracker`, `REPORTING_ELIGIBILITY_VALUES`, `RETRY_SCHEMA_VERSION`, `SEISMIC_FRAGILITY_PARAMS`, `SENDAI_CRITICAL_INFRASTRUCTURE`, `SENDAI_REFERENCE`, `SENSORTHINGS_METHOD_ID`, `SHAKEMAP_METHOD_ID`, `STAC_METHOD_ID`, `STATE_SCHEMA_VERSION`, `SUPPORTED_SCHEMA_VERSIONS`, `USGS_API_URL`, `VALID_B_SUBINDICATORS`, `VALID_CATEGORIES`, `VALID_CERTAINTIES`, `VALID_D_DAMAGE_INDICATORS`, `VALID_D_DISRUPTION_INDICATORS`, `VALID_FLOOD_OCCUPANCIES`, `VALID_MSG_TYPES`, `VALID_SCOPES`, `VALID_SEVERITIES`, `VALID_STATUSES`, `VALID_URGENCIES`, `VERIFICATION_STATUS_VALUES`, `aggregateBasinRainfall`, `analyzeFloodRisk`, `buildFdsnEventUrl`, `buildRelationalRecordBundle`, `buildSensorThingsUrl`, `buildStacSearchUrl`, `calculateBBox`, `calculateExpectedAnnualLoss`, `callDeltaMcp`, `checkDomainApplicability`, `checkForecastPersistence`, `classifyError`, `classifyNehrpVs30`, `classifyStacAssets`, `computeAssessmentKey`, `computeBackoffDelayMs`, `computeCanonicalEventHash`, `computeEventIdentity`, `computePayloadHash`, `computeRasterZonalStats`, `computeRingAreaSqKm`, `computeSnapshotHash`, `createAssessmentEnvelope`, `createEmptyLedgerState`, `createGeodesicBuffer`, `createProvenanceManifest`, `createSeededRng`, `createStateStore`, `crosswalkHazard`, `dispatchWebhook`, `enforceTenantIsolation`, `erf`, `escapeXml`, `estimatePgaFromMmi`, `estimatePgaFromMmiDetailed`, `evaluateActionPolicy`, `evaluateFloodDamage`, `evaluateMitigationCostBenefit`, `evaluateSeismicFragility`, `evaluateSourceFreshness`, `evaluateVulnerabilityMatrix`, `evaluateWindDamage`, `executeWithRetry`, `fetchDeltaDimensions`, `fetchDeltaDocs`, `fetchDeltaHazards`, `fetchExposureFromDelta`, `fetchJsonWithConfig`, `fetchWeatherForecast`, `findHipHazards`, `formatCapTimestamp`, `formatMonitorMarkdownSummary`, `generateCapXml`, `generateEmergencyBrief`, `generateVisualSitRepHtml`, `geojsonToCapPolygon`, `getAllHipClusters`, `getAllHipHazards`, `getAllHipTypes`, `getHipHierarchy`, `getRegisteredMethod`, `haversineDistance`, `ingestFdsnShakeMap`, `ingestGdacsAlerts`, `ingestSensorThings`, `ingestStacHazardCatalog`, `ingestUsgsEarthquakes`, `ingestValidatedInundationGrid`, `isBlockedWebhookHost`, `isEventInCountry`, `isPointInGeometry`, `issueApprovalToken`, `listRegisteredMethods`, `loadEnv`, `loadMonitoringRules`, `lognormalCdf`, `lookupHip`, `mapAssetCategoryToSector`, `mapEventType`, `mapHazardToHip`, `mapOutcomeToExitCode`, `matchAndDeduplicateEvents`, `migrateStateSchema`, `normalCdf`, `normalizeDepthValuesToMeters`, `normalizeHazardFamily`, `normalizeHazardIntensity`, `normalizeLongitude`, `normalizePgaToG`, `normalizeQcFlag`, `parseEnvContent`, `parseFdsnShakeMapPayload`, `parseGdacsFeed`, `parseRetryAfterMs`, `parseSensorThingsPayload`, `parseShakeMapContours`, `parseShakeMapPgaGrid`, `parseShakeMapStations`, `parseStacCatalogPayload`, `parseUsgsFeed`, `pointInPolygonRing`, `pointOnSegment`, `prepareCapPublication`, `processQualifyingEvent`, `propagateUncertainty`, `pushDraftDisasterRecord`, `redactSensitiveObject`, `redactUrlSecrets`, `repairGeoJsonGeometry`, `resolveSensorUnit`, `revertEventDecision`, `ringCrossesAntimeridian`, `runMonitoringCycle`, `runOnce`, `runReplayValidation`, `sanitizeForProvenanceHash`, `sanitizeUntrustedFeedText`, `screenRiverDischarge`, `segmentsIntersect`, `signedRingArea`, `spatialExposureJoin`, `startMonitoringDaemon`, `stripVolatileEventFields`, `summarizeDepthGrid`, `toSensorGeoJSON`, `toShakeMapGeoJSON`, `toStacFootprintGeoJSON`, `toUtcIsoWithOffset`, `transformCrs`, `transitionGovernanceState`, `unwrapAntimeridianRing`, `validateCapXml`, `validateCoordinatePair`, `validateDeltaSchema`, `validateDestination`, `validateGeoJson`, `validateInputContract`, `validateLedgerStateSchema`, `validateMonitorConfig`, `validateRunRecord`, `validateSendaiSubmission`, `validateStacDepthGrid`, `validateTemporalInterval`, `validateXmlSafety`, `verifyApprovalToken`

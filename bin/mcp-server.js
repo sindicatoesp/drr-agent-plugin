@@ -27,6 +27,7 @@ const { calculateExpectedAnnualLoss, evaluateMitigationCostBenefit } = require("
 const { sanitizeUntrustedFeedText } = require("../lib/security");
 const { ingestSensorThings, toSensorGeoJSON } = require("../lib/sensorthings");
 const { ingestStacHazardCatalog, toStacFootprintGeoJSON } = require("../lib/stac");
+const { ingestFdsnShakeMap, toShakeMapGeoJSON } = require("../lib/shakemap");
 
 const SERVER_NAME = "drr-analytics-mcp";
 const SERVER_VERSION = "1.4.0";
@@ -739,10 +740,95 @@ const TOOLS = [
 			},
 		},
 	},
+	{
+		name: "drr_fdsn_shakemap_fetch",
+		description:
+			"Ingest custom national FDSN-WS seismic events (BMKG, PHIVOLCS, JMA, EMSC, GeoNet, USGS) and ShakeMap v4 PGA/PGV/Vs30 contours, instrumented station lists, and gridded PGA rasters (upgrading C-04 beyond Wald99 GMICE).",
+		inputSchema: {
+			type: "object",
+			properties: {
+				endpointUrl: {
+					type: "string",
+					description: "Custom FDSN-WS event service root or /query URL (SSRF-guarded; optional if samplePayload or FDSN_API_URL is set)",
+				},
+				agency: {
+					type: "string",
+					description: "Optional national seismic agency identifier (e.g. 'BMKG', 'PHIVOLCS', 'JMA', 'EMSC', 'GeoNet')",
+				},
+				minMagnitude: {
+					type: "number",
+					description: "Optional minimum earthquake magnitude filter",
+				},
+				startTime: {
+					type: "string",
+					description: "Optional ISO-8601 start time for FDSN-WS query",
+				},
+				endTime: {
+					type: "string",
+					description: "Optional ISO-8601 end time for FDSN-WS query",
+				},
+				bbox: {
+					type: "array",
+					items: { type: "number" },
+					description: "Optional geographic bounding box [minLon, minLat, maxLon, maxLat]",
+				},
+				limit: {
+					type: "number",
+					description: "Maximum number of FDSN events (default: 20, max: 200)",
+				},
+				minPgaG: {
+					type: "number",
+					description: "Optional minimum PGA threshold in g for filtering ShakeMap contours",
+				},
+				shakemapContours: {
+					type: "object",
+					description: "Optional ShakeMap PGA contours GeoJSON FeatureCollection (cont_pga.json)",
+				},
+				shakemapStations: {
+					type: "object",
+					description: "Optional ShakeMap stationlist.json GeoJSON FeatureCollection with PGA, PGV, and Vs30",
+				},
+				shakemapPgaGrid: {
+					type: "object",
+					description: "Optional ShakeMap PGA raster grid { bbox, crs, unit, width, height, values, nodata }",
+				},
+				asGeoJSON: {
+					type: "string",
+					enum: ["contours", "stations"],
+					description: "Optional: include a GeoJSON FeatureCollection of ShakeMap 'contours' or 'stations' for drr_spatial_exposure_join",
+				},
+				samplePayload: {
+					type: "object",
+					description: "Optional offline/test FDSN-WS GeoJSON or combined ShakeMap bundle JSON payload",
+				},
+			},
+		},
+	},
 ];
 
 async function handleToolCall(name, args) {
 	switch (name) {
+		case "drr_fdsn_shakemap_fetch": {
+			const report = await ingestFdsnShakeMap({
+				endpointUrl: args.endpointUrl,
+				agency: args.agency,
+				minMagnitude: args.minMagnitude,
+				startTime: args.startTime,
+				endTime: args.endTime,
+				bbox: args.bbox,
+				limit: args.limit,
+				minPgaG: args.minPgaG,
+				shakemapContours: args.shakemapContours,
+				shakemapStations: args.shakemapStations,
+				shakemapPgaGrid: args.shakemapPgaGrid,
+				samplePayload: args.samplePayload,
+			});
+			if (args.asGeoJSON) {
+				return { ...report, geojson: toShakeMapGeoJSON(report, args.asGeoJSON) };
+			}
+			return report;
+		}
+
 		case "drr_stac_hazard_fetch": {
 			const report = await ingestStacHazardCatalog({
 				endpointUrl: args.endpointUrl,
