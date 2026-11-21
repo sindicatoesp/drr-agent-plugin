@@ -32,10 +32,11 @@ const { ingestSensorThings, toSensorGeoJSON } = require("../lib/sensorthings");
 const { ingestStacHazardCatalog, toStacFootprintGeoJSON } = require("../lib/stac");
 const { ingestFdsnShakeMap, toShakeMapGeoJSON } = require("../lib/shakemap");
 const { ingestCriticalInfraOverlay } = require("../lib/infra-overlay");
+const pkg = require("../package.json");
 
 function printHelp() {
 	console.log(`
-DRR Analytics & Agent Plugin CLI v1.4.0
+DRR Analytics & Agent Plugin CLI v${pkg.version}
 Disaster Risk Reduction Tools: GDACS, USGS, FDSN-WS/ShakeMap, Open-Meteo, OGC SensorThings, STAC EO Grids, Sendai Infra Overlay, Hydro, Spatial/CRS/Raster, Fragility, CAP Alerts, Sendai, DELTA, Uncertainty, Appraisal & Replay
 
 Usage:
