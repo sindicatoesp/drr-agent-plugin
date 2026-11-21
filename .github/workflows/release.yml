@@ -1,0 +1,136 @@
+name: Auto Release (dev -> main)
+
+on:
+  pull_request:
+    types: [closed]
+    branches: [main]
+  workflow_dispatch:
+    inputs:
+      bump:
+        description: 'SemVer increment override (auto detects major/minor/patch from commits & PR)'
+        required: false
+        default: 'auto'
+        type: choice
+        options:
+          - auto
+          - patch
+          - minor
+          - major
+
+permissions:
+  contents: write
+  pull-requests: read
+
+concurrency:
+  group: drr-auto-release-main
+  cancel-in-progress: false
+
+jobs:
+  verify:
+    name: Verify Merged main Before Release
+    if: >-
+      github.event_name == 'workflow_dispatch' ||
+      (
+        github.event.pull_request.merged == true &&
+        github.event.pull_request.head.ref == 'dev' &&
+        github.event.pull_request.base.ref == 'main'
+      )
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout main
+        uses: actions/checkout@v4
+        with:
+          ref: main
+
+      - name: Setup Node.js 20.x
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20.x'
+
+      - name: Run Static Lint & Syntax Check
+        run: node scripts/lint.js
+
+      - name: Run All Unit & MCP Test Suites
+        run: bash tests/run-all-tests.sh
+
+      - name: Run Southern Thailand Flood 2026 Benchmark
+        run: bash examples/thailand-flood-scenario/run.sh
+
+  release:
+    name: Create SemVer Tag & GitHub Release
+    needs: verify
+    runs-on: ubuntu-latest
+    env:
+      GH_TOKEN: ${{ github.token }}
+      PR_TITLE: ${{ github.event.pull_request.title || '' }}
+      PR_BODY: ${{ github.event.pull_request.body || '' }}
+      PR_LABELS: ${{ join(github.event.pull_request.labels.*.name, ',') }}
+      RELEASE_BUMP_OVERRIDE: ${{ inputs.bump || 'auto' }}
+    steps:
+      - name: Checkout main (Full History & Tags)
+        uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 0
+          fetch-tags: true
+
+      - name: Setup Node.js 20.x
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20.x'
+
+      - name: Compute Next SemVer Release Version
+        id: semver
+        run: |
+          node scripts/next-version.js \
+            --pr-labels "$PR_LABELS" \
+            --override "$RELEASE_BUMP_OVERRIDE" \
+            --github-output
+
+      - name: Check Existing Tag / Release Idempotency
+        id: check
+        run: |
+          TAG="${{ steps.semver.outputs.tag }}"
+          COMMITS="${{ steps.semver.outputs.commits_analyzed }}"
+          if git rev-parse "$TAG" >/dev/null 2>&1; then
+            echo "Tag $TAG already exists; skipping release creation."
+            echo "should_release=false" >> "$GITHUB_OUTPUT"
+          elif [ "$COMMITS" = "0" ] && [ "$RELEASE_BUMP_OVERRIDE" = "auto" ]; then
+            echo "No new commits since ${{ steps.semver.outputs.previous_tag }}; skipping release."
+            echo "should_release=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "should_release=true" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Create GitHub Release & SemVer Tag
+        if: steps.check.outputs.should_release == 'true'
+        run: |
+          TAG="${{ steps.semver.outputs.tag }}"
+          PREV_TAG="${{ steps.semver.outputs.previous_tag }}"
+          TARGET_SHA="$(git rev-parse HEAD)"
+
+          if [ -n "$PREV_TAG" ]; then
+            gh release create "$TAG" \
+              --target "$TARGET_SHA" \
+              --title "$TAG" \
+              --generate-notes \
+              --notes-start-tag "$PREV_TAG"
+          else
+            gh release create "$TAG" \
+              --target "$TARGET_SHA" \
+              --title "$TAG" \
+              --generate-notes
+          fi
+
+      - name: Write Release Summary
+        run: |
+          {
+            echo "## Automated Release Summary"
+            echo ""
+            echo "- **Previous Tag**: \`${{ steps.semver.outputs.previous_tag || 'none' }}\`"
+            echo "- **Next Tag**: \`${{ steps.semver.outputs.tag }}\`"
+            echo "- **SemVer Increment**: \`${{ steps.semver.outputs.bump }}\`"
+            echo "- **Reason**: ${{ steps.semver.outputs.reason }}"
+            echo "- **Commits Analyzed**: ${{ steps.semver.outputs.commits_analyzed }}"
+            echo "- **Release Created**: \`${{ steps.check.outputs.should_release }}\`"
+          } >> "$GITHUB_STEP_SUMMARY"
