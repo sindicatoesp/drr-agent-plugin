@@ -35,3 +35,19 @@ description: Ingest, sanitize, and interpret GDACS active hazard alerts for eart
 * **Expected Sanitized Event Fields**:
   `{ id, eventType, alertLevel, sourceIssuedAt, retrievedAt, payloadHash, promptInjectionFlagged, coordinates }`.
 * **Typed Failure**: Missing offline fixture in `DRR_OFFLINE_MODE=true` returns explicit offline network block rather than fabricating synthetic alerts.
+
+## Example End-User Prompts
+* **Use Case — South Pacific Tropical Cyclone Alert Triage (UN OCHA)**:
+  ```text
+  Use the gdacs-feed-ingestion skill to fetch all active GDACS Orange and Red Tropical Cyclone (TC)
+  alerts. Report alertLevel, sourceIssuedAt, payloadHash, and promptInjectionFlagged status, then
+  crosswalk the "TC" code to its UNDRR-ISC HIP triad.
+  ```
+* **Use Case — Offline Flood Fixture & Clinic Exposure Screening**:
+  ```text
+  Ingest examples/flood-gdacs-exposure/sample-gdacs-flood.json via gdacs-feed-ingestion, verify
+  sanitization metadata, and run a spatial exposure join against
+  examples/flood-gdacs-exposure/critical-facilities.geojson.
+  ```
+* See [`docs/skills-guide.md`](../../docs/skills-guide.md#2-gdacs-feed-ingestion) for additional examples.
+

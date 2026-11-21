@@ -31,3 +31,19 @@ description: Enforces UNDRR Sendai Framework Monitor (SFM) indicator definitions
 
 ## Example Output & Failure Cases
 * **Official Reporting Gate**: Unreviewed modelled payload yields `reportingEligibility: "pending"` or `"ineligible"` with structured reason codes (never silently promoted to official national statistics).
+
+## Example End-User Prompts
+* **Use Case — Annual Provincial Flood Sendai SFM Audit (National Focal Point)**:
+  ```text
+  Using the sendai-indicator-accounting skill, audit examples/thailand-flood-scenario/vulnerability-report.json
+  for Sendai Targets B, C, and D compliance. Verify that modelled displacement is not mapped to B-1,
+  physical damage (D-2..D-4) is separated from service disruption (D-6..D-8), and per-100,000 rates
+  require an explicit non-zero populationDenominator.
+  ```
+* **Use Case — Official Reporting Eligibility Gate Check**:
+  ```text
+  Run drr_sendai_validate with requireCalibratedMethodology: true on an unreviewed modelled flood
+  assessment and list the exact escalation requirements before official national submission.
+  ```
+* See [`docs/skills-guide.md`](../../docs/skills-guide.md#8-sendai-indicator-accounting) for additional examples.
+

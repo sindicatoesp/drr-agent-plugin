@@ -29,3 +29,19 @@ description: Enforces C-07 CAP state separation, signed cryptographic approval t
 
 ## Example Output & Failure Cases
 * **Self-Asserted Approval Blocked**: Passing `{ approved: true }` without a valid HMAC signature is rejected with an explicit authorization policy failure.
+
+## Example End-User Prompts
+* **Use Case — Sandbox Broadcast Drill (National EOC)**:
+  ```text
+  Using the cap-governance-and-approval skill, test publishing the validated CAP XML at
+  examples/earthquake-hazus-scenario/output-cap-alert.xml to channelType "sandbox" at
+  "https://sandbox.cap.example.org/ingest" with permissionScope "publish_cap" and
+  idempotencyKey "cap-drill-2026-001". Report the delivery and authorization audit status.
+  ```
+* **Use Case — Fail-Closed Production Guardrail Check (Security Officer)**:
+  ```text
+  Verify that attempting to publish a Draft CAP alert to channelType "production" with a
+  self-asserted { approved: true } object (no signed HMAC approvalToken) is rejected.
+  ```
+* See [`docs/skills-guide.md`](../../docs/skills-guide.md#7-cap-governance-and-approval) for additional examples.
+

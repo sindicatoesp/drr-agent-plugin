@@ -33,3 +33,19 @@ description: Schema-validated, tenant-isolated, draft-only interoperability with
 * **Expected Draft Output**:
   `{ success: true, record: { status: "draft", source: "drr-agent-plugin", apiImportId: ... }, governanceMetadata: { evidenceBasis, verificationStatus, approvalStatus, reportingEligibility } }`.
 * **Production Gate**: Calling live push while `DRR_ENABLE_PRODUCTION_PUBLISH !== "true"` is blocked cleanly unless `mock: true`.
+
+## Example End-User Prompts
+* **Use Case — Thailand DDPM Draft Flood Record Submission**:
+  ```text
+  Using the delta-disaster-recording skill, validate examples/thailand-flood-scenario/vulnerability-report.json
+  against the DELTA DTS schema (HIP triad, SRID 4326 footprint, wire sanitization) and perform a dry-run
+  (mock: true) draft push under tenantContext { actorTenant: "THA", targetTenant: "THA" } with name
+  "Southern Thailand Monsoon Flood 2026" and notes "Rapid PDNA draft for DDPM review".
+  ```
+* **Use Case — Baseline Exposure & HIP Lookup**:
+  ```text
+  Fetch DELTA DTS documentation and baseline administrative divisions (mock: true) using
+  delta-disaster-recording, and verify that cross-tenant pushes (THA -> IDN) are blocked.
+  ```
+* See [`docs/skills-guide.md`](../../docs/skills-guide.md#9-delta-disaster-recording) for additional examples.
+

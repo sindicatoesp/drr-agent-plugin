@@ -36,3 +36,20 @@ description: Execute deterministic spatial joins (antimeridian, hole, CRS, raste
 ## Example Output & Failure Cases
 * **Expected Zero-Intensity Invariant**: `intensity: 0` deterministically yields `meanDamageRatio: 0`, `probabilities.none: 1`.
 * **Production Gate Failure**: Calling `drr_fragility_eval` with `mode: "production"` throws/rejects uncalibrated baseline curves cleanly.
+
+## Example End-User Prompts
+* **Use Case — GeoJSON Validation, Opt-In Repair & Municipal Exposure Join**:
+  ```text
+  Using the hazard-exposure-modeling skill, validate examples/earthquake-hazus-scenario/input-hazard.json.
+  If any ring is unclosed or has invalid RFC 7946 winding, repair it with repairRequested: true
+  (preserving originalGeometry), then run a spatial exposure join against
+  examples/earthquake-hazus-scenario/input-exposure.json.
+  ```
+* **Use Case — Seismic & Flood Illustrative Fragility Comparison**:
+  ```text
+  Evaluate earthquake fragility at 0.40 g PGA for URM and C1_PRE_CODE in exploratory mode, and
+  compare flood depth-damage at 1.8 m for residential_1story vs. commercial occupancy. Also confirm
+  that mode: "production" is blocked on uncalibrated illustrative curves.
+  ```
+* See [`docs/skills-guide.md`](../../docs/skills-guide.md#4-hazard-exposure-modeling) for additional examples.
+
