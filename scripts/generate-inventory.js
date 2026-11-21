@@ -68,6 +68,8 @@ const TEST_MAPPING = {
 	drr_uncertainty_propagate: "tests/test-delta-uncertainty-appraisal.js, tests/test-mcp-server.js",
 	drr_expected_annual_loss: "tests/test-delta-uncertainty-appraisal.js, tests/test-mcp-server.js",
 	drr_mitigation_cost_benefit: "tests/test-delta-uncertainty-appraisal.js, tests/test-mcp-server.js",
+	drr_sensorthings_fetch: "tests/test-sensorthings.js, tests/test-mcp-server.js",
+	drr_stac_hazard_fetch: "tests/test-stac.js, tests/test-mcp-server.js",
 };
 
 function generateInventoryMarkdown() {

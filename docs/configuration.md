@@ -28,6 +28,12 @@ A template configuration is provided in [`drr-agent-plugin/.env.example`](../.en
 | **`USGS_DEFAULT_LIMIT`**| `20` | Maximum number of seismic events to return per query. |
 | **`OPENMETEO_API_URL`** | `https://api.open-meteo.com/v1/forecast` | Open-Meteo endpoint for numerical weather prediction. Automatically switches to `customer-api.open-meteo.com` when `OPENMETEO_API_KEY` is provided. |
 | **`OPENMETEO_API_KEY`** | *None (empty)* | Optional commercial API key for high-frequency or SLA-backed Open-Meteo queries. |
+| **`OGC_SENSORTHINGS_URL`** | *None (empty)* | Default OGC SensorThings API v1.1 root or `/Datastreams` endpoint for custom government or private in-situ sensor networks. |
+| **`OGC_SENSORTHINGS_API_KEY`** | *None (empty)* | Optional API key sent when querying authenticated OGC SensorThings endpoints (redacted from logs and provenance hashes). |
+| **`OGC_SENSORTHINGS_API_KEY_HEADER`** | `X-API-Key` | HTTP header name used to transmit `OGC_SENSORTHINGS_API_KEY` (e.g., `X-API-Key` or `Authorization`). |
+| **`STAC_API_URL`** | *None (empty)* | Default STAC v1.0.0 root or `/search` endpoint for government or commercial Earth Observation hazard catalogs. |
+| **`STAC_API_KEY`** | *None (empty)* | Optional API key sent when querying authenticated STAC API endpoints (redacted from logs and provenance hashes). |
+| **`STAC_API_KEY_HEADER`** | `X-API-Key` | HTTP header name used to transmit `STAC_API_KEY` (e.g., `X-API-Key` or `Authorization`). |
 | **`DELTA_API_URL`** | `http://localhost:3000/en/api/mcp` | Target endpoint for connecting to DELTA Resilience core application MCP server. |
 | **`DELTA_MCP_API_KEY`** | *None (empty)* | Secret API token passed in `X-Auth` header to authenticate against DELTA's database. |
 | **`TARGET_COUNTRIES`** | `*` (all) | Comma-separated list of target country names or ISO-2/3 codes (e.g. `Indonesia,ID,IDN`). Foreign events are excluded from DELTA push. |

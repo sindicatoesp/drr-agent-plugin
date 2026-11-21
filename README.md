@@ -146,13 +146,13 @@ node bin/cli.js cap-generate \
 
 ---
 
-## MCP Server Tools (29 Tools)
+## MCP Server Tools (31 Tools)
 
-The MCP server (`bin/mcp-server.js`) exposes **29 deterministic, provenance-aware tools**:
+The MCP server (`bin/mcp-server.js`) exposes **31 deterministic, provenance-aware tools**:
 
 | Category | MCP Tools |
 | :--- | :--- |
-| **Telemetry & Hydrology** | `drr_gdacs_fetch`, `drr_usgs_earthquake_fetch`, `drr_openmeteo_forecast`, `drr_basin_rainfall_aggregate`, `drr_river_discharge_screen`, `drr_monitor_check` |
+| **Telemetry & Hydrology** | `drr_gdacs_fetch`, `drr_usgs_earthquake_fetch`, `drr_openmeteo_forecast`, `drr_sensorthings_fetch`, `drr_stac_hazard_fetch`, `drr_basin_rainfall_aggregate`, `drr_river_discharge_screen`, `drr_monitor_check` |
 | **Contracts, Governance & Replay** | `drr_input_contract_validate`, `drr_source_provenance_manifest`, `drr_model_registry_list`, `drr_assessment_replay_validate` |
 | **Spatial, CRS & Raster** | `drr_spatial_exposure_join`, `drr_geojson_validate`, `drr_geometry_repair`, `drr_crs_transform`, `drr_raster_zonal_stats` |
 | **Fragility, Loss & Sendai** | `drr_fragility_eval`, `drr_vulnerability_matrix_calc`, `drr_sendai_validate` |
@@ -164,11 +164,11 @@ See **[docs/tool-inventory.md](docs/tool-inventory.md)** for auto-generated per-
 
 ---
 
-## Domain Skills & Prompting Guide (13 Skills)
+## Domain Skills & Prompting Guide (15 Skills)
 
 Each skill in `skills/*/SKILL.md` encodes DRR scientific guardrails, tool orchestration, and governance escalation rules. See **[docs/skills-guide.md](docs/skills-guide.md)** for ready-to-use end-user prompts applying specific real-world use cases to every skill:
 
-* **Telemetry & Early Warning**: [`early-warning-telemetry`](docs/skills-guide.md#1-early-warning-telemetry), [`gdacs-feed-ingestion`](docs/skills-guide.md#2-gdacs-feed-ingestion), [`forecast-based-action-trigger-design`](docs/skills-guide.md#3-forecast-based-action-trigger-design)
+* **Telemetry & Early Warning**: [`early-warning-telemetry`](docs/skills-guide.md#1-early-warning-telemetry), [`gdacs-feed-ingestion`](docs/skills-guide.md#2-gdacs-feed-ingestion), [`forecast-based-action-trigger-design`](docs/skills-guide.md#3-forecast-based-action-trigger-design), [`ogc-sensorthings-telemetry`](docs/skills-guide.md#14-ogc-sensorthings-telemetry), [`stac-eo-hazard-grids`](docs/skills-guide.md#15-stac-eo-hazard-grids)
 * **Spatial, Fragility & Impact**: [`hazard-exposure-modeling`](docs/skills-guide.md#4-hazard-exposure-modeling), [`vulnerability-matrix`](docs/skills-guide.md#5-vulnerability-matrix)
 * **Alerting & Broadcast Governance**: [`oasis-cap-alerting`](docs/skills-guide.md#6-oasis-cap-alerting), [`cap-governance-and-approval`](docs/skills-guide.md#7-cap-governance-and-approval)
 * **Sendai, DELTA & Taxonomy**: [`sendai-indicator-accounting`](docs/skills-guide.md#8-sendai-indicator-accounting), [`delta-disaster-recording`](docs/skills-guide.md#9-delta-disaster-recording), [`undrr-hip-hazard-classification`](docs/skills-guide.md#10-undrr-hip-hazard-classification), [`event-identity-and-linkage`](docs/skills-guide.md#11-event-identity-and-linkage)
