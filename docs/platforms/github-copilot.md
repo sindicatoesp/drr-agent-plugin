@@ -11,11 +11,14 @@ Add the following section to `.github/copilot-instructions.md`:
 
 ```markdown
 ## Disaster Risk Reduction (DRR) Domain Capabilities
-When working on hazard modeling, loss estimation, GDACS feeds, or CAP emergency alerts:
-- Follow the methodology in `drr-agent-plugin/skills/hazard-exposure-modeling/SKILL.md`
-- For vulnerability matrices and Sendai Targets B/C/D, consult `drr-agent-plugin/skills/vulnerability-matrix/SKILL.md`
-- For OASIS CAP v1.2 alerts, follow `drr-agent-plugin/skills/oasis-cap-alerting/SKILL.md`
-- Use the CLI tool: `drr-agent-plugin/bin/cli.js` for deterministic calculations
+When working on disaster telemetry, exposure modeling, loss estimation, alerting, Sendai/DELTA
+reporting, or mitigation appraisal, consult the relevant skill in `drr-agent-plugin/skills/`:
+- Telemetry & Triggers: `early-warning-telemetry`, `gdacs-feed-ingestion`, `forecast-based-action-trigger-design`
+- Spatial & Impact: `hazard-exposure-modeling`, `vulnerability-matrix`
+- Alerting Governance: `oasis-cap-alerting`, `cap-governance-and-approval`
+- Sendai, DELTA & Taxonomy: `sendai-indicator-accounting`, `delta-disaster-recording`, `undrr-hip-hazard-classification`, `event-identity-and-linkage`
+- Quality & Appraisal: `drr-data-quality-and-provenance`, `risk-reduction-options-appraisal`
+- Use the MCP server (`drr-agent-plugin/bin/mcp-server.js`, 29 tools) or CLI (`drr-agent-plugin/bin/cli.js`, 29 commands) for deterministic calculations.
 ```
 
 ---
@@ -27,13 +30,14 @@ You can create a specialized Copilot agent in `.github/agents/drr-analyst.agent.
 ```markdown
 ---
 name: drr-analyst
-description: Specialist agent for hazard exposure modeling, GEM/HAZUS fragility curves, and OASIS CAP alert generation.
+description: Specialist agent for hazard exposure modeling, GEM/HAZUS fragility curves, Sendai/DELTA accounting, and OASIS CAP alert generation.
 ---
 
 # DRR Analyst Agent
 You are an expert disaster risk reduction analyst assisting UNDRR.
-Always use the tools in `drr-agent-plugin/bin/cli.js` for deterministic spatial joins,
-fragility probabilities, and CAP XML validation.
+Always use the 29 MCP tools in `drr-agent-plugin/bin/mcp-server.js` (or CLI `drr-agent-plugin/bin/cli.js`)
+and follow the 13 domain skills in `drr-agent-plugin/skills/` for deterministic spatial joins,
+fragility probabilities, Sendai validation, and CAP XML governance.
 ```
 
 ---
@@ -55,12 +59,14 @@ In `.vscode/settings.json`:
 
 ---
 
-## 4. Running Verification Commands in the VS Code Terminal
+## 4. Verification Commands & Prompt Examples
+
+> For end-user prompt examples covering all **13 DRR skills**, see **[docs/skills-guide.md](../skills-guide.md)**.
 
 ```bash
-# Verify installation
+# Verify installation (lists all 29 CLI subcommands)
 node drr-agent-plugin/bin/cli.js --help
 
-# Test fragility calculation
+# Test illustrative fragility calculation
 node drr-agent-plugin/bin/cli.js fragility --hazard earthquake --intensity 0.35 --taxonomy URM
 ```

@@ -32,3 +32,19 @@ description: Validates input contracts, explicit intensity units, lat/lon orderi
 
 ## Example Output & Failure Cases
 * **Contract Failure**: Out-of-order `[lat, lon]` coordinates (`lat > 90` in slot 1) or incompatible units return structured `errors` rather than silent coercion.
+
+## Example End-User Prompts
+* **Use Case — Pre-Flight Audit & Secret-Sanitized Provenance Manifest**:
+  ```text
+  Using the drr-data-quality-and-provenance skill, validate an earthquake input with coordinates
+  [125.15, 6.85], intensity 0.38 g, currency "USD", valuationYear 2026, and strictMissingData: true.
+  Then generate a SHA-256 provenance manifest for method REG_WALD99_GMICE with evidenceBasis "modelled"
+  and approvalStatus "draft", ensuring any API keys in inputsSnapshot are redacted before hashing.
+  ```
+* **Use Case — Model Registry & Scientific Replay Verification**:
+  ```text
+  List all registered methods in MODEL_REGISTRY, check applicability of REG_WALD99_GMICE at MMI 9.2,
+  and run drr_assessment_replay_validate (suite: "all") to verify frozen-input invariants.
+  ```
+* See [`docs/skills-guide.md`](../../docs/skills-guide.md#12-drr-data-quality-and-provenance) for additional examples.
+

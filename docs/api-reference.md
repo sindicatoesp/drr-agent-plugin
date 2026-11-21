@@ -155,12 +155,16 @@ Validates a DELTA relational bundle or assessment against DTS `fieldsDefApi` con
 ```
 
 ## 13. `drr_monitor_check`
-Executes an automated monitoring cycle against `alerts-config.json` rules using geodesic circular buffers (`createGeodesicBuffer`), hazard-appropriate intensity mapping (no cross-hazard seismic PGA fallback for tropical cyclones), cross-source event deduplication (`matchAndDeduplicateEvents`), and `Draft`-status CAP alert artifacts.
+Executes a bounded single-run monitoring cycle against `alerts-config.json` rules using geodesic circular buffers (`createGeodesicBuffer`), hazard-appropriate intensity mapping (no cross-hazard seismic PGA fallback for tropical cyclones), durable CAS state/leases, cross-source event deduplication (`matchAndDeduplicateEvents`), read-only shadow mode protection, and `Draft`-status CAP alert artifacts.
 
 ```json
 {
   "configPath": "alerts-config.json",
-  "mock": true
+  "mock": true,
+  "readOnly": true,
+  "scopeId": "default",
+  "stateBackend": "cas-file-store | memory-cas-store | stateless",
+  "runDeadlineMs": 120000
 }
 ```
 

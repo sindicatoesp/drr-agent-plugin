@@ -31,3 +31,19 @@ description: Versioned crosswalk of hazard codes, external telemetry taxonomies,
 * **Exact Match**: `{ resolutionType: "exact", taxonomyVersion: "UNDRR-ISC-HIP-2020-DELTA-v1", originalQuery: "EQ", resolved: { hipId: "GH0101", ... } }`.
 * **Free Text**: `{ resolutionType: "candidates_require_review", requiresHumanReview: true, candidates: [...] }`.
 * **Unknown Code**: `{ resolutionType: "unresolved", resolved: null }`.
+
+## Example End-User Prompts
+* **Use Case — Multi-Agency Telemetry Code Harmonization (Disaster Catalog Team)**:
+  ```text
+  Using the undrr-hip-hazard-classification skill, crosswalk GDACS codes "EQ", "TC", and "FL"
+  (sourceSystem: "GDACS") to their official UNDRR-ISC HIP typeId, clusterId, and hazardId,
+  and report any 2025 HIP revision flags (requires2025Crosswalk).
+  ```
+* **Use Case — Free-Text Field Report & Unknown Code Triage**:
+  ```text
+  Classify the free-text report "coastal storm surge and urban flash flooding" (candidateLimit: 5)
+  and the unknown code "ZZ999" using undrr-hip-hazard-classification, confirming human-review
+  candidates vs. unresolved handling.
+  ```
+* See [`docs/skills-guide.md`](../../docs/skills-guide.md#10-undrr-hip-hazard-classification) for additional examples.
+

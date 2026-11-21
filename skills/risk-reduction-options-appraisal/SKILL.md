@@ -32,3 +32,20 @@ description: Expected Annual Loss (EAL) trapezoidal AEP integration and mitigati
 ## Example Output & Failure Cases
 * **Single-Event EAL Rejection**: Supplying 1 return-period point fails deterministically (`EAL requires at least 2 distinct return periods`).
 * **CBA Separation**: Returns both `quantitativeMetrics: { npv, bcr, residualRiskEal, sensitivityMatrix }` and distinct `policyJudgements` array.
+
+## Example End-User Prompts
+* **Use Case — Coastal Flood Levee EAL & Cost-Benefit Appraisal (Municipal Treasury)**:
+  ```text
+  Using the risk-reduction-options-appraisal skill, compute baseline EAL (USD, 2026,
+  tailHandling: "flat_extrapolation") from return-period flood losses: 10-yr $800k, 50-yr $4.2M,
+  100-yr $8.5M, 250-yr $14M. Then run CBA for a $2.5M levee upgrade ($30k/yr OpEx, $15k/yr
+  co-benefits, 5% discount rate, 25-year horizon) that lowers EAL to $180k/yr, reporting NPV,
+  BCR, residual risk, sensitivity matrix, and separate policyJudgements.
+  ```
+* **Use Case — Seeded Monte Carlo Uncertainty Check**:
+  ```text
+  Run seeded Monte Carlo uncertainty propagation (seed: 42, iterations: 1000,
+  allowIllustrativeDistributions: true) for a 2.0 m flood across $10M residential_1story exposure.
+  ```
+* See [`docs/skills-guide.md`](../../docs/skills-guide.md#13-risk-reduction-options-appraisal) for additional examples.
+

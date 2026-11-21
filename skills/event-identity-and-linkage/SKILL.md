@@ -30,3 +30,19 @@ description: Multi-source disaster event deduplication, revision tracking, and r
 ## Example Output & Failure Cases
 * **Exact ID Match**: `classification: "exact_match_idempotent"`, prevents duplicate CAP/DELTA artifacts.
 * **Cross-Hazard Co-occurrence**: `classification: "cascading_candidate"`, `causalInferenceAllowed: false`.
+
+## Example End-User Prompts
+* **Use Case — Multi-Feed Earthquake & Coastal Flood Deduplication (24/7 EOC)**:
+  ```text
+  Using the event-identity-and-linkage skill, run drr_event_match_deduplicate (spatialRadiusKm: 50,
+  timeWindowHours: 48) to compare an incoming USGS magnitude revision, a nearby GDACS EQ alert 18 km away,
+  and a GDACS flood alert 3 hours later against our catalog. Distinguish revision_update from
+  possible_duplicate (held for human review) and cascading_candidate (causalInferenceAllowed: false).
+  ```
+* **Use Case — Shadow Monitoring Deduplication Verification**:
+  ```text
+  Run drr_monitor_check with mock: true and readOnly: true against alerts-config.example.json and show
+  how duplicate events are suppressed while preserving reversible mergeHistory.
+  ```
+* See [`docs/skills-guide.md`](../../docs/skills-guide.md#11-event-identity-and-linkage) for additional examples.
+

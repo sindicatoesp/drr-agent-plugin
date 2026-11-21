@@ -33,3 +33,19 @@ description: Generates XXE-hardened OASIS CAP v1.2 / ITU-T X.1303 XML emergency 
 * **C-07 Separated Governance Block**:
   `validation.governanceStates: { schemaValid: true, profileCompliant: true, authenticityVerified: false, issuerAuthorized: false, publicationApproved: false, deliveryStatus: "not_sent" }`.
 * **Publication Block**: Submitting a `Draft` alert to `channelType: "production"` is rejected deterministically.
+
+## Example End-User Prompts
+* **Use Case — Sulawesi Mw 7.2 Earthquake Draft CAP XML (Civil Defense)**:
+  ```text
+  Using the oasis-cap-alerting skill, generate a Draft OASIS CAP v1.2 XML alert for a Mw 7.2
+  earthquake in Central Sulawesi with severity "Extreme", urgency "Immediate", certainty "Observed",
+  and areaDesc "Palu Bay and Donggala Coastal Wards". Validate the XML and display the C-07
+  separated governance states.
+  ```
+* **Use Case — CAP XML Validation & EOC Situation Brief**:
+  ```text
+  Validate examples/earthquake-hazus-scenario/output-cap-alert.xml for XXE safety and CAP v1.2
+  conformance, then synthesize a Markdown emergency situation brief from the vulnerability report.
+  ```
+* See [`docs/skills-guide.md`](../../docs/skills-guide.md#6-oasis-cap-alerting) for additional examples.
+

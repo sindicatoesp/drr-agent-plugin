@@ -4,18 +4,18 @@
 
 ## Baseline & Manifest Reconciliation
 
-- **Package**: `@sindicatoesp/drr-agent-plugin` v1.3.0
-- **Plugin Manifest**: `drr-analytics` v1.3.0
+- **Package**: `@sindicatoesp/drr-agent-plugin` v1.3.2
+- **Plugin Manifest**: `drr-analytics` v1.3.2
 - **MCP Server**: `drr-analytics-mcp` v1.4.0 (protocol `2024-11-05`)
-- **Git Branch**: `feat/scheduled-drr-monitoring`
-- **Reference Baseline Commit (`origin/dev`)**: `unknown`
-- **Current HEAD Commit**: `c5ffa91bb66c3577088f297e162c11fbfc02bd1f`
+- **Git Branch**: `docs/review-and-skill-examples`
+- **Reference Baseline Commit (`origin/dev`)**: `b58324b29e6b3d8f2043884078281a4efa8cdd72`
+- **Current HEAD Commit**: `b58324b29e6b3d8f2043884078281a4efa8cdd72`
 - **Registered MCP Tools**: 29
 - **Registered CLI Subcommands**: 29
 - **Library Modules (`lib/*.js`)**: 24
 - **Public Exports (`lib/index.js`)**: 173
 - **Skills (`skills/*/SKILL.md`)**: 13
-- **Test Suites (`tests/test-*.js`)**: 19
+- **Test Suites (`tests/test-*.js`)**: 20
 
 ### Documentation Reconciliation Note
 - **Historical 10-vs-11 discrepancy (`origin/dev`)**: `bin/mcp-server.js` registered 11 tools (including `drr_delta_docs`), whereas `docs/api-reference.md` documented 10 tools and omitted `drr_delta_docs`. Both `docs/api-reference.md` and `README.md` are now reconciled with the expanded registration baseline of **29 MCP tools**.
@@ -129,7 +129,7 @@
 - `skills/undrr-hip-hazard-classification/SKILL.md`
 - `skills/vulnerability-matrix/SKILL.md`
 
-## Automated Test Suites (19)
+## Automated Test Suites (20)
 
 - `tests/test-cap.js`
 - `tests/test-cli-inventory.js`
@@ -143,6 +143,7 @@
 - `tests/test-mcp-server.js`
 - `tests/test-monitor.js`
 - `tests/test-openmeteo.js`
+- `tests/test-release-version.js`
 - `tests/test-scheduled-monitoring.js`
 - `tests/test-security-cap.js`
 - `tests/test-sendai-replay.js`

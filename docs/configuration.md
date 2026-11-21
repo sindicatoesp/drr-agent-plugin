@@ -40,8 +40,12 @@ A template configuration is provided in [`drr-agent-plugin/.env.example`](../.en
 | **`HTTPS_PROXY`** | *None* | HTTPS proxy URL for secure outbound connections. |
 | **`NO_PROXY`** | *None* | Comma-separated list of hostnames/IPs to bypass the proxy (e.g. `localhost,127.0.0.1`). |
 | **`DRR_REQUEST_TIMEOUT_MS`** | `8000` | Network request timeout in milliseconds. |
+| **`DRR_MAX_RESPONSE_BYTES`** | `15728640` (15 MiB) | Maximum allowed response body size in bytes to prevent memory exhaustion on oversized feeds. |
 | **`DRR_USER_AGENT`** | `UNDRR-DRR-Agent-Plugin/1.3` | User-Agent string sent with outgoing scientific data requests. |
+| **`DRR_ALLOW_PRIVATE_WEBHOOKS`** | `false` | When `false` (default), blocks webhook delivery to loopback, RFC 1918 private networks, and cloud metadata IPs (SSRF guard). |
 | **`DRR_OFFLINE_MODE`** | `false` | When set to `true`, blocks all outgoing network calls and requires offline sample payloads (ideal for air-gapped EOCs and secure sandboxes). |
+| **`DRR_ENABLE_PRODUCTION_PUBLISH`** | `false` | Fail-closed publication gate. Must be explicitly set to `true` (in addition to signed `approvalToken` / tenant checks) before `drr_cap_publish` or `drr_delta_push_draft_record` can execute live production writes. |
+| **`DRR_ENV_FILE`** | *None (auto-discovered)* | Optional explicit path to a `.env` file loaded before workspace/plugin `.env` defaults. |
 
 ---
 
