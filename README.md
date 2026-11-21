@@ -146,30 +146,30 @@ node bin/cli.js cap-generate \
 
 ---
 
-## MCP Server Tools (32 Tools)
+## MCP Server Tools (33 Tools)
 
-The MCP server (`bin/mcp-server.js`) exposes **32 deterministic, provenance-aware tools**:
+The MCP server (`bin/mcp-server.js`) exposes **33 deterministic, provenance-aware tools**:
 
 | Category | MCP Tools |
 | :--- | :--- |
 | **Telemetry & Hydrology** | `drr_gdacs_fetch`, `drr_usgs_earthquake_fetch`, `drr_fdsn_shakemap_fetch`, `drr_openmeteo_forecast`, `drr_sensorthings_fetch`, `drr_stac_hazard_fetch`, `drr_basin_rainfall_aggregate`, `drr_river_discharge_screen`, `drr_monitor_check` |
 | **Contracts, Governance & Replay** | `drr_input_contract_validate`, `drr_source_provenance_manifest`, `drr_model_registry_list`, `drr_assessment_replay_validate` |
-| **Spatial, CRS & Raster** | `drr_spatial_exposure_join`, `drr_geojson_validate`, `drr_geometry_repair`, `drr_crs_transform`, `drr_raster_zonal_stats` |
+| **Spatial, CRS, Overlay & Raster** | `drr_spatial_exposure_join`, `drr_critical_infra_overlay`, `drr_geojson_validate`, `drr_geometry_repair`, `drr_crs_transform`, `drr_raster_zonal_stats` |
 | **Fragility, Loss & Sendai** | `drr_fragility_eval`, `drr_vulnerability_matrix_calc`, `drr_sendai_validate` |
 | **Taxonomy & Event Identity** | `drr_hazard_crosswalk`, `drr_event_match_deduplicate` |
 | **CAP & DELTA Interoperability** | `drr_cap_alert_generate_validate`, `drr_cap_publish`, `drr_delta_push_draft_record`, `drr_delta_fetch_exposure`, `drr_delta_docs`, `drr_delta_schema_validate` |
 | **Uncertainty & Appraisal** | `drr_uncertainty_propagate`, `drr_expected_annual_loss`, `drr_mitigation_cost_benefit` |
 
-See **[docs/tool-inventory.md](docs/tool-inventory.md)** for auto-generated per-tool parameter schemas and test mappings.
+See **[docs/tool-inventory.md](docs/tool-inventory.md)** for auto-generated per-tool parameter schemas and test mappings, and **[docs/critical-infrastructure-overlay-guide.md](docs/critical-infrastructure-overlay-guide.md)** for the Sendai Target D 9-sector overlay authoring & OGC API – Features integration guide.
 
 ---
 
-## Domain Skills & Prompting Guide (16 Skills)
+## Domain Skills & Prompting Guide (17 Skills)
 
 Each skill in `skills/*/SKILL.md` encodes DRR scientific guardrails, tool orchestration, and governance escalation rules. See **[docs/skills-guide.md](docs/skills-guide.md)** for ready-to-use end-user prompts applying specific real-world use cases to every skill:
 
 * **Telemetry & Early Warning**: [`early-warning-telemetry`](docs/skills-guide.md#1-early-warning-telemetry), [`gdacs-feed-ingestion`](docs/skills-guide.md#2-gdacs-feed-ingestion), [`forecast-based-action-trigger-design`](docs/skills-guide.md#3-forecast-based-action-trigger-design), [`ogc-sensorthings-telemetry`](docs/skills-guide.md#14-ogc-sensorthings-telemetry), [`stac-eo-hazard-grids`](docs/skills-guide.md#15-stac-eo-hazard-grids), [`fdsn-shakemap-seismic`](docs/skills-guide.md#16-fdsn-shakemap-seismic)
-* **Spatial, Fragility & Impact**: [`hazard-exposure-modeling`](docs/skills-guide.md#4-hazard-exposure-modeling), [`vulnerability-matrix`](docs/skills-guide.md#5-vulnerability-matrix)
+* **Spatial, Overlays, Fragility & Impact**: [`hazard-exposure-modeling`](docs/skills-guide.md#4-hazard-exposure-modeling), [`vulnerability-matrix`](docs/skills-guide.md#5-vulnerability-matrix), [`critical-infrastructure-overlay`](docs/skills-guide.md#17-critical-infrastructure-overlay)
 * **Alerting & Broadcast Governance**: [`oasis-cap-alerting`](docs/skills-guide.md#6-oasis-cap-alerting), [`cap-governance-and-approval`](docs/skills-guide.md#7-cap-governance-and-approval)
 * **Sendai, DELTA & Taxonomy**: [`sendai-indicator-accounting`](docs/skills-guide.md#8-sendai-indicator-accounting), [`delta-disaster-recording`](docs/skills-guide.md#9-delta-disaster-recording), [`undrr-hip-hazard-classification`](docs/skills-guide.md#10-undrr-hip-hazard-classification), [`event-identity-and-linkage`](docs/skills-guide.md#11-event-identity-and-linkage)
 * **Quality, Provenance & Appraisal**: [`drr-data-quality-and-provenance`](docs/skills-guide.md#12-drr-data-quality-and-provenance), [`risk-reduction-options-appraisal`](docs/skills-guide.md#13-risk-reduction-options-appraisal)

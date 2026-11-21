@@ -1,6 +1,6 @@
 # DRR Agent Plugin — End-User Skills & Prompting Guide
 
-This guide explains how end users—**EOC Duty Officers, Anticipatory Action Leads, UN OCHA Analysts, National Sendai/DELTA Focal Points, and Resilience Engineers**—can prompt AI assistants (Google Antigravity, Claude Code/Desktop, Cursor, GitHub Copilot, OpenCode) to invoke each of the **16 DRR Domain Skills** using realistic, specific disaster risk reduction use cases.
+This guide explains how end users—**EOC Duty Officers, Anticipatory Action Leads, UN OCHA Analysts, National Sendai/DELTA Focal Points, and Resilience Engineers**—can prompt AI assistants (Google Antigravity, Claude Code/Desktop, Cursor, GitHub Copilot, OpenCode) to invoke each of the **17 DRR Domain Skills** using realistic, specific disaster risk reduction use cases.
 
 ---
 
@@ -8,7 +8,7 @@ This guide explains how end users—**EOC Duty Officers, Anticipatory Action Lea
 
 Each skill in `skills/<skill-name>/SKILL.md` provides your AI assistant with:
 1. **Domain Methodology & Guardrails** (what is scientifically valid and what is strictly forbidden, such as fabricating flood depths from rainfall or auto-publishing live CAP sirens).
-2. **Exact Tool Orchestration** (which of the **32 deterministic MCP tools** to call instead of letting the LLM guess numbers).
+2. **Exact Tool Orchestration** (which of the **33 deterministic MCP tools** to call instead of letting the LLM guess numbers).
 3. **Escalation & Governance Rules** (when the assistant must stop and ask a human Duty Officer, Hydrologist, or National Focal Point for review or approval).
 
 ### Tips for Effective Prompts
@@ -19,7 +19,7 @@ Each skill in `skills/<skill-name>/SKILL.md` provides your AI assistant with:
 
 ---
 
-## Quick Reference: All 16 DRR Skills
+## Quick Reference: All 17 DRR Skills
 
 | # | Skill Name | Primary Persona | Specific Use Case Example Below | Core MCP Tools |
 | :---: | :--- | :--- | :--- | :--- |
@@ -39,6 +39,7 @@ Each skill in `skills/<skill-name>/SKILL.md` provides your AI assistant with:
 | 14 | [`ogc-sensorthings-telemetry`](#14-ogc-sensorthings-telemetry) | Hydro-Met / EOC Sensor Lead | Municipal river-level & private rain gauge ingestion via OGC SensorThings v1.1 | `drr_sensorthings_fetch`, `drr_spatial_exposure_join`, `drr_input_contract_validate`, `drr_source_provenance_manifest` |
 | 15 | [`stac-eo-hazard-grids`](#15-stac-eo-hazard-grids) | EO / GIS Flood Analyst | Copernicus EMS & ICEYE SAR flood depth grid validation & zonal exposure | `drr_stac_hazard_fetch`, `drr_raster_zonal_stats`, `drr_spatial_exposure_join`, `drr_vulnerability_matrix_calc` |
 | 16 | [`fdsn-shakemap-seismic`](#16-fdsn-shakemap-seismic) | National Seismologist / EOC | PHIVOLCS/BMKG FDSN-WS & ShakeMap PGA/PGV/$V_{s30}$ contour/grid ingestion | `drr_fdsn_shakemap_fetch`, `drr_raster_zonal_stats`, `drr_spatial_exposure_join`, `drr_fragility_eval` |
+| 17 | [`critical-infrastructure-overlay`](#17-critical-infrastructure-overlay) | EOC Operations / GIS Lead | Sendai 9-sector critical infrastructure overlay, lifeline cascades & CIP redaction | `drr_critical_infra_overlay`, `drr_spatial_exposure_join`, `drr_delta_fetch_exposure`, `drr_sendai_validate` |
 
 ---
 
@@ -528,6 +529,71 @@ if only FDSN catalog events are returned.
 **Expected Behavior & Guardrails:**
 * Calls `drr_fdsn_shakemap_fetch` (registered method `telemetry.fdsn.shakemap_v1`).
 * Separates instrumented seismic stations from DYFI reports, computes NEHRP $V_{s30}$ site classes, and flags `replacesWald99Gmice: false` when only an event catalog is supplied.
+
+---
+
+### 17. `critical-infrastructure-overlay`
+**Skill file:** [`skills/critical-infrastructure-overlay/SKILL.md`](../skills/critical-infrastructure-overlay/SKILL.md)  
+**Authoring & Integration Guide:** [`docs/critical-infrastructure-overlay-guide.md`](./critical-infrastructure-overlay-guide.md)
+
+**Specific Use Case — Sendai 9-Sector Flood Overlay, Lifeline Cascades & Public Redaction (National EOC):**
+During the Southern Thailand monsoon flood, the EOC operations lead overlays all 9 Sendai critical infrastructure sectors onto the flood footprint to identify both physically flooded utilities and structurally intact upland hospitals/schools at risk of losing power or water (`D-6..D-8`).
+
+#### Canonical Sendai Sector Keys & GeoJSON Contract
+
+| Canonical `sendaiSector` Key | Sendai Indicator | Typical Asset Subtypes (`assetType`) |
+| :--- | :---: | :--- |
+| `health` | `D-2` / `D-7` | `hospital`, `health_centre`, `clinic`, `pharmacy` |
+| `education` | `D-3` / `D-6` | `school`, `university`, `college` |
+| `water` | `D-4` / `D-8` | `water_treatment_plant`, `water_supply`, `pumping_station`, `reservoir` |
+| `transportation` | `D-4` / `D-8` | `road`, `bridge`, `airport`, `seaport`, `railway` |
+| `telecommunications` | `D-4` / `D-8` | `mobile_tower`, `telecom_exchange`, `broadcast_station` |
+| `energy` | `D-4` / `D-8` | `power_plant`, `substation`, `transmission_line`, `distribution_hub` |
+| `waste_management` | `D-4` / `D-8` | `wastewater_plant`, `sanitation_facility`, `landfill` |
+| `protective_infrastructure` | `D-4` / `D-8` | `levee`, `floodwall`, `dam`, `drainage_pump`, `seawall` |
+| `other_essential` | `D-4` / `D-8` | `emergency_shelter`, `eoc`, `fire_station`, `government_designated` |
+
+```json
+{
+  "type": "Feature",
+  "id": "HOSP-YALA-UP",
+  "geometry": { "type": "Point", "coordinates": [100.1500, 7.2500] },
+  "properties": {
+    "name": "Yala Upland Regional Hospital",
+    "sendaiSector": "health",
+    "assetType": "hospital",
+    "taxonomy": "C2",
+    "valueUsd": 22000000,
+    "dependsOn": ["SUB-YALA-01", "WTP-YALA-01"],
+    "sensitivity": "public",
+    "redistributionAllowed": true
+  }
+}
+```
+
+#### Prompt Example A (Offline 9-Sector Overlay, C-02 Cascade Separation & CIP Redaction)
+```text
+Using the critical-infrastructure-overlay skill, overlay
+examples/critical-infra-overlay/sample-sendai-infra.json onto
+examples/thailand-flood-scenario/input-hazard.json (audience: "eoc_internal").
+Confirm that:
+1. All facilities are grouped by the 9 Sendai Target D sectors,
+2. Physical exposure (D-2..D-4) is strictly separated from cascading lifeline disruption risk
+   (D-6..D-8) on the upland hospital (HOSP-YALA-UP) and high school (SCH-YALA-01),
+3. Re-running with audience: "public" automatically redacts restricted energy and telecom nodes.
+```
+
+#### Prompt Example B (Live OGC API – Features National GIS Integration)
+```text
+Using critical-infrastructure-overlay, query our OGC API - Features server at
+"https://gis.agency.gov/ogcapi" (collection: "critical-infrastructure",
+bbox: [101.1, 6.4, 101.4, 6.7], sectors: ["health", "energy", "water", "protective_infrastructure"])
+and overlay against our latest STAC flood footprint.
+```
+
+**Expected Behavior & Guardrails:**
+* Calls `drr_critical_infra_overlay` (registered method `overlay.sendai.critical_infra_v1`).
+* Enforces Sendai Target D 9-sector grouping, C-02 separation of physical exposure vs. cascading disruption, `null` value preservation (`R-02`), SSRF blocking, and CIP public redaction.
 
 ---
 

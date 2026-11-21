@@ -1,0 +1,146 @@
+{
+  "type": "FeatureCollection",
+  "features": [
+    {
+      "type": "Feature",
+      "id": "SUB-YALA-01",
+      "geometry": { "type": "Point", "coordinates": [101.2810, 6.5405] },
+      "properties": {
+        "name": "Yala 115kV Main Substation",
+        "sendaiSector": "energy",
+        "assetType": "substation",
+        "taxonomy": "S1",
+        "valueUsd": 12000000,
+        "sensitivity": "restricted",
+        "redistributionAllowed": false
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "WTP-YALA-01",
+      "geometry": { "type": "Point", "coordinates": [101.2850, 6.5440] },
+      "properties": {
+        "name": "Pattani River Municipal Water Treatment Plant",
+        "sendaiSector": "water",
+        "assetType": "water_treatment_plant",
+        "taxonomy": "C2",
+        "valueUsd": 8500000,
+        "sensitivity": "eoc_internal",
+        "redistributionAllowed": false
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "HOSP-YALA-IN",
+      "geometry": { "type": "Point", "coordinates": [101.2790, 6.5390] },
+      "properties": {
+        "name": "Yala Downtown Health Centre",
+        "sendaiSector": "health",
+        "assetType": "health_centre",
+        "taxonomy": "C1_MODERATE_CODE",
+        "valueUsd": 4200000,
+        "capacity": 120,
+        "sensitivity": "public",
+        "redistributionAllowed": true
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "HOSP-YALA-UP",
+      "geometry": { "type": "Point", "coordinates": [100.1500, 7.2500] },
+      "properties": {
+        "name": "Yala Upland Regional Hospital (Outside Flood Zone)",
+        "sendaiSector": "health",
+        "assetType": "hospital",
+        "taxonomy": "C2",
+        "valueUsd": 22000000,
+        "capacity": 500,
+        "dependsOn": ["SUB-YALA-01", "WTP-YALA-01"],
+        "sensitivity": "public",
+        "redistributionAllowed": true
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "SCH-YALA-01",
+      "geometry": { "type": "Point", "coordinates": [100.1800, 7.2200] },
+      "properties": {
+        "name": "Satri Yala High School (Outside Flood Zone)",
+        "sendaiSector": "education",
+        "assetType": "school",
+        "taxonomy": "C1_MODERATE_CODE",
+        "valueUsd": null,
+        "capacity": 1800,
+        "dependsOn": ["WTP-YALA-01"],
+        "sensitivity": "public",
+        "redistributionAllowed": true
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "BRG-HWY418",
+      "geometry": { "type": "Point", "coordinates": [101.2750, 6.5460] },
+      "properties": {
+        "name": "Highway 418 Pattani River Bridge",
+        "sendaiSector": "transportation",
+        "assetType": "bridge",
+        "valueUsd": 9400000,
+        "sensitivity": "public",
+        "redistributionAllowed": true
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "TEL-YALA-01",
+      "geometry": { "type": "Point", "coordinates": [101.2820, 6.5415] },
+      "properties": {
+        "name": "Yala Core Mobile & Fiber Exchange",
+        "sendaiSector": "telecommunications",
+        "assetType": "telecom_exchange",
+        "valueUsd": 3100000,
+        "sensitivity": "restricted",
+        "redistributionAllowed": false
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "WWTP-YALA-01",
+      "geometry": { "type": "Point", "coordinates": [101.2880, 6.5350] },
+      "properties": {
+        "name": "Yala Municipal Wastewater Treatment Facility",
+        "sendaiSector": "waste_management",
+        "assetType": "wastewater_plant",
+        "valueUsd": 5000000,
+        "sensitivity": "eoc_internal",
+        "redistributionAllowed": false
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "LEVEE-PATTANI-01",
+      "geometry": { "type": "Point", "coordinates": [101.2800, 6.5430] },
+      "properties": {
+        "name": "Pattani River West Bank Floodwall & Drainage Pump",
+        "sendaiSector": "protective_infrastructure",
+        "assetType": "floodwall",
+        "valueUsd": 7200000,
+        "sensitivity": "eoc_internal",
+        "redistributionAllowed": false
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "SHELTER-YALA-01",
+      "geometry": { "type": "Point", "coordinates": [100.2000, 7.2800] },
+      "properties": {
+        "name": "Provincial Civic Center Evacuation Shelter",
+        "sendaiSector": "other_essential",
+        "assetType": "emergency_shelter",
+        "nationalCategory": "DDPM Designated Evacuation Shelter",
+        "capacity": 2500,
+        "sensitivity": "public",
+        "redistributionAllowed": true
+      }
+    }
+  ]
+}
