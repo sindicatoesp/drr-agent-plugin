@@ -26,6 +26,7 @@ const { propagateUncertainty } = require("../lib/uncertainty");
 const { calculateExpectedAnnualLoss, evaluateMitigationCostBenefit } = require("../lib/appraisal");
 const { sanitizeUntrustedFeedText } = require("../lib/security");
 const { ingestSensorThings, toSensorGeoJSON } = require("../lib/sensorthings");
+const { ingestStacHazardCatalog, toStacFootprintGeoJSON } = require("../lib/stac");
 
 const SERVER_NAME = "drr-analytics-mcp";
 const SERVER_VERSION = "1.4.0";
@@ -690,10 +691,75 @@ const TOOLS = [
 			},
 		},
 	},
+	{
+		name: "drr_stac_hazard_fetch",
+		description:
+			"Ingest STAC v1.0.0 Earth Observation catalogs (Copernicus EMS, Sentinel-1 SAR, ICEYE, Floodbase) and validate flood depth grids via ingestValidatedInundationGrid (C-05/R-12), separating flood extent from depth and enforcing commercial licensing, cloud cover, and SSRF guards.",
+		inputSchema: {
+			type: "object",
+			properties: {
+				endpointUrl: {
+					type: "string",
+					description: "STAC API v1.0.0 root or /search URL (SSRF-guarded; optional if samplePayload or STAC_API_URL is set)",
+				},
+				bbox: {
+					type: "array",
+					items: { type: "number" },
+					description: "Optional bounding box [minLon, minLat, maxLon, maxLat]",
+				},
+				datetime: {
+					type: "string",
+					description: "Optional RFC 3339 datetime or interval (e.g. '2026-11-01T00:00:00Z/2026-11-10T00:00:00Z')",
+				},
+				collections: {
+					type: "array",
+					items: { type: "string" },
+					description: "Optional STAC collection IDs to query",
+				},
+				limit: {
+					type: "number",
+					description: "Maximum number of STAC items to return (default: 20, max: 100)",
+				},
+				maxCloudCover: {
+					type: "number",
+					description: "Maximum acceptable eo:cloud_cover percentage before flagging cloudObscured (default: 25)",
+				},
+				sampleDepthGrid: {
+					type: "object",
+					description: "Optional pre-extracted depth grid object { itemId?, bbox, crs, unit, width, height, values, nodata } to validate against a STAC Item",
+				},
+				asGeoJSON: {
+					type: "boolean",
+					description: "When true, includes a GeoJSON FeatureCollection of STAC footprints ready for drr_spatial_exposure_join",
+				},
+				samplePayload: {
+					type: "object",
+					description: "Optional offline/test STAC v1.0.0 FeatureCollection or Item JSON payload",
+				},
+			},
+		},
+	},
 ];
 
 async function handleToolCall(name, args) {
 	switch (name) {
+		case "drr_stac_hazard_fetch": {
+			const report = await ingestStacHazardCatalog({
+				endpointUrl: args.endpointUrl,
+				bbox: args.bbox,
+				datetime: args.datetime,
+				collections: args.collections,
+				limit: args.limit,
+				maxCloudCover: args.maxCloudCover,
+				sampleDepthGrid: args.sampleDepthGrid,
+				samplePayload: args.samplePayload,
+			});
+			if (args.asGeoJSON) {
+				return { ...report, geojson: toStacFootprintGeoJSON(report) };
+			}
+			return report;
+		}
+
 		case "drr_sensorthings_fetch": {
 			const report = await ingestSensorThings({
 				endpointUrl: args.endpointUrl,

@@ -131,10 +131,10 @@ alerts-validate: ## Validate declarative alert rules in alerts-config.json
 lint: ## Run zero-dependency static lint & syntax checker (node --check, vm.Script, JSON)
 	@node scripts/lint.js
 
-test: ## Run the complete 21-suite unit and MCP test suite
+test: ## Run the complete 22-suite unit and MCP test suite
 	@bash tests/run-all-tests.sh
 
-check: lint test ## Run full pre-commit gate (linting + all 21 test suites)
+check: lint test ## Run full pre-commit gate (linting + all 22 test suites)
 
 pre-commit-install: ## Install automatic Git pre-commit hook into .git/hooks
 	@node scripts/install-git-hook.js

@@ -32,8 +32,8 @@ assert(helpOut.includes("replay-validate"), "CLI --help must list new commands")
 assert(helpOut.includes("sendai-validate"), "CLI --help must list sendai-validate");
 
 const cliCmds = extractCliCommands();
-assert.strictEqual(TOOLS.length, 30, "MCP server must expose 30 tools");
-assert.strictEqual(cliCmds.length, 30, "CLI must register 30 subcommands");
+assert.strictEqual(TOOLS.length, 31, "MCP server must expose 31 tools");
+assert.strictEqual(cliCmds.length, 31, "CLI must register 31 subcommands");
 
 const invMd = generateInventoryMarkdown();
 for (const tool of TOOLS) {
@@ -52,7 +52,7 @@ assert.strictEqual(fragOut.method.productionStatus, "illustrative_baseline");
 runCli(["fragility", "--hazard", "earthquake"], true);
 
 const regOut = JSON.parse(runCli(["registry"]));
-assert(Array.isArray(regOut.methods) && regOut.methods.length >= 8);
+assert(Array.isArray(regOut.methods) && regOut.methods.length >= 9);
 
 const replayOut = JSON.parse(runCli(["replay-validate", "--suite", "all"]));
 assert.strictEqual(replayOut.valid, true);
@@ -79,5 +79,15 @@ const stOut = JSON.parse(
 );
 assert.strictEqual(stOut.summary.datastreamCount, 3);
 assert.strictEqual(stOut.summary.criticalCount, 1);
+
+const stacOut = JSON.parse(
+	runCli([
+		"stac-hazard",
+		"--file",
+		"examples/stac-flood-depth/sample-stac-items.json",
+	]),
+);
+assert.strictEqual(stacOut.summary.itemCount, 3);
+assert.strictEqual(stacOut.summary.validatedDepthGridCount, 1);
 
 console.log("✅ CLI subcommands & programmatic inventory tests passed!");
