@@ -240,4 +240,25 @@ assert.strictEqual(validVal.authorization.publicationApproved, false);
 assert.strictEqual(validVal.delivery.status, "not_dispatched");
 assert(/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\+00:00$/.test(actualXml.match(/<sent>(.*?)<\/sent>/)[1]));
 
+// --- Additional Hardening: Circular Reference & Prototype Pollution Defense in redactSensitiveObject ---
+const circularObj = { name: "test", token: "secret_123" };
+circularObj.self = circularObj;
+const redactedCircular = redactSensitiveObject(circularObj);
+assert.strictEqual(redactedCircular.token, "[REDACTED]");
+assert.strictEqual(redactedCircular.self, "[CIRCULAR_REDACTED]");
+
+const protoPayload = JSON.parse('{"__proto__":{"polluted":true},"normal":"ok","apikey":"key123"}');
+const redactedProto = redactSensitiveObject(protoPayload);
+assert.strictEqual(({}).polluted, undefined, "Object.prototype must not be polluted");
+assert.strictEqual(redactedProto.apikey, "[REDACTED]");
+assert.strictEqual(redactedProto.normal, "ok");
+
+// --- Additional Hardening: Illegal XML 1.0 Control Character Stripping ---
+const ctrlCap = generateCapXml({
+	info: { headline: "Alert\x00\x07\x1FHeadline", event: "Flood\x08Event" },
+});
+assert(!/[\x00-\x08\x0B\x0C\x0E-\x1F]/.test(ctrlCap), "Illegal XML 1.0 control chars must be stripped");
+assert(ctrlCap.includes("AlertHeadline"), "Printable characters must be preserved");
+
 console.log("✅ Security, XXE, injection-guard, policy & CAP C-07 governance tests passed!");
+
