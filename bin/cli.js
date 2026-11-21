@@ -29,11 +29,12 @@ const { matchAndDeduplicateEvents } = require("../lib/events");
 const { propagateUncertainty } = require("../lib/uncertainty");
 const { calculateExpectedAnnualLoss, evaluateMitigationCostBenefit } = require("../lib/appraisal");
 const { ingestSensorThings, toSensorGeoJSON } = require("../lib/sensorthings");
+const { ingestStacHazardCatalog, toStacFootprintGeoJSON } = require("../lib/stac");
 
 function printHelp() {
 	console.log(`
 DRR Analytics & Agent Plugin CLI v1.4.0
-Disaster Risk Reduction Tools: GDACS, USGS, Open-Meteo, OGC SensorThings, Hydro, Spatial/CRS/Raster, Fragility, CAP Alerts, Sendai, DELTA, Uncertainty, Appraisal & Replay
+Disaster Risk Reduction Tools: GDACS, USGS, Open-Meteo, OGC SensorThings, STAC EO Grids, Hydro, Spatial/CRS/Raster, Fragility, CAP Alerts, Sendai, DELTA, Uncertainty, Appraisal & Replay
 
 Usage:
   drr-tool <command> [options]
@@ -43,6 +44,7 @@ Commands:
   usgs                 Query USGS Earthquake Hazards Program (Wald99 GMICE PGA)
   forecast             Open-Meteo Anticipatory Action rainfall-threshold screening
   sensorthings         Ingest custom government/private OGC SensorThings API v1.1 gauges
+  stac-hazard          Ingest STAC v1.0.0 EO catalogs & validated flood depth grids (C-05)
   basin-rainfall       Aggregate rainfall forecasts (mm) across catchment polygon/points
   river-discharge      Screen GloFAS / Open-Meteo river discharge (m^3/s)
   fragility            Evaluate GEM/HAZUS structural fragility curves (requires --intensity)
@@ -577,6 +579,36 @@ async function main() {
 					samplePayload,
 				});
 				const output = options["as-geojson"] ? toSensorGeoJSON(report) : report;
+				console.log(JSON.stringify(output, null, 2));
+				break;
+			}
+
+			case "stac-hazard": {
+				const samplePayload = options.file
+					? JSON.parse(fs.readFileSync(options.file, "utf8"))
+					: undefined;
+				const sampleDepthGrid = options["depth-grid-file"]
+					? JSON.parse(fs.readFileSync(options["depth-grid-file"], "utf8"))
+					: undefined;
+				const bbox = options.bbox
+					? options.bbox.split(",").map((n) => parseFloat(n.trim()))
+					: undefined;
+				const collections = options.collections
+					? options.collections.split(",").map((c) => c.trim()).filter(Boolean)
+					: undefined;
+				const report = await ingestStacHazardCatalog({
+					endpointUrl: options.url,
+					bbox,
+					datetime: options.datetime,
+					collections,
+					limit: options.limit ? parseInt(options.limit, 10) : undefined,
+					maxCloudCover: options["max-cloud-cover"]
+						? parseFloat(options["max-cloud-cover"])
+						: undefined,
+					sampleDepthGrid,
+					samplePayload,
+				});
+				const output = options["as-geojson"] ? toStacFootprintGeoJSON(report) : report;
 				console.log(JSON.stringify(output, null, 2));
 				break;
 			}

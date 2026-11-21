@@ -1,6 +1,6 @@
 # DRR Agent Plugin — End-User Skills & Prompting Guide
 
-This guide explains how end users—**EOC Duty Officers, Anticipatory Action Leads, UN OCHA Analysts, National Sendai/DELTA Focal Points, and Resilience Engineers**—can prompt AI assistants (Google Antigravity, Claude Code/Desktop, Cursor, GitHub Copilot, OpenCode) to invoke each of the **14 DRR Domain Skills** using realistic, specific disaster risk reduction use cases.
+This guide explains how end users—**EOC Duty Officers, Anticipatory Action Leads, UN OCHA Analysts, National Sendai/DELTA Focal Points, and Resilience Engineers**—can prompt AI assistants (Google Antigravity, Claude Code/Desktop, Cursor, GitHub Copilot, OpenCode) to invoke each of the **15 DRR Domain Skills** using realistic, specific disaster risk reduction use cases.
 
 ---
 
@@ -8,7 +8,7 @@ This guide explains how end users—**EOC Duty Officers, Anticipatory Action Lea
 
 Each skill in `skills/<skill-name>/SKILL.md` provides your AI assistant with:
 1. **Domain Methodology & Guardrails** (what is scientifically valid and what is strictly forbidden, such as fabricating flood depths from rainfall or auto-publishing live CAP sirens).
-2. **Exact Tool Orchestration** (which of the **30 deterministic MCP tools** to call instead of letting the LLM guess numbers).
+2. **Exact Tool Orchestration** (which of the **31 deterministic MCP tools** to call instead of letting the LLM guess numbers).
 3. **Escalation & Governance Rules** (when the assistant must stop and ask a human Duty Officer, Hydrologist, or National Focal Point for review or approval).
 
 ### Tips for Effective Prompts
@@ -19,7 +19,7 @@ Each skill in `skills/<skill-name>/SKILL.md` provides your AI assistant with:
 
 ---
 
-## Quick Reference: All 14 DRR Skills
+## Quick Reference: All 15 DRR Skills
 
 | # | Skill Name | Primary Persona | Specific Use Case Example Below | Core MCP Tools |
 | :---: | :--- | :--- | :--- | :--- |
@@ -37,6 +37,7 @@ Each skill in `skills/<skill-name>/SKILL.md` provides your AI assistant with:
 | 12 | [`drr-data-quality-and-provenance`](#12-drr-data-quality-and-provenance) | DRR Data Steward / Auditor | Pre-flight validation, SHA-256 provenance manifest & replay verification | `drr_input_contract_validate`, `drr_source_provenance_manifest`, `drr_model_registry_list`, `drr_assessment_replay_validate`, `drr_uncertainty_propagate` |
 | 13 | [`risk-reduction-options-appraisal`](#13-risk-reduction-options-appraisal) | Municipal Economist / Planner | Coastal flood levee vs. drainage Expected Annual Loss (EAL) & CBA appraisal | `drr_expected_annual_loss`, `drr_mitigation_cost_benefit`, `drr_uncertainty_propagate` |
 | 14 | [`ogc-sensorthings-telemetry`](#14-ogc-sensorthings-telemetry) | Hydro-Met / EOC Sensor Lead | Municipal river-level & private rain gauge ingestion via OGC SensorThings v1.1 | `drr_sensorthings_fetch`, `drr_spatial_exposure_join`, `drr_input_contract_validate`, `drr_source_provenance_manifest` |
+| 15 | [`stac-eo-hazard-grids`](#15-stac-eo-hazard-grids) | EO / GIS Flood Analyst | Copernicus EMS & ICEYE SAR flood depth grid validation & zonal exposure | `drr_stac_hazard_fetch`, `drr_raster_zonal_stats`, `drr_spatial_exposure_join`, `drr_vulnerability_matrix_calc` |
 
 ---
 
@@ -464,6 +465,37 @@ Flag any stale stations or QARTOD suspect/bad readings for the hydrological engi
 **Expected Behavior & Guardrails:**
 * Calls `drr_sensorthings_fetch` (registered method `telemetry.ogc.sensorthings_v1_1`).
 * Normalizes units across DRR domains (`ft`/`cm`→`m`, `in`→`mm`, `cfs`→`m3/s`, `m/s`/`kt`→`km/h`, `gal`→`g`), excludes `bad`/`missing` QC readings from triggers, enforces SSRF host blocking, and flags restricted private redistribution.
+
+---
+
+### 15. `stac-eo-hazard-grids`
+**Skill file:** [`skills/stac-eo-hazard-grids/SKILL.md`](../skills/stac-eo-hazard-grids/SKILL.md)
+
+**Specific Use Case — Satellite SAR Flood Depth Grid Validation & Zonal Stats (EO / GIS Analyst):**
+After a severe monsoon flood in Southern Thailand, the EO analyst ingests a STAC v1.0.0 catalog combining an **ICEYE commercial SAR flood depth product** (in feet, proprietary license), a **Copernicus EMS Sentinel-1 flood extent mask**, and a cloudy Sentinel-2 optical COG to extract validated meter-scale depths for `drr_raster_zonal_stats`.
+
+#### Prompt Example A (Offline STAC Catalog, Unit Normalization & C-05 Separation)
+```text
+Using the stac-eo-hazard-grids skill, ingest examples/stac-flood-depth/sample-stac-items.json
+with maxCloudCover: 25 and asGeoJSON: true.
+Confirm that:
+1. The ICEYE SAR depth grid (reported in ft) normalizes to meters, preserves nodata (-9999),
+   passes ingestValidatedInundationGrid (depthStatus: "validated_depth_grid"), and flags
+   redistributionAllowed: false,
+2. The Copernicus EMS Sentinel-1 item stays "extent_only_no_depth" (never fabricating depth),
+3. The cloudy Sentinel-2 COG flags requiresExternalCogDecoder: true and cloudObscured: true.
+```
+
+#### Prompt Example B (Live STAC API Search + Zonal Depth Extraction)
+```text
+Using stac-eo-hazard-grids, query our STAC v1.0.0 endpoint at "https://stac.agency.gov/v1"
+for bbox [101.1, 6.4, 101.4, 6.7] and datetime "2026-11-06T00:00:00Z/2026-11-08T00:00:00Z".
+Pass any validated inundation depth grid into drr_raster_zonal_stats for our municipal ward polygons.
+```
+
+**Expected Behavior & Guardrails:**
+* Calls `drr_stac_hazard_fetch` (registered method `telemetry.stac.hazard_grid_v1`) and bridges directly into `ingestValidatedInundationGrid` and `drr_raster_zonal_stats`.
+* Enforces C-05 (extent != depth), commercial EO licensing (`redistributionAllowed`), cloud-cover gating, and SSRF protection.
 
 ---
 

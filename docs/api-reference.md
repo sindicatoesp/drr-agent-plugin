@@ -1,12 +1,12 @@
 # MCP Tools & CLI Technical Reference
 
-Complete technical specification of all **30 MCP tools** provided by `bin/mcp-server.js` and the **30 CLI commands** in `bin/cli.js`.
+Complete technical specification of all **31 MCP tools** provided by `bin/mcp-server.js` and the **31 CLI commands** in `bin/cli.js`.
 
-> **Inventory Note (R-01)**: Historically at baseline commit `1d7600ce5cc50dcdea7b438ccbd59d28282793dd` (`origin/dev`), `bin/mcp-server.js` registered 11 tools (including `drr_delta_docs`) while this reference listed 10. Both `docs/api-reference.md` and `docs/tool-inventory.md` are now reconciled with the full **30-tool** registration source.
+> **Inventory Note (R-01)**: Historically at baseline commit `1d7600ce5cc50dcdea7b438ccbd59d28282793dd` (`origin/dev`), `bin/mcp-server.js` registered 11 tools (including `drr_delta_docs`) while this reference listed 10. Both `docs/api-reference.md` and `docs/tool-inventory.md` are now reconciled with the full **31-tool** registration source.
 
 ---
 
-# Part 1: Model Context Protocol (MCP) Tools (30 Tools)
+# Part 1: Model Context Protocol (MCP) Tools (31 Tools)
 
 ## 1. `drr_gdacs_fetch`
 Ingests and filters active GDACS alerts by severity, hazard type (`EQ`, `TC`, `FL`, `VO`, `DR`), or country, with untrusted feed sanitization (`promptInjectionFlagged`), `sourceIssuedAt`, `retrievedAt`, and `payloadHash`.
@@ -386,13 +386,30 @@ Ingests and normalizes custom government or private in-situ sensor observations 
 }
 ```
 
+## 31. `drr_stac_hazard_fetch`
+Ingests **STAC v1.0.0** Earth Observation catalogs (Copernicus EMS, Sentinel-1 SAR, ICEYE, Floodbase; registered method `telemetry.stac.hazard_grid_v1`) and validates flood inundation depth grids via `ingestValidatedInundationGrid` (`lib/hydro.js`), normalizing `cm`/`ft`→`m`, preserving `nodata`, separating flood extent (`extent_only_no_depth`) from depth (`validated_depth_grid`), flagging binary COGs (`cog_asset_requires_extraction`), enforcing `eo:cloud_cover` thresholds, commercial redistribution licensing, SSRF guards, and exporting footprints as GeoJSON.
+
+```json
+{
+  "endpointUrl": "https://stac.agency.gov/v1",
+  "bbox": [101.1, 6.4, 101.4, 6.7],
+  "datetime": "2026-11-06T00:00:00Z/2026-11-08T00:00:00Z",
+  "collections": ["copernicus-ems-rapid-mapping"],
+  "limit": 20,
+  "maxCloudCover": 25,
+  "sampleDepthGrid": {},
+  "asGeoJSON": true,
+  "samplePayload": {}
+}
+```
+
 ---
 
-# Part 2: Command-Line Interface (CLI) Reference (30 Subcommands)
+# Part 2: Command-Line Interface (CLI) Reference (31 Subcommands)
 
 Run `node bin/cli.js --help` (or `drr-tool --help`) for usage.
 
-* **Telemetry & Hydro**: `gdacs`, `usgs`, `forecast`, `sensorthings`, `basin-rainfall`, `river-discharge`, `monitor`
+* **Telemetry & Hydro**: `gdacs`, `usgs`, `forecast`, `sensorthings`, `stac-hazard`, `basin-rainfall`, `river-discharge`, `monitor`
 * **Contracts, Registry & Replay**: `validate-input`, `registry`, `replay-validate`
 * **Spatial, CRS & Raster**: `spatial-join`, `geojson-validate`, `geometry-repair`, `crs-transform`, `raster-zonal-stats`
 * **Fragility, Vulnerability & Sendai**: `fragility` *(requires `--intensity`)*, `vulnerability` *(requires `--spatial` and `--intensity`)*, `sendai-validate`
