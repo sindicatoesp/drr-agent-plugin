@@ -539,6 +539,38 @@ if only FDSN catalog events are returned.
 **Specific Use Case — Sendai 9-Sector Flood Overlay, Lifeline Cascades & Public Redaction (National EOC):**
 During the Southern Thailand monsoon flood, the EOC operations lead overlays all 9 Sendai critical infrastructure sectors onto the flood footprint to identify both physically flooded utilities and structurally intact upland hospitals/schools at risk of losing power or water (`D-6..D-8`).
 
+#### Canonical Sendai Sector Keys & GeoJSON Contract
+
+| Canonical `sendaiSector` Key | Sendai Indicator | Typical Asset Subtypes (`assetType`) |
+| :--- | :---: | :--- |
+| `health` | `D-2` / `D-7` | `hospital`, `health_centre`, `clinic`, `pharmacy` |
+| `education` | `D-3` / `D-6` | `school`, `university`, `college` |
+| `water` | `D-4` / `D-8` | `water_treatment_plant`, `water_supply`, `pumping_station`, `reservoir` |
+| `transportation` | `D-4` / `D-8` | `road`, `bridge`, `airport`, `seaport`, `railway` |
+| `telecommunications` | `D-4` / `D-8` | `mobile_tower`, `telecom_exchange`, `broadcast_station` |
+| `energy` | `D-4` / `D-8` | `power_plant`, `substation`, `transmission_line`, `distribution_hub` |
+| `waste_management` | `D-4` / `D-8` | `wastewater_plant`, `sanitation_facility`, `landfill` |
+| `protective_infrastructure` | `D-4` / `D-8` | `levee`, `floodwall`, `dam`, `drainage_pump`, `seawall` |
+| `other_essential` | `D-4` / `D-8` | `emergency_shelter`, `eoc`, `fire_station`, `government_designated` |
+
+```json
+{
+  "type": "Feature",
+  "id": "HOSP-YALA-UP",
+  "geometry": { "type": "Point", "coordinates": [100.1500, 7.2500] },
+  "properties": {
+    "name": "Yala Upland Regional Hospital",
+    "sendaiSector": "health",
+    "assetType": "hospital",
+    "taxonomy": "C2",
+    "valueUsd": 22000000,
+    "dependsOn": ["SUB-YALA-01", "WTP-YALA-01"],
+    "sensitivity": "public",
+    "redistributionAllowed": true
+  }
+}
+```
+
 #### Prompt Example A (Offline 9-Sector Overlay, C-02 Cascade Separation & CIP Redaction)
 ```text
 Using the critical-infrastructure-overlay skill, overlay

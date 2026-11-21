@@ -54,7 +54,7 @@ You can organize your infrastructure layers either as:
   "id": "HOSP-YALA-UP",
   "geometry": {
     "type": "Point",
-    "coordinates": [101.3900, 6.6200]
+    "coordinates": [100.1500, 7.2500]
   },
   "properties": {
     "name": "Yala Upland Regional Hospital",

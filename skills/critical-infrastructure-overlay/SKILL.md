@@ -24,6 +24,20 @@ description: Groups critical infrastructure assets by the 9 UNDRR Sendai Framewo
 * Offline `infraGeoJSON` (single FeatureCollection) OR `infraLayers` (array of per-sector FeatureCollections) OR live OGC API – Features `endpointUrl` + `collection`.
 * Optional: `hazardGeoJSON` (or `epicenter` + `bufferKm`), `sectors` filter array, and `audience` (`"eoc_internal"` | `"public"`).
 
+## Canonical Sendai Sector Keys & GeoJSON Contract
+
+| Canonical `sendaiSector` Key | Sendai Indicator | Typical Asset Subtypes (`assetType`) |
+| :--- | :---: | :--- |
+| `health` | `D-2` / `D-7` | `hospital`, `health_centre`, `clinic`, `pharmacy` |
+| `education` | `D-3` / `D-6` | `school`, `university`, `college` |
+| `water` | `D-4` / `D-8` | `water_treatment_plant`, `water_supply`, `pumping_station`, `reservoir` |
+| `transportation` | `D-4` / `D-8` | `road`, `bridge`, `airport`, `seaport`, `railway` |
+| `telecommunications` | `D-4` / `D-8` | `mobile_tower`, `telecom_exchange`, `broadcast_station` |
+| `energy` | `D-4` / `D-8` | `power_plant`, `substation`, `transmission_line`, `distribution_hub` |
+| `waste_management` | `D-4` / `D-8` | `wastewater_plant`, `sanitation_facility`, `landfill` |
+| `protective_infrastructure` | `D-4` / `D-8` | `levee`, `floodwall`, `dam`, `drainage_pump`, `seawall` |
+| `other_essential` | `D-4` / `D-8` | `emergency_shelter`, `eoc`, `fire_station`, `government_designated` |
+
 ## Allowed Executable Tools
 * `drr_critical_infra_overlay`
 * `drr_spatial_exposure_join`
