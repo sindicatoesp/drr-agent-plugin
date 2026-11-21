@@ -1,0 +1,147 @@
+{
+  "type": "FeatureCollection",
+  "stac_version": "1.0.0",
+  "features": [
+    {
+      "type": "Feature",
+      "stac_version": "1.0.0",
+      "id": "ICEYE-SAR-FLOOD-YALA-20261107",
+      "collection": "iceye-flood-depth-v2",
+      "bbox": [101.20, 6.45, 101.35, 6.60],
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [101.20, 6.45],
+            [101.35, 6.45],
+            [101.35, 6.60],
+            [101.20, 6.60],
+            [101.20, 6.45]
+          ]
+        ]
+      },
+      "properties": {
+        "title": "ICEYE X-Band SAR Flood Depth — Yala Municipal Basin",
+        "datetime": "2026-11-07T06:30:00Z",
+        "platform": "iceye-x24",
+        "constellation": "iceye",
+        "instruments": ["sar"],
+        "sar:instrument_mode": "Strip",
+        "gsd": 3.0,
+        "proj:epsg": 4326,
+        "license": "proprietary",
+        "providers": [
+          { "name": "ICEYE", "roles": ["producer", "licensor"] }
+        ],
+        "drr:depth_grid": {
+          "unit": "ft",
+          "crs": "EPSG:4326",
+          "bbox": [101.20, 6.45, 101.35, 6.60],
+          "width": 3,
+          "height": 2,
+          "nodata": -9999,
+          "values": [
+            [0.0, 4.5, 7.2],
+            [3.0, -9999, 8.5]
+          ]
+        }
+      },
+      "assets": {
+        "flood_depth_cog": {
+          "href": "https://eo.example.org/iceye/yala-20261107-depth.tif",
+          "type": "image/tiff; application=geotiff; profile=cloud-optimized",
+          "title": "SAR Inundation Depth (COG)",
+          "roles": ["data", "flood-depth"]
+        },
+        "flood_depth_json": {
+          "href": "https://eo.example.org/iceye/yala-20261107-depth.json",
+          "type": "application/json",
+          "title": "Pre-Extracted Flood Depth Grid (JSON)",
+          "roles": ["data", "flood-depth"]
+        }
+      }
+    },
+    {
+      "type": "Feature",
+      "stac_version": "1.0.0",
+      "id": "EMSR999-SENTINEL1-EXTENT-20261107",
+      "collection": "copernicus-ems-rapid-mapping",
+      "bbox": [101.10, 6.40, 101.40, 6.65],
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [101.10, 6.40],
+            [101.40, 6.40],
+            [101.40, 6.65],
+            [101.10, 6.65],
+            [101.10, 6.40]
+          ]
+        ]
+      },
+      "properties": {
+        "title": "Copernicus EMS Sentinel-1 Flood Extent Mask",
+        "datetime": "2026-11-07T05:15:00Z",
+        "platform": "sentinel-1a",
+        "constellation": "sentinel-1",
+        "instruments": ["c-sar"],
+        "sar:instrument_mode": "IW",
+        "gsd": 10.0,
+        "proj:epsg": 4326,
+        "license": "CC-BY-4.0",
+        "providers": [
+          { "name": "Copernicus EMS / ESA", "roles": ["producer"] }
+        ]
+      },
+      "assets": {
+        "flood_extent": {
+          "href": "https://emergency.copernicus.eu/emsr999/flood-extent.geojson",
+          "type": "application/geo+json",
+          "title": "Observed Flood Extent Polygon",
+          "roles": ["data", "flood-extent"]
+        }
+      }
+    },
+    {
+      "type": "Feature",
+      "stac_version": "1.0.0",
+      "id": "OPTICAL-S2-CLOUDY-COG-20261107",
+      "collection": "sentinel-2-l2a-flood",
+      "bbox": [101.15, 6.42, 101.38, 6.62],
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [101.15, 6.42],
+            [101.38, 6.42],
+            [101.38, 6.62],
+            [101.15, 6.62],
+            [101.15, 6.42]
+          ]
+        ]
+      },
+      "properties": {
+        "title": "Sentinel-2 Optical Flood Depth COG (High Cloud Cover)",
+        "datetime": "2026-11-07T03:45:00Z",
+        "platform": "sentinel-2b",
+        "constellation": "sentinel-2",
+        "instruments": ["msi"],
+        "eo:cloud_cover": 78.5,
+        "gsd": 10.0,
+        "proj:epsg": 4326,
+        "license": "CC-BY-4.0",
+        "providers": [
+          { "name": "ESA Copernicus", "roles": ["producer"] }
+        ]
+      },
+      "assets": {
+        "depth_cog": {
+          "href": "https://eo.example.org/s2/cloudy-depth.tif",
+          "type": "image/tiff; application=geotiff; profile=cloud-optimized",
+          "title": "Optical Derived Depth (COG)",
+          "roles": ["data", "flood-depth"]
+        }
+      }
+    }
+  ]
+}

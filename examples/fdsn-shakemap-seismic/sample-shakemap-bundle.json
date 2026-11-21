@@ -1,0 +1,140 @@
+{
+  "agency": "PHIVOLCS",
+  "fdsnEvents": {
+    "type": "FeatureCollection",
+    "features": [
+      {
+        "type": "Feature",
+        "id": "phivolcs2026mindanao01",
+        "properties": {
+          "mag": 6.9,
+          "magType": "mww",
+          "place": "14 km SE of Davao del Sur, Mindanao, Philippines",
+          "time": "2026-11-21T03:15:00Z",
+          "updated": "2026-11-21T03:22:00Z",
+          "mmi": 8.2,
+          "net": "PHIVOLCS"
+        },
+        "geometry": {
+          "type": "Point",
+          "coordinates": [125.35, 6.72, 18.0]
+        }
+      }
+    ]
+  },
+  "shakemapContours": {
+    "type": "FeatureCollection",
+    "metadata": { "units": "%g" },
+    "features": [
+      {
+        "type": "Feature",
+        "id": "pga_40pct",
+        "properties": { "value": 40.0, "units": "%g", "title": "0.40g Strong Shaking Core" },
+        "geometry": {
+          "type": "Polygon",
+          "coordinates": [
+            [
+              [125.20, 6.60],
+              [125.50, 6.60],
+              [125.50, 6.85],
+              [125.20, 6.85],
+              [125.20, 6.60]
+            ]
+          ]
+        }
+      },
+      {
+        "type": "Feature",
+        "id": "pga_15pct",
+        "properties": { "value": 15.0, "units": "%g", "title": "0.15g Moderate-Strong Shaking" },
+        "geometry": {
+          "type": "Polygon",
+          "coordinates": [
+            [
+              [125.05, 6.45],
+              [125.65, 6.45],
+              [125.65, 7.00],
+              [125.05, 7.00],
+              [125.05, 6.45]
+            ]
+          ]
+        }
+      }
+    ]
+  },
+  "shakemapStations": {
+    "type": "FeatureCollection",
+    "features": [
+      {
+        "type": "Feature",
+        "id": "PH.DVO",
+        "properties": {
+          "code": "DVO",
+          "network": "PH",
+          "name": "Davao City Accelerograph",
+          "station_type": "seismic",
+          "pga": 46.2,
+          "pga_unit": "%g",
+          "pgv": 41.5,
+          "intensity": 8.1,
+          "vs30": 245,
+          "distance": 16.4
+        },
+        "geometry": {
+          "type": "Point",
+          "coordinates": [125.60, 7.07]
+        }
+      },
+      {
+        "type": "Feature",
+        "id": "PH.DIG",
+        "properties": {
+          "code": "DIG",
+          "network": "PH",
+          "name": "Digos Soft-Soil Basin Sensor",
+          "station_type": "seismic",
+          "pga": 52.8,
+          "pga_unit": "%g",
+          "pgv": 49.0,
+          "intensity": 8.4,
+          "vs30": 165,
+          "distance": 11.2
+        },
+        "geometry": {
+          "type": "Point",
+          "coordinates": [125.36, 6.75]
+        }
+      },
+      {
+        "type": "Feature",
+        "id": "DYFI.9001",
+        "properties": {
+          "code": "DYFI9001",
+          "network": "DYFI",
+          "name": "Crowd-sourced Felt Report (General Santos)",
+          "station_type": "macroseismic",
+          "pga": 95.0,
+          "pga_unit": "%g",
+          "intensity": 7.0,
+          "distance": 62.0
+        },
+        "geometry": {
+          "type": "Point",
+          "coordinates": [125.17, 6.11]
+        }
+      }
+    ]
+  },
+  "shakemapPgaGrid": {
+    "unit": "%g",
+    "crs": "EPSG:4326",
+    "bbox": [125.20, 6.60, 125.50, 6.85],
+    "width": 3,
+    "height": 2,
+    "nodata": -9999,
+    "values": [
+      [18.0, 42.0, 25.0],
+      [22.0, 52.8, -9999]
+    ]
+  }
+}

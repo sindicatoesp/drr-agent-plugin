@@ -25,6 +25,10 @@ const { matchAndDeduplicateEvents } = require("../lib/events");
 const { propagateUncertainty } = require("../lib/uncertainty");
 const { calculateExpectedAnnualLoss, evaluateMitigationCostBenefit } = require("../lib/appraisal");
 const { sanitizeUntrustedFeedText } = require("../lib/security");
+const { ingestSensorThings, toSensorGeoJSON } = require("../lib/sensorthings");
+const { ingestStacHazardCatalog, toStacFootprintGeoJSON } = require("../lib/stac");
+const { ingestFdsnShakeMap, toShakeMapGeoJSON } = require("../lib/shakemap");
+const { ingestCriticalInfraOverlay } = require("../lib/infra-overlay");
 
 const SERVER_NAME = "drr-analytics-mcp";
 const SERVER_VERSION = "1.4.0";
@@ -639,10 +643,303 @@ const TOOLS = [
 			},
 		},
 	},
+	{
+		name: "drr_sensorthings_fetch",
+		description:
+			"Ingest and normalize custom government or private in-situ sensor observations via OGC SensorThings API v1.1 (OGC 18-088) with unit conversion, WMO/QARTOD QC filtering, staleness checks, licensing/redistribution metadata, and optional threshold screening.",
+		inputSchema: {
+			type: "object",
+			properties: {
+				endpointUrl: {
+					type: "string",
+					description: "OGC SensorThings API v1.1 root or /Datastreams URL (SSRF-guarded; optional if samplePayload or OGC_SENSORTHINGS_URL is set)",
+				},
+				observedProperty: {
+					type: "string",
+					description: "Optional ObservedProperty name filter (e.g. 'Water Level', 'Precipitation', 'River Discharge', 'PGA')",
+				},
+				filter: {
+					type: "string",
+					description: "Optional OGC SensorThings $filter expression",
+				},
+				top: {
+					type: "number",
+					description: "Maximum number of Datastreams to retrieve (default: 50, max: 200)",
+				},
+				observationsTop: {
+					type: "number",
+					description: "Maximum observations per Datastream ordered newest-first (default: 5, max: 100)",
+				},
+				thresholds: {
+					type: "object",
+					description: "Optional threshold rules: { warning?: number, critical?: number, unit?: string }",
+				},
+				maxAgeMinutes: {
+					type: "number",
+					description: "Maximum observation age in minutes before flagging stale (default: 180)",
+				},
+				excludeSuspect: {
+					type: "boolean",
+					description: "When true, excludes QARTOD 'suspect' observations from threshold evaluation (default: false)",
+				},
+				asGeoJSON: {
+					type: "boolean",
+					description: "When true, includes a GeoJSON FeatureCollection of stations and latest readings",
+				},
+				samplePayload: {
+					type: "object",
+					description: "Optional offline/test OGC SensorThings v1.1 JSON payload to parse instead of fetching live network",
+				},
+			},
+		},
+	},
+	{
+		name: "drr_stac_hazard_fetch",
+		description:
+			"Ingest STAC v1.0.0 Earth Observation catalogs (Copernicus EMS, Sentinel-1 SAR, ICEYE, Floodbase) and validate flood depth grids via ingestValidatedInundationGrid (C-05/R-12), separating flood extent from depth and enforcing commercial licensing, cloud cover, and SSRF guards.",
+		inputSchema: {
+			type: "object",
+			properties: {
+				endpointUrl: {
+					type: "string",
+					description: "STAC API v1.0.0 root or /search URL (SSRF-guarded; optional if samplePayload or STAC_API_URL is set)",
+				},
+				bbox: {
+					type: "array",
+					items: { type: "number" },
+					description: "Optional bounding box [minLon, minLat, maxLon, maxLat]",
+				},
+				datetime: {
+					type: "string",
+					description: "Optional RFC 3339 datetime or interval (e.g. '2026-11-01T00:00:00Z/2026-11-10T00:00:00Z')",
+				},
+				collections: {
+					type: "array",
+					items: { type: "string" },
+					description: "Optional STAC collection IDs to query",
+				},
+				limit: {
+					type: "number",
+					description: "Maximum number of STAC items to return (default: 20, max: 100)",
+				},
+				maxCloudCover: {
+					type: "number",
+					description: "Maximum acceptable eo:cloud_cover percentage before flagging cloudObscured (default: 25)",
+				},
+				sampleDepthGrid: {
+					type: "object",
+					description: "Optional pre-extracted depth grid object { itemId?, bbox, crs, unit, width, height, values, nodata } to validate against a STAC Item",
+				},
+				asGeoJSON: {
+					type: "boolean",
+					description: "When true, includes a GeoJSON FeatureCollection of STAC footprints ready for drr_spatial_exposure_join",
+				},
+				samplePayload: {
+					type: "object",
+					description: "Optional offline/test STAC v1.0.0 FeatureCollection or Item JSON payload",
+				},
+			},
+		},
+	},
+	{
+		name: "drr_fdsn_shakemap_fetch",
+		description:
+			"Ingest custom national FDSN-WS seismic events (BMKG, PHIVOLCS, JMA, EMSC, GeoNet, USGS) and ShakeMap v4 PGA/PGV/Vs30 contours, instrumented station lists, and gridded PGA rasters (upgrading C-04 beyond Wald99 GMICE).",
+		inputSchema: {
+			type: "object",
+			properties: {
+				endpointUrl: {
+					type: "string",
+					description: "Custom FDSN-WS event service root or /query URL (SSRF-guarded; optional if samplePayload or FDSN_API_URL is set)",
+				},
+				agency: {
+					type: "string",
+					description: "Optional national seismic agency identifier (e.g. 'BMKG', 'PHIVOLCS', 'JMA', 'EMSC', 'GeoNet')",
+				},
+				minMagnitude: {
+					type: "number",
+					description: "Optional minimum earthquake magnitude filter",
+				},
+				startTime: {
+					type: "string",
+					description: "Optional ISO-8601 start time for FDSN-WS query",
+				},
+				endTime: {
+					type: "string",
+					description: "Optional ISO-8601 end time for FDSN-WS query",
+				},
+				bbox: {
+					type: "array",
+					items: { type: "number" },
+					description: "Optional geographic bounding box [minLon, minLat, maxLon, maxLat]",
+				},
+				limit: {
+					type: "number",
+					description: "Maximum number of FDSN events (default: 20, max: 200)",
+				},
+				minPgaG: {
+					type: "number",
+					description: "Optional minimum PGA threshold in g for filtering ShakeMap contours",
+				},
+				shakemapContours: {
+					type: "object",
+					description: "Optional ShakeMap PGA contours GeoJSON FeatureCollection (cont_pga.json)",
+				},
+				shakemapStations: {
+					type: "object",
+					description: "Optional ShakeMap stationlist.json GeoJSON FeatureCollection with PGA, PGV, and Vs30",
+				},
+				shakemapPgaGrid: {
+					type: "object",
+					description: "Optional ShakeMap PGA raster grid { bbox, crs, unit, width, height, values, nodata }",
+				},
+				asGeoJSON: {
+					type: "string",
+					enum: ["contours", "stations"],
+					description: "Optional: include a GeoJSON FeatureCollection of ShakeMap 'contours' or 'stations' for drr_spatial_exposure_join",
+				},
+				samplePayload: {
+					type: "object",
+					description: "Optional offline/test FDSN-WS GeoJSON or combined ShakeMap bundle JSON payload",
+				},
+			},
+		},
+	},
+	{
+		name: "drr_critical_infra_overlay",
+		description:
+			"Group critical infrastructure assets by the 9 UNDRR Sendai Framework Target D sectors (health, education, water, transportation, telecommunications, energy, waste_management, protective_infrastructure, other_essential), ingest via OGC API - Features or GeoJSON, overlay onto hazard footprints, evaluate lifeline dependency cascades (D-6..D-8 separate from D-2..D-4), and enforce CIP sensitivity redaction.",
+		inputSchema: {
+			type: "object",
+			properties: {
+				endpointUrl: {
+					type: "string",
+					description: "Optional OGC API - Features (OGC 17-069r4) root or /items URL (SSRF-guarded)",
+				},
+				collection: {
+					type: "string",
+					description: "Optional OGC API - Features collection ID (e.g. 'critical-infrastructure')",
+				},
+				bbox: {
+					type: "array",
+					items: { type: "number" },
+					description: "Optional bounding box [minLon, minLat, maxLon, maxLat]",
+				},
+				limit: {
+					type: "number",
+					description: "Maximum features to fetch from OGC API - Features (default: 200, max: 1000)",
+				},
+				infraGeoJSON: {
+					type: "object",
+					description: "Offline Critical Infrastructure GeoJSON FeatureCollection",
+				},
+				infraLayers: {
+					type: "array",
+					items: { type: "object" },
+					description: "Optional array of separate per-sector GeoJSON FeatureCollections to merge and group",
+				},
+				hazardGeoJSON: {
+					type: "object",
+					description: "Optional hazard footprint GeoJSON (e.g. ShakeMap contour, STAC flood footprint, GDACS polygon) to overlay against",
+				},
+				epicenter: {
+					type: "array",
+					items: { type: "number" },
+					description: "Optional [lon, lat] epicenter for geodesic buffer overlay when no polygon is supplied",
+				},
+				bufferKm: {
+					type: "number",
+					description: "Optional geodesic buffer radius in km paired with epicenter",
+				},
+				sectors: {
+					type: "array",
+					items: { type: "string" },
+					description: "Optional filter to include only specific Sendai Target D sector keys (e.g. ['health', 'energy', 'water'])",
+				},
+				audience: {
+					type: "string",
+					enum: ["eoc_internal", "public"],
+					description: "Redaction mode: 'eoc_internal' (default) retains restricted assets; 'public' strips sensitivity='restricted' and redistributionAllowed=false assets",
+				},
+			},
+		},
+	},
 ];
 
 async function handleToolCall(name, args) {
 	switch (name) {
+		case "drr_critical_infra_overlay": {
+			return ingestCriticalInfraOverlay({
+				endpointUrl: args.endpointUrl,
+				collection: args.collection,
+				bbox: args.bbox,
+				limit: args.limit,
+				infraGeoJSON: args.infraGeoJSON,
+				infraLayers: args.infraLayers,
+				hazardGeoJSON: args.hazardGeoJSON,
+				epicenter: args.epicenter,
+				bufferKm: args.bufferKm,
+				sectors: args.sectors,
+				audience: args.audience,
+			});
+		}
+
+		case "drr_fdsn_shakemap_fetch": {
+			const report = await ingestFdsnShakeMap({
+				endpointUrl: args.endpointUrl,
+				agency: args.agency,
+				minMagnitude: args.minMagnitude,
+				startTime: args.startTime,
+				endTime: args.endTime,
+				bbox: args.bbox,
+				limit: args.limit,
+				minPgaG: args.minPgaG,
+				shakemapContours: args.shakemapContours,
+				shakemapStations: args.shakemapStations,
+				shakemapPgaGrid: args.shakemapPgaGrid,
+				samplePayload: args.samplePayload,
+			});
+			if (args.asGeoJSON) {
+				return { ...report, geojson: toShakeMapGeoJSON(report, args.asGeoJSON) };
+			}
+			return report;
+		}
+
+		case "drr_stac_hazard_fetch": {
+			const report = await ingestStacHazardCatalog({
+				endpointUrl: args.endpointUrl,
+				bbox: args.bbox,
+				datetime: args.datetime,
+				collections: args.collections,
+				limit: args.limit,
+				maxCloudCover: args.maxCloudCover,
+				sampleDepthGrid: args.sampleDepthGrid,
+				samplePayload: args.samplePayload,
+			});
+			if (args.asGeoJSON) {
+				return { ...report, geojson: toStacFootprintGeoJSON(report) };
+			}
+			return report;
+		}
+
+		case "drr_sensorthings_fetch": {
+			const report = await ingestSensorThings({
+				endpointUrl: args.endpointUrl,
+				observedProperty: args.observedProperty,
+				filter: args.filter,
+				top: args.top,
+				observationsTop: args.observationsTop,
+				thresholds: args.thresholds,
+				maxAgeMinutes: args.maxAgeMinutes,
+				excludeSuspect: args.excludeSuspect,
+				samplePayload: args.samplePayload,
+			});
+			if (args.asGeoJSON) {
+				return { ...report, geojson: toSensorGeoJSON(report) };
+			}
+			return report;
+		}
+
 		case "drr_gdacs_fetch": {
 			const events = await ingestGdacsAlerts(args.samplePayload || null, {
 				minAlertLevel: args.minAlertLevel,

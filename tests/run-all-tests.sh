@@ -26,8 +26,12 @@ node "$DIR/test-hindcast-regression.js"
 node "$DIR/test-cli-inventory.js"
 node "$DIR/test-scheduled-monitoring.js"
 node "$DIR/test-release-version.js"
+node "$DIR/test-sensorthings.js"
+node "$DIR/test-stac.js"
+node "$DIR/test-shakemap.js"
+node "$DIR/test-infra-overlay.js"
 
 echo "=================================================="
-echo " 🎉 ALL 20 TEST SUITES PASSED SUCCESSFULLY!"
+echo " 🎉 ALL 24 TEST SUITES PASSED SUCCESSFULLY!"
 echo "=================================================="
 

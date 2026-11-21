@@ -1,12 +1,12 @@
 # MCP Tools & CLI Technical Reference
 
-Complete technical specification of all **29 MCP tools** provided by `bin/mcp-server.js` and the **29 CLI commands** in `bin/cli.js`.
+Complete technical specification of all **33 MCP tools** provided by `bin/mcp-server.js` and the **33 CLI commands** in `bin/cli.js`.
 
-> **Inventory Note (R-01)**: Historically at baseline commit `1d7600ce5cc50dcdea7b438ccbd59d28282793dd` (`origin/dev`), `bin/mcp-server.js` registered 11 tools (including `drr_delta_docs`) while this reference listed 10. Both `docs/api-reference.md` and `docs/tool-inventory.md` are now reconciled with the full **29-tool** registration source.
+> **Inventory Note (R-01)**: Historically at baseline commit `1d7600ce5cc50dcdea7b438ccbd59d28282793dd` (`origin/dev`), `bin/mcp-server.js` registered 11 tools (including `drr_delta_docs`) while this reference listed 10. Both `docs/api-reference.md` and `docs/tool-inventory.md` are now reconciled with the full **33-tool** registration source.
 
 ---
 
-# Part 1: Model Context Protocol (MCP) Tools (29 Tools)
+# Part 1: Model Context Protocol (MCP) Tools (33 Tools)
 
 ## 1. `drr_gdacs_fetch`
 Ingests and filters active GDACS alerts by severity, hazard type (`EQ`, `TC`, `FL`, `VO`, `DR`), or country, with untrusted feed sanitization (`promptInjectionFlagged`), `sourceIssuedAt`, `retrievedAt`, and `payloadHash`.
@@ -369,15 +369,79 @@ Evaluates DRR prevention/mitigation options via discounted Cost-Benefit Analysis
 }
 ```
 
+## 30. `drr_sensorthings_fetch`
+Ingests and normalizes custom government or private in-situ sensor observations via **OGC SensorThings API v1.1** (`OGC 18-088`, registered method `telemetry.ogc.sensorthings_v1_1`) with DRR unit normalization (`ft`/`cm`→`m`, `in`→`mm`, `cfs`→`m3/s`, `m/s`/`kt`/`mph`→`km/h`, `m/s2`/`gal`→`g`), WMO/QARTOD quality-control filtering (`bad`/`missing` excluded from threshold triggers), null preservation, staleness checks, SSRF protection, prompt-injection sanitization, private redistribution licensing metadata, and optional GeoJSON export.
+
+```json
+{
+  "endpointUrl": "https://sensors.agency.gov/v1.1",
+  "observedProperty": "Water Level",
+  "top": 50,
+  "observationsTop": 5,
+  "thresholds": { "warning": 2.0, "critical": 2.5, "unit": "m" },
+  "maxAgeMinutes": 180,
+  "excludeSuspect": false,
+  "asGeoJSON": true,
+  "samplePayload": {}
+}
+```
+
+## 31. `drr_stac_hazard_fetch`
+Ingests **STAC v1.0.0** Earth Observation catalogs (Copernicus EMS, Sentinel-1 SAR, ICEYE, Floodbase; registered method `telemetry.stac.hazard_grid_v1`) and validates flood inundation depth grids via `ingestValidatedInundationGrid` (`lib/hydro.js`), normalizing `cm`/`ft`→`m`, preserving `nodata`, separating flood extent (`extent_only_no_depth`) from depth (`validated_depth_grid`), flagging binary COGs (`cog_asset_requires_extraction`), enforcing `eo:cloud_cover` thresholds, commercial redistribution licensing, SSRF guards, and exporting footprints as GeoJSON.
+
+```json
+{
+  "endpointUrl": "https://stac.agency.gov/v1",
+  "bbox": [101.1, 6.4, 101.4, 6.7],
+  "datetime": "2026-11-06T00:00:00Z/2026-11-08T00:00:00Z",
+  "collections": ["copernicus-ems-rapid-mapping"],
+  "limit": 20,
+  "maxCloudCover": 25,
+  "sampleDepthGrid": {},
+  "asGeoJSON": true,
+  "samplePayload": {}
+}
+```
+
+## 32. `drr_fdsn_shakemap_fetch`
+Ingests custom national **FDSN-WS** seismic events (BMKG, PHIVOLCS, JMA, EMSC, GeoNet, USGS; registered method `telemetry.fdsn.shakemap_v1`) and **ShakeMap v4** PGA/PGV/$V_{s30}$ contours, instrumented station lists, and continuous PGA grids — upgrading **C-04** beyond Wald et al. (1999) GMICE approximations with NEHRP site classes (`A`–`E`), `%g`/`m/s2`/`gal`→`g` normalization, DYFI macroseismic separation, SSRF protection, and GeoJSON export.
+
+```json
+{
+  "endpointUrl": "https://seismic.agency.gov/fdsnws/event/1",
+  "agency": "PHIVOLCS",
+  "minMagnitude": 5.5,
+  "bbox": [120.0, 5.0, 127.0, 10.0],
+  "limit": 20,
+  "minPgaG": 0.15,
+  "asGeoJSON": "contours",
+  "samplePayload": {}
+}
+```
+
+## 33. `drr_critical_infra_overlay`
+Groups critical infrastructure assets by the **9 UNDRR Sendai Framework Target D sectors** (`health`, `education`, `water`, `transportation`, `telecommunications`, `energy`, `waste_management`, `protective_infrastructure`, `other_essential`; registered method `overlay.sendai.critical_infra_v1`), ingests layers via **OGC API – Features** (`OGC 17-069r4`) or GeoJSON, overlays onto hazard footprints, separates direct physical exposure (`D-2..D-4`) from cascading lifeline disruption risk (`D-6..D-8` via `dependsOn`), and enforces CIP sensitivity redaction when `audience: "public"`.
+
+```json
+{
+  "endpointUrl": "https://gis.agency.gov/ogcapi",
+  "collection": "critical-infrastructure",
+  "infraGeoJSON": {},
+  "hazardGeoJSON": {},
+  "sectors": ["health", "energy", "water", "protective_infrastructure"],
+  "audience": "eoc_internal | public"
+}
+```
+
 ---
 
-# Part 2: Command-Line Interface (CLI) Reference (29 Subcommands)
+# Part 2: Command-Line Interface (CLI) Reference (33 Subcommands)
 
 Run `node bin/cli.js --help` (or `drr-tool --help`) for usage.
 
-* **Telemetry & Hydro**: `gdacs`, `usgs`, `forecast`, `basin-rainfall`, `river-discharge`, `monitor`
+* **Telemetry & Hydro**: `gdacs`, `usgs`, `fdsn-shakemap`, `forecast`, `sensorthings`, `stac-hazard`, `basin-rainfall`, `river-discharge`, `monitor`
 * **Contracts, Registry & Replay**: `validate-input`, `registry`, `replay-validate`
-* **Spatial, CRS & Raster**: `spatial-join`, `geojson-validate`, `geometry-repair`, `crs-transform`, `raster-zonal-stats`
+* **Spatial, CRS, Overlay & Raster**: `spatial-join`, `infra-overlay`, `geojson-validate`, `geometry-repair`, `crs-transform`, `raster-zonal-stats`
 * **Fragility, Vulnerability & Sendai**: `fragility` *(requires `--intensity`)*, `vulnerability` *(requires `--spatial` and `--intensity`)*, `sendai-validate`
 * **Taxonomy & Event Identity**: `hazard-crosswalk`, `event-dedup`
 * **Uncertainty & Appraisal**: `uncertainty`, `eal`, `cba`

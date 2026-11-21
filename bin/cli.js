@@ -28,11 +28,15 @@ const { crosswalkHazard } = require("../lib/hips");
 const { matchAndDeduplicateEvents } = require("../lib/events");
 const { propagateUncertainty } = require("../lib/uncertainty");
 const { calculateExpectedAnnualLoss, evaluateMitigationCostBenefit } = require("../lib/appraisal");
+const { ingestSensorThings, toSensorGeoJSON } = require("../lib/sensorthings");
+const { ingestStacHazardCatalog, toStacFootprintGeoJSON } = require("../lib/stac");
+const { ingestFdsnShakeMap, toShakeMapGeoJSON } = require("../lib/shakemap");
+const { ingestCriticalInfraOverlay } = require("../lib/infra-overlay");
 
 function printHelp() {
 	console.log(`
 DRR Analytics & Agent Plugin CLI v1.4.0
-Disaster Risk Reduction Tools: GDACS, USGS, Open-Meteo, Hydro, Spatial/CRS/Raster, Fragility, CAP Alerts, Sendai, DELTA, Uncertainty, Appraisal & Replay
+Disaster Risk Reduction Tools: GDACS, USGS, FDSN-WS/ShakeMap, Open-Meteo, OGC SensorThings, STAC EO Grids, Sendai Infra Overlay, Hydro, Spatial/CRS/Raster, Fragility, CAP Alerts, Sendai, DELTA, Uncertainty, Appraisal & Replay
 
 Usage:
   drr-tool <command> [options]
@@ -40,7 +44,11 @@ Usage:
 Commands:
   gdacs                Fetch or parse GDACS active hazard alerts
   usgs                 Query USGS Earthquake Hazards Program (Wald99 GMICE PGA)
+  fdsn-shakemap        Ingest custom national FDSN-WS events & ShakeMap PGA/Vs30 contours/grids (C-04 upgrade)
   forecast             Open-Meteo Anticipatory Action rainfall-threshold screening
+  sensorthings         Ingest custom government/private OGC SensorThings API v1.1 gauges
+  stac-hazard          Ingest STAC v1.0.0 EO catalogs & validated flood depth grids (C-05)
+  infra-overlay        Group & overlay Sendai Target D 9-sector critical infrastructure (OGC API - Features / GeoJSON)
   basin-rainfall       Aggregate rainfall forecasts (mm) across catchment polygon/points
   river-discharge      Screen GloFAS / Open-Meteo river discharge (m^3/s)
   fragility            Evaluate GEM/HAZUS structural fragility curves (requires --intensity)
@@ -548,6 +556,133 @@ async function main() {
 					const intervalMinutes = options.interval ? parseInt(options.interval, 10) : undefined;
 					startMonitoringDaemon({ configPath, intervalMinutes, mock: isMock });
 				}
+				break;
+			}
+
+			case "sensorthings": {
+				const samplePayload = options.file
+					? JSON.parse(fs.readFileSync(options.file, "utf8"))
+					: undefined;
+				const thresholds =
+					options.warning !== undefined || options.critical !== undefined
+						? {
+								warning: options.warning !== undefined ? parseFloat(options.warning) : undefined,
+								critical: options.critical !== undefined ? parseFloat(options.critical) : undefined,
+								unit: options.unit,
+							}
+						: undefined;
+				const report = await ingestSensorThings({
+					endpointUrl: options.url,
+					observedProperty: options.property,
+					filter: options.filter,
+					top: options.top ? parseInt(options.top, 10) : undefined,
+					observationsTop: options["obs-top"] ? parseInt(options["obs-top"], 10) : undefined,
+					thresholds,
+					maxAgeMinutes: options["max-age-min"] ? parseFloat(options["max-age-min"]) : undefined,
+					excludeSuspect: Boolean(options["exclude-suspect"]),
+					samplePayload,
+				});
+				const output = options["as-geojson"] ? toSensorGeoJSON(report) : report;
+				console.log(JSON.stringify(output, null, 2));
+				break;
+			}
+
+			case "stac-hazard": {
+				const samplePayload = options.file
+					? JSON.parse(fs.readFileSync(options.file, "utf8"))
+					: undefined;
+				const sampleDepthGrid = options["depth-grid-file"]
+					? JSON.parse(fs.readFileSync(options["depth-grid-file"], "utf8"))
+					: undefined;
+				const bbox = options.bbox
+					? options.bbox.split(",").map((n) => parseFloat(n.trim()))
+					: undefined;
+				const collections = options.collections
+					? options.collections.split(",").map((c) => c.trim()).filter(Boolean)
+					: undefined;
+				const report = await ingestStacHazardCatalog({
+					endpointUrl: options.url,
+					bbox,
+					datetime: options.datetime,
+					collections,
+					limit: options.limit ? parseInt(options.limit, 10) : undefined,
+					maxCloudCover: options["max-cloud-cover"]
+						? parseFloat(options["max-cloud-cover"])
+						: undefined,
+					sampleDepthGrid,
+					samplePayload,
+				});
+				const output = options["as-geojson"] ? toStacFootprintGeoJSON(report) : report;
+				console.log(JSON.stringify(output, null, 2));
+				break;
+			}
+
+			case "fdsn-shakemap": {
+				const samplePayload = options.file
+					? JSON.parse(fs.readFileSync(options.file, "utf8"))
+					: undefined;
+				const shakemapContours = options["contours-file"]
+					? JSON.parse(fs.readFileSync(options["contours-file"], "utf8"))
+					: undefined;
+				const shakemapStations = options["stations-file"]
+					? JSON.parse(fs.readFileSync(options["stations-file"], "utf8"))
+					: undefined;
+				const shakemapPgaGrid = options["grid-file"]
+					? JSON.parse(fs.readFileSync(options["grid-file"], "utf8"))
+					: undefined;
+				const bbox = options.bbox
+					? options.bbox.split(",").map((n) => parseFloat(n.trim()))
+					: undefined;
+				const report = await ingestFdsnShakeMap({
+					endpointUrl: options.url,
+					agency: options.agency,
+					minMagnitude: options["min-mag"] ? parseFloat(options["min-mag"]) : undefined,
+					startTime: options["start-time"],
+					endTime: options["end-time"],
+					bbox,
+					limit: options.limit ? parseInt(options.limit, 10) : undefined,
+					minPgaG: options["min-pga-g"] ? parseFloat(options["min-pga-g"]) : undefined,
+					shakemapContours,
+					shakemapStations,
+					shakemapPgaGrid,
+					samplePayload,
+				});
+				const geoMode =
+					options["as-geojson"] === "stations"
+						? "stations"
+						: options["as-geojson"]
+							? "contours"
+							: null;
+				const output = geoMode ? toShakeMapGeoJSON(report, geoMode) : report;
+				console.log(JSON.stringify(output, null, 2));
+				break;
+			}
+
+			case "infra-overlay": {
+				const infraGeoJSON = options.file
+					? JSON.parse(fs.readFileSync(options.file, "utf8"))
+					: undefined;
+				const hazardGeoJSON = options.hazard
+					? JSON.parse(fs.readFileSync(options.hazard, "utf8"))
+					: undefined;
+				const sectors = options.sectors
+					? options.sectors.split(",").map((s) => s.trim()).filter(Boolean)
+					: undefined;
+				const bbox = options.bbox
+					? options.bbox.split(",").map((n) => parseFloat(n.trim()))
+					: undefined;
+				const report = await ingestCriticalInfraOverlay({
+					endpointUrl: options.url,
+					collection: options.collection,
+					bbox,
+					limit: options.limit ? parseInt(options.limit, 10) : undefined,
+					infraGeoJSON,
+					hazardGeoJSON,
+					sectors,
+					audience: options.audience || "eoc_internal",
+				});
+				const output = options["as-geojson"] ? report.overlayGeoJSON : report;
+				console.log(JSON.stringify(output, null, 2));
 				break;
 			}
 

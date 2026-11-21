@@ -32,8 +32,8 @@ assert(helpOut.includes("replay-validate"), "CLI --help must list new commands")
 assert(helpOut.includes("sendai-validate"), "CLI --help must list sendai-validate");
 
 const cliCmds = extractCliCommands();
-assert.strictEqual(TOOLS.length, 29, "MCP server must expose 29 tools");
-assert.strictEqual(cliCmds.length, 29, "CLI must register 29 subcommands");
+assert.strictEqual(TOOLS.length, 33, "MCP server must expose 33 tools");
+assert.strictEqual(cliCmds.length, 33, "CLI must register 33 subcommands");
 
 const invMd = generateInventoryMarkdown();
 for (const tool of TOOLS) {
@@ -52,7 +52,7 @@ assert.strictEqual(fragOut.method.productionStatus, "illustrative_baseline");
 runCli(["fragility", "--hazard", "earthquake"], true);
 
 const regOut = JSON.parse(runCli(["registry"]));
-assert(Array.isArray(regOut.methods) && regOut.methods.length >= 7);
+assert(Array.isArray(regOut.methods) && regOut.methods.length >= 11);
 
 const replayOut = JSON.parse(runCli(["replay-validate", "--suite", "all"]));
 assert.strictEqual(replayOut.valid, true);
@@ -63,5 +63,53 @@ assert.strictEqual(crosswalkOut.mapping.code, "GH0001");
 
 const capOut = runCli(["cap-generate", "--headline", "CLI Test Alert"]);
 assert(capOut.includes("<status>Draft</status>"), "CLI cap-generate must default to Draft status");
+
+const stOut = JSON.parse(
+	runCli([
+		"sensorthings",
+		"--file",
+		"examples/ogc-sensorthings-gauges/sample-datastreams.json",
+		"--warning",
+		"2.0",
+		"--critical",
+		"2.5",
+		"--unit",
+		"m",
+	]),
+);
+assert.strictEqual(stOut.summary.datastreamCount, 3);
+assert.strictEqual(stOut.summary.criticalCount, 1);
+
+const stacOut = JSON.parse(
+	runCli([
+		"stac-hazard",
+		"--file",
+		"examples/stac-flood-depth/sample-stac-items.json",
+	]),
+);
+assert.strictEqual(stacOut.summary.itemCount, 3);
+assert.strictEqual(stacOut.summary.validatedDepthGridCount, 1);
+
+const shakeOut = JSON.parse(
+	runCli([
+		"fdsn-shakemap",
+		"--file",
+		"examples/fdsn-shakemap-seismic/sample-shakemap-bundle.json",
+	]),
+);
+assert.strictEqual(shakeOut.replacesWald99Gmice, true);
+assert.strictEqual(shakeOut.summary.peakObservedPgaG, 0.528);
+
+const infraOut = JSON.parse(
+	runCli([
+		"infra-overlay",
+		"--file",
+		"examples/critical-infra-overlay/sample-sendai-infra.json",
+		"--hazard",
+		"examples/thailand-flood-scenario/input-hazard.json",
+	]),
+);
+assert.strictEqual(infraOut.summary.totalFacilities, 10);
+assert.strictEqual(infraOut.summary.cascadingServiceRiskCount, 2);
 
 console.log("✅ CLI subcommands & programmatic inventory tests passed!");

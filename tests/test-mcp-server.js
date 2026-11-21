@@ -56,7 +56,7 @@ async function run() {
 	send({ jsonrpc: "2.0", id: 2, method: "tools/list", params: {} });
 	const listRes = await waitForResponse(2);
 	assert(listRes, "Expected tools/list response");
-	assert.strictEqual(listRes.result.tools.length, 29);
+	assert.strictEqual(listRes.result.tools.length, 33);
 
 	// 3. tools/call: drr_fragility_eval
 	send({
@@ -338,6 +338,70 @@ async function run() {
 	});
 	assert(cbaRes.quantitativeMetrics.benefitCostRatio > 1);
 
+	const fs = require("fs");
+	const stSample = JSON.parse(
+		fs.readFileSync(
+			path.join(__dirname, "../examples/ogc-sensorthings-gauges/sample-datastreams.json"),
+			"utf8",
+		),
+	);
+	const stRes = await callTool(27, "drr_sensorthings_fetch", {
+		samplePayload: stSample,
+		thresholds: { warning: 2.0, critical: 2.5, unit: "m" },
+		asGeoJSON: true,
+	});
+	assert.strictEqual(stRes.summary.datastreamCount, 3);
+	assert.strictEqual(stRes.summary.criticalCount, 1);
+	assert.strictEqual(stRes.geojson.type, "FeatureCollection");
+
+	const stacSample = JSON.parse(
+		fs.readFileSync(
+			path.join(__dirname, "../examples/stac-flood-depth/sample-stac-items.json"),
+			"utf8",
+		),
+	);
+	const stacRes = await callTool(28, "drr_stac_hazard_fetch", {
+		samplePayload: stacSample,
+		asGeoJSON: true,
+	});
+	assert.strictEqual(stacRes.summary.itemCount, 3);
+	assert.strictEqual(stacRes.summary.validatedDepthGridCount, 1);
+	assert.strictEqual(stacRes.geojson.type, "FeatureCollection");
+
+	const shakeSample = JSON.parse(
+		fs.readFileSync(
+			path.join(__dirname, "../examples/fdsn-shakemap-seismic/sample-shakemap-bundle.json"),
+			"utf8",
+		),
+	);
+	const shakeRes = await callTool(29, "drr_fdsn_shakemap_fetch", {
+		samplePayload: shakeSample,
+		asGeoJSON: "contours",
+	});
+	assert.strictEqual(shakeRes.replacesWald99Gmice, true);
+	assert.strictEqual(shakeRes.summary.peakObservedPgaG, 0.528);
+	assert.strictEqual(shakeRes.geojson.type, "FeatureCollection");
+
+	const infraSample = JSON.parse(
+		fs.readFileSync(
+			path.join(__dirname, "../examples/critical-infra-overlay/sample-sendai-infra.json"),
+			"utf8",
+		),
+	);
+	const thaiHazard = JSON.parse(
+		fs.readFileSync(
+			path.join(__dirname, "../examples/thailand-flood-scenario/input-hazard.json"),
+			"utf8",
+		),
+	);
+	const infraRes = await callTool(30, "drr_critical_infra_overlay", {
+		infraGeoJSON: infraSample,
+		hazardGeoJSON: thaiHazard,
+		audience: "eoc_internal",
+	});
+	assert.strictEqual(infraRes.summary.totalFacilities, 10);
+	assert.strictEqual(infraRes.summary.cascadingServiceRiskCount, 2);
+
 	// 10. Error propagation verification for invalid input
 	send({
 		jsonrpc: "2.0",
@@ -351,10 +415,9 @@ async function run() {
 	const errRes = await waitForResponse(99);
 	assert(errRes.error && errRes.error.message.includes("SINGLE_EVENT_CANNOT_ESTABLISH_EAL"));
 
-	const fs = require("fs");
 	fs.rmSync(path.join(__dirname, "../alerts"), { recursive: true, force: true });
 	child.kill();
-	console.log("✅ MCP Server Stdio tests passed (29 tools + error handling verified)!");
+	console.log("✅ MCP Server Stdio tests passed (33 tools + error handling verified)!");
 }
 
 run().catch((err) => {
