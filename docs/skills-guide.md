@@ -1,6 +1,6 @@
 # DRR Agent Plugin — End-User Skills & Prompting Guide
 
-This guide explains how end users—**EOC Duty Officers, Anticipatory Action Leads, UN OCHA Analysts, National Sendai/DELTA Focal Points, and Resilience Engineers**—can prompt AI assistants (Google Antigravity, Claude Code/Desktop, Cursor, GitHub Copilot, OpenCode) to invoke each of the **15 DRR Domain Skills** using realistic, specific disaster risk reduction use cases.
+This guide explains how end users—**EOC Duty Officers, Anticipatory Action Leads, UN OCHA Analysts, National Sendai/DELTA Focal Points, and Resilience Engineers**—can prompt AI assistants (Google Antigravity, Claude Code/Desktop, Cursor, GitHub Copilot, OpenCode) to invoke each of the **16 DRR Domain Skills** using realistic, specific disaster risk reduction use cases.
 
 ---
 
@@ -8,7 +8,7 @@ This guide explains how end users—**EOC Duty Officers, Anticipatory Action Lea
 
 Each skill in `skills/<skill-name>/SKILL.md` provides your AI assistant with:
 1. **Domain Methodology & Guardrails** (what is scientifically valid and what is strictly forbidden, such as fabricating flood depths from rainfall or auto-publishing live CAP sirens).
-2. **Exact Tool Orchestration** (which of the **31 deterministic MCP tools** to call instead of letting the LLM guess numbers).
+2. **Exact Tool Orchestration** (which of the **32 deterministic MCP tools** to call instead of letting the LLM guess numbers).
 3. **Escalation & Governance Rules** (when the assistant must stop and ask a human Duty Officer, Hydrologist, or National Focal Point for review or approval).
 
 ### Tips for Effective Prompts
@@ -19,7 +19,7 @@ Each skill in `skills/<skill-name>/SKILL.md` provides your AI assistant with:
 
 ---
 
-## Quick Reference: All 15 DRR Skills
+## Quick Reference: All 16 DRR Skills
 
 | # | Skill Name | Primary Persona | Specific Use Case Example Below | Core MCP Tools |
 | :---: | :--- | :--- | :--- | :--- |
@@ -38,6 +38,7 @@ Each skill in `skills/<skill-name>/SKILL.md` provides your AI assistant with:
 | 13 | [`risk-reduction-options-appraisal`](#13-risk-reduction-options-appraisal) | Municipal Economist / Planner | Coastal flood levee vs. drainage Expected Annual Loss (EAL) & CBA appraisal | `drr_expected_annual_loss`, `drr_mitigation_cost_benefit`, `drr_uncertainty_propagate` |
 | 14 | [`ogc-sensorthings-telemetry`](#14-ogc-sensorthings-telemetry) | Hydro-Met / EOC Sensor Lead | Municipal river-level & private rain gauge ingestion via OGC SensorThings v1.1 | `drr_sensorthings_fetch`, `drr_spatial_exposure_join`, `drr_input_contract_validate`, `drr_source_provenance_manifest` |
 | 15 | [`stac-eo-hazard-grids`](#15-stac-eo-hazard-grids) | EO / GIS Flood Analyst | Copernicus EMS & ICEYE SAR flood depth grid validation & zonal exposure | `drr_stac_hazard_fetch`, `drr_raster_zonal_stats`, `drr_spatial_exposure_join`, `drr_vulnerability_matrix_calc` |
+| 16 | [`fdsn-shakemap-seismic`](#16-fdsn-shakemap-seismic) | National Seismologist / EOC | PHIVOLCS/BMKG FDSN-WS & ShakeMap PGA/PGV/$V_{s30}$ contour/grid ingestion | `drr_fdsn_shakemap_fetch`, `drr_raster_zonal_stats`, `drr_spatial_exposure_join`, `drr_fragility_eval` |
 
 ---
 
@@ -496,6 +497,37 @@ Pass any validated inundation depth grid into drr_raster_zonal_stats for our mun
 **Expected Behavior & Guardrails:**
 * Calls `drr_stac_hazard_fetch` (registered method `telemetry.stac.hazard_grid_v1`) and bridges directly into `ingestValidatedInundationGrid` and `drr_raster_zonal_stats`.
 * Enforces C-05 (extent != depth), commercial EO licensing (`redistributionAllowed`), cloud-cover gating, and SSRF protection.
+
+---
+
+### 16. `fdsn-shakemap-seismic`
+**Skill file:** [`skills/fdsn-shakemap-seismic/SKILL.md`](../skills/fdsn-shakemap-seismic/SKILL.md)
+
+**Specific Use Case — National Agency ShakeMap PGA/$V_{s30}$ Ingestion & Fragility Upgrade (Philippines EOC):**
+Minutes after a Mw 6.9 earthquake in Davao del Sur, PHIVOLCS publishes a ShakeMap bundle with `%g` PGA contours, two accelerograph stations (one on NEHRP Class E soft clay), a crowd-sourced DYFI report, and a gridded PGA raster. The EOC seismologist ingests it to replace Wald99 GMICE approximations (`C-04`).
+
+#### Prompt Example A (Offline National ShakeMap Bundle & C-04 Upgrade)
+```text
+Using the fdsn-shakemap-seismic skill, ingest
+examples/fdsn-shakemap-seismic/sample-shakemap-bundle.json with asGeoJSON: "contours".
+Confirm that:
+1. Peak instrumented PGA is normalized from %g to 0.528 g and replacesWald99Gmice is true,
+2. The crowd-sourced DYFI macroseismic report (95 %g) is kept separate from instrumented stations,
+3. Digos station (Vs30 = 165 m/s) is flagged as NEHRP Site Class E (soft-soil amplification risk),
+4. The continuous PGA grid can be passed directly into drr_raster_zonal_stats and drr_fragility_eval.
+```
+
+#### Prompt Example B (Live Custom National FDSN-WS Query)
+```text
+Using fdsn-shakemap-seismic, query our national FDSN-WS endpoint at
+"https://seismic.agency.gov/fdsnws/event/1" (agency: "BMKG", minMagnitude: 5.5,
+bbox: [95.0, -11.0, 141.0, 6.0], limit: 10). Report whether ShakeMap contours are present or
+if only FDSN catalog events are returned.
+```
+
+**Expected Behavior & Guardrails:**
+* Calls `drr_fdsn_shakemap_fetch` (registered method `telemetry.fdsn.shakemap_v1`).
+* Separates instrumented seismic stations from DYFI reports, computes NEHRP $V_{s30}$ site classes, and flags `replacesWald99Gmice: false` when only an event catalog is supplied.
 
 ---
 

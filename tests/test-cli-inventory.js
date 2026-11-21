@@ -32,8 +32,8 @@ assert(helpOut.includes("replay-validate"), "CLI --help must list new commands")
 assert(helpOut.includes("sendai-validate"), "CLI --help must list sendai-validate");
 
 const cliCmds = extractCliCommands();
-assert.strictEqual(TOOLS.length, 31, "MCP server must expose 31 tools");
-assert.strictEqual(cliCmds.length, 31, "CLI must register 31 subcommands");
+assert.strictEqual(TOOLS.length, 32, "MCP server must expose 32 tools");
+assert.strictEqual(cliCmds.length, 32, "CLI must register 32 subcommands");
 
 const invMd = generateInventoryMarkdown();
 for (const tool of TOOLS) {
@@ -52,7 +52,7 @@ assert.strictEqual(fragOut.method.productionStatus, "illustrative_baseline");
 runCli(["fragility", "--hazard", "earthquake"], true);
 
 const regOut = JSON.parse(runCli(["registry"]));
-assert(Array.isArray(regOut.methods) && regOut.methods.length >= 9);
+assert(Array.isArray(regOut.methods) && regOut.methods.length >= 10);
 
 const replayOut = JSON.parse(runCli(["replay-validate", "--suite", "all"]));
 assert.strictEqual(replayOut.valid, true);
@@ -89,5 +89,15 @@ const stacOut = JSON.parse(
 );
 assert.strictEqual(stacOut.summary.itemCount, 3);
 assert.strictEqual(stacOut.summary.validatedDepthGridCount, 1);
+
+const shakeOut = JSON.parse(
+	runCli([
+		"fdsn-shakemap",
+		"--file",
+		"examples/fdsn-shakemap-seismic/sample-shakemap-bundle.json",
+	]),
+);
+assert.strictEqual(shakeOut.replacesWald99Gmice, true);
+assert.strictEqual(shakeOut.summary.peakObservedPgaG, 0.528);
 
 console.log("✅ CLI subcommands & programmatic inventory tests passed!");

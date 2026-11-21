@@ -1,12 +1,12 @@
 # MCP Tools & CLI Technical Reference
 
-Complete technical specification of all **31 MCP tools** provided by `bin/mcp-server.js` and the **31 CLI commands** in `bin/cli.js`.
+Complete technical specification of all **32 MCP tools** provided by `bin/mcp-server.js` and the **32 CLI commands** in `bin/cli.js`.
 
-> **Inventory Note (R-01)**: Historically at baseline commit `1d7600ce5cc50dcdea7b438ccbd59d28282793dd` (`origin/dev`), `bin/mcp-server.js` registered 11 tools (including `drr_delta_docs`) while this reference listed 10. Both `docs/api-reference.md` and `docs/tool-inventory.md` are now reconciled with the full **31-tool** registration source.
+> **Inventory Note (R-01)**: Historically at baseline commit `1d7600ce5cc50dcdea7b438ccbd59d28282793dd` (`origin/dev`), `bin/mcp-server.js` registered 11 tools (including `drr_delta_docs`) while this reference listed 10. Both `docs/api-reference.md` and `docs/tool-inventory.md` are now reconciled with the full **32-tool** registration source.
 
 ---
 
-# Part 1: Model Context Protocol (MCP) Tools (31 Tools)
+# Part 1: Model Context Protocol (MCP) Tools (32 Tools)
 
 ## 1. `drr_gdacs_fetch`
 Ingests and filters active GDACS alerts by severity, hazard type (`EQ`, `TC`, `FL`, `VO`, `DR`), or country, with untrusted feed sanitization (`promptInjectionFlagged`), `sourceIssuedAt`, `retrievedAt`, and `payloadHash`.
@@ -403,13 +403,29 @@ Ingests **STAC v1.0.0** Earth Observation catalogs (Copernicus EMS, Sentinel-1 S
 }
 ```
 
+## 32. `drr_fdsn_shakemap_fetch`
+Ingests custom national **FDSN-WS** seismic events (BMKG, PHIVOLCS, JMA, EMSC, GeoNet, USGS; registered method `telemetry.fdsn.shakemap_v1`) and **ShakeMap v4** PGA/PGV/$V_{s30}$ contours, instrumented station lists, and continuous PGA grids — upgrading **C-04** beyond Wald et al. (1999) GMICE approximations with NEHRP site classes (`A`–`E`), `%g`/`m/s2`/`gal`→`g` normalization, DYFI macroseismic separation, SSRF protection, and GeoJSON export.
+
+```json
+{
+  "endpointUrl": "https://seismic.agency.gov/fdsnws/event/1",
+  "agency": "PHIVOLCS",
+  "minMagnitude": 5.5,
+  "bbox": [120.0, 5.0, 127.0, 10.0],
+  "limit": 20,
+  "minPgaG": 0.15,
+  "asGeoJSON": "contours",
+  "samplePayload": {}
+}
+```
+
 ---
 
-# Part 2: Command-Line Interface (CLI) Reference (31 Subcommands)
+# Part 2: Command-Line Interface (CLI) Reference (32 Subcommands)
 
 Run `node bin/cli.js --help` (or `drr-tool --help`) for usage.
 
-* **Telemetry & Hydro**: `gdacs`, `usgs`, `forecast`, `sensorthings`, `stac-hazard`, `basin-rainfall`, `river-discharge`, `monitor`
+* **Telemetry & Hydro**: `gdacs`, `usgs`, `fdsn-shakemap`, `forecast`, `sensorthings`, `stac-hazard`, `basin-rainfall`, `river-discharge`, `monitor`
 * **Contracts, Registry & Replay**: `validate-input`, `registry`, `replay-validate`
 * **Spatial, CRS & Raster**: `spatial-join`, `geojson-validate`, `geometry-repair`, `crs-transform`, `raster-zonal-stats`
 * **Fragility, Vulnerability & Sendai**: `fragility` *(requires `--intensity`)*, `vulnerability` *(requires `--spatial` and `--intensity`)*, `sendai-validate`

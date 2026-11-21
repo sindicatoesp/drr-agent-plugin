@@ -28,8 +28,9 @@ node "$DIR/test-scheduled-monitoring.js"
 node "$DIR/test-release-version.js"
 node "$DIR/test-sensorthings.js"
 node "$DIR/test-stac.js"
+node "$DIR/test-shakemap.js"
 
 echo "=================================================="
-echo " 🎉 ALL 22 TEST SUITES PASSED SUCCESSFULLY!"
+echo " 🎉 ALL 23 TEST SUITES PASSED SUCCESSFULLY!"
 echo "=================================================="
 

@@ -56,7 +56,7 @@ async function run() {
 	send({ jsonrpc: "2.0", id: 2, method: "tools/list", params: {} });
 	const listRes = await waitForResponse(2);
 	assert(listRes, "Expected tools/list response");
-	assert.strictEqual(listRes.result.tools.length, 31);
+	assert.strictEqual(listRes.result.tools.length, 32);
 
 	// 3. tools/call: drr_fragility_eval
 	send({
@@ -368,6 +368,20 @@ async function run() {
 	assert.strictEqual(stacRes.summary.validatedDepthGridCount, 1);
 	assert.strictEqual(stacRes.geojson.type, "FeatureCollection");
 
+	const shakeSample = JSON.parse(
+		fs.readFileSync(
+			path.join(__dirname, "../examples/fdsn-shakemap-seismic/sample-shakemap-bundle.json"),
+			"utf8",
+		),
+	);
+	const shakeRes = await callTool(29, "drr_fdsn_shakemap_fetch", {
+		samplePayload: shakeSample,
+		asGeoJSON: "contours",
+	});
+	assert.strictEqual(shakeRes.replacesWald99Gmice, true);
+	assert.strictEqual(shakeRes.summary.peakObservedPgaG, 0.528);
+	assert.strictEqual(shakeRes.geojson.type, "FeatureCollection");
+
 	// 10. Error propagation verification for invalid input
 	send({
 		jsonrpc: "2.0",
@@ -383,7 +397,7 @@ async function run() {
 
 	fs.rmSync(path.join(__dirname, "../alerts"), { recursive: true, force: true });
 	child.kill();
-	console.log("✅ MCP Server Stdio tests passed (31 tools + error handling verified)!");
+	console.log("✅ MCP Server Stdio tests passed (32 tools + error handling verified)!");
 }
 
 run().catch((err) => {
