@@ -24,9 +24,9 @@ DOCKER_IMAGE ?= undrr/drr-agent-plugin:latest
 
 .PHONY: help info version \
         config-init config-check config-show alerts-validate \
-        test monitor monitor-once mcp usgs forecast \
+        test check lint inventory monitor monitor-once mcp usgs forecast \
         scenario-earthquake scenario-flood scenario-cyclone scenarios \
-        presentation gis-map serve sitrep-sample clean-alerts \
+        presentation gis-map serve run sitrep-sample clean-alerts \
         docker-build docker-up docker-down docker-restart docker-status \
         docker-logs docker-test docker-once docker-shell
 
@@ -181,6 +181,11 @@ gis-map: ## Show link and launch instructions for the 100% offline GIS mapping p
 
 serve: ## Launch local web server & compliant OSM tile proxy on http://localhost:3300
 	@node bin/serve.js
+
+run: serve ## Alias for serve (launch local web server & GIS preview on http://localhost:3300)
+
+inventory: ## Regenerate docs/tool-inventory.md from executable registration sources
+	@node scripts/generate-inventory.js
 
 sitrep-sample: ## Generate an executive HTML Situation Report from HAZUS scenario
 	@node bin/cli.js sitrep --file examples/earthquake-hazus-scenario/vulnerability-report.json --html --output examples/earthquake-hazus-scenario/situation-report.html
