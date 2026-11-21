@@ -1119,6 +1119,51 @@ async function runTests() {
 		fs.rmSync(lockTestDir, { recursive: true, force: true });
 	}
 
+	// =========================================================================
+	// GDACS Freshness with 0 Orange/Red Events & Case-Insensitive alertlevel
+	// =========================================================================
+	{
+		const nowMs = Date.UTC(2026, 10, 21, 12, 0, 0);
+		const store = new InMemoryCasStateStore({ scopeId: "gdacs-freshness-test" });
+		const summary = await runOnce(
+			{
+				scopeId: "gdacs-freshness-test",
+				readOnly: true,
+				writeLocalArtifacts: false,
+				rules: {
+					earthquake: { enabled: false },
+					gdacs: { enabled: true, minAlertLevel: "Orange" },
+				},
+			},
+			{
+				clock: { now: () => nowMs },
+				stateStore: store,
+				transport: {
+					gdacs: async () => ({
+						type: "FeatureCollection",
+						features: [
+							{
+								type: "Feature",
+								properties: {
+									eventid: 5001,
+									eventtype: "EQ",
+									alertlevel: "green",
+									datemodified: "2026-11-21T11:30:00Z",
+								},
+								geometry: { type: "Point", coordinates: [100.0, 10.0] },
+							},
+						],
+					}),
+				},
+			},
+		);
+		assert.strictEqual(summary.status, "success");
+		assert.strictEqual(summary.feedHealth.gdacs.status, "healthy");
+		assert.strictEqual(summary.feedHealth.gdacs.eventsReturned, 0);
+		assert.strictEqual(summary.feedHealth.gdacs.freshness.fresh, true);
+		assert(!summary.warnings.some((w) => w.code === "SOURCE_ISSUE_TIME_MISSING"));
+	}
+
 	console.log("✅ All Scheduled DRR Monitoring tests (SR, PS, RT, CC & 19-Row Matrix) passed!");
 }
 
