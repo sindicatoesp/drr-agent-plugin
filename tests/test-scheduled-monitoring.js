@@ -1093,6 +1093,32 @@ async function runTests() {
 		fs.rmSync(path.join(__dirname, "..", "alerts"), { recursive: true, force: true });
 	}
 
+	// =========================================================================
+	// Direct State Store Hardening: scopeId Path Traversal Guard & Stale Lock Recovery
+	// =========================================================================
+	{
+		assert.throws(
+			() => new FileCasStateStore({ storageDir: path.join(__dirname, "tmp_bad_scope"), scopeId: "../../etc/passwd" }),
+			/INVALID_SCOPE_ID/,
+			"FileCasStateStore must reject path traversal in scopeId directly at constructor boundary",
+		);
+
+		const lockTestDir = path.join(__dirname, "tmp_stale_lock_test");
+		if (fs.existsSync(lockTestDir)) {
+			fs.rmSync(lockTestDir, { recursive: true, force: true });
+		}
+		const store = new FileCasStateStore({ storageDir: lockTestDir, scopeId: "stale-test" });
+		fs.mkdirSync(path.join(lockTestDir, "objects"), { recursive: true });
+		// Simulate a crashed process leaving a lockfile 60 seconds in the past
+		fs.writeFileSync(store.lockFilePath, "stale", "utf8");
+		const pastTime = new Date(Date.now() - 60000);
+		fs.utimesSync(store.lockFilePath, pastTime, pastTime);
+
+		const leaseRes = await store.acquireLease({ ownerId: "worker_after_crash", ttlMs: 30000 });
+		assert.strictEqual(leaseRes.acquired, true, "FileCasStateStore must recover from stale lockfile > 30s old");
+		fs.rmSync(lockTestDir, { recursive: true, force: true });
+	}
+
 	console.log("✅ All Scheduled DRR Monitoring tests (SR, PS, RT, CC & 19-Row Matrix) passed!");
 }
 
