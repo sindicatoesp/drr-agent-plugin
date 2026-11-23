@@ -1,0 +1,1885 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>DRR Agent Plugin — Deterministic Disaster Risk Reduction &amp; Early Warning Intelligence</title>
+  <meta name="description" content="Zero-dependency, provenance-aware AI Agent Plugin &amp; MCP Server for Disaster Risk Reduction (DRR): USGS, GDACS, Open-Meteo, OCHA HDX/COD-AB, OpenStreetMap, GEM/HAZUS fragility, Sendai Targets A–D, OASIS CAP v1.2, and UNDRR DELTA Resilience." />
+  <meta property="og:title" content="DRR Agent Plugin — Deterministic Disaster Risk Reduction Intelligence" />
+  <meta property="og:description" content="40 MCP tools, 40 CLI commands, 19 domain skills, 0 external npm dependencies. Built for EOCs, humanitarian analysts, and UNDRR DELTA Resilience." />
+  <meta property="og:type" content="website" />
+  <meta property="og:url" content="https://sindicatoesp.github.io/drr-agent-plugin/" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=JetBrains+Mono:wght@400;500;600&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --paper: #f7f5f0;
+      --paper-elevated: #ffffff;
+      --paper-warm: #efeae0;
+      --ink: #0b1b2b;
+      --ink-soft: #3a4c5e;
+      --ink-muted: #647486;
+      --hairline: #ddd6c9;
+      --hairline-strong: #c5bcac;
+      --ocean: #0c2236;
+      --ocean-deep: #071522;
+      --teal: #0f766e;
+      --teal-soft: rgba(15, 118, 110, 0.1);
+      --signal: #c94a1e;
+      --signal-soft: rgba(201, 74, 30, 0.11);
+      --amber: #b45309;
+      --serif: "Instrument Serif", Georgia, "Times New Roman", serif;
+      --sans: "Plus Jakarta Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      --mono: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
+      --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+      --radius: 14px;
+      --max-w: 1180px;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; }
+
+    html {
+      scroll-behavior: smooth;
+      background: var(--paper);
+      color: var(--ink);
+      font-family: var(--sans);
+      -webkit-font-smoothing: antialiased;
+    }
+
+    body {
+      margin: 0;
+      background: var(--paper);
+      color: var(--ink);
+      line-height: 1.6;
+      overflow-x: hidden;
+      position: relative;
+    }
+
+    /* Subtle archival paper grain overlay */
+    body::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      z-index: 999;
+      opacity: 0.032;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+    }
+
+    a { color: inherit; text-decoration: none; }
+    button { font-family: inherit; }
+
+    .wrap {
+      max-width: var(--max-w);
+      margin: 0 auto;
+      padding: 0 28px;
+    }
+
+    /* Top Navigation */
+    .site-nav {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      background: rgba(247, 245, 240, 0.86);
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+      border-bottom: 1px solid var(--hairline);
+      transition: box-shadow 0.3s var(--ease-out);
+    }
+    .site-nav.scrolled {
+      box-shadow: 0 8px 28px rgba(11, 27, 43, 0.06);
+    }
+    .nav-inner {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      height: 68px;
+      gap: 20px;
+    }
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-weight: 700;
+      font-size: 15px;
+      letter-spacing: -0.01em;
+    }
+    .brand-mark {
+      width: 32px;
+      height: 32px;
+      border-radius: 9px;
+      background: var(--ocean);
+      color: var(--paper);
+      display: grid;
+      place-items: center;
+      font-family: var(--mono);
+      font-size: 12px;
+      font-weight: 600;
+      letter-spacing: -0.03em;
+      position: relative;
+      overflow: hidden;
+    }
+    .brand-mark::after {
+      content: "";
+      position: absolute;
+      width: 14px;
+      height: 14px;
+      border-radius: 50%;
+      border: 1.5px solid rgba(255, 255, 255, 0.35);
+      right: -4px;
+      bottom: -4px;
+    }
+    .nav-links {
+      display: flex;
+      align-items: center;
+      gap: 26px;
+      font-size: 14px;
+      font-weight: 500;
+      color: var(--ink-soft);
+    }
+    .nav-links a {
+      position: relative;
+      padding: 4px 0;
+      transition: color 0.2s ease;
+    }
+    .nav-links a::after {
+      content: "";
+      position: absolute;
+      left: 0;
+      right: 0;
+      bottom: -2px;
+      height: 1.5px;
+      background: var(--ink);
+      transform: scaleX(0);
+      transform-origin: left;
+      transition: transform 0.28s var(--ease-out);
+    }
+    .nav-links a:hover { color: var(--ink); }
+    .nav-links a:hover::after { transform: scaleX(1); }
+
+    .nav-actions {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      padding: 10px 18px;
+      border-radius: 999px;
+      font-size: 14px;
+      font-weight: 600;
+      border: 1px solid transparent;
+      cursor: pointer;
+      transition: transform 0.22s var(--ease-out), background 0.22s ease, border-color 0.22s ease, box-shadow 0.22s ease;
+      white-space: nowrap;
+    }
+    .btn:active { transform: translateY(1px) scale(0.99); }
+    .btn-primary {
+      background: var(--ocean);
+      color: #ffffff;
+      box-shadow: 0 6px 20px rgba(12, 34, 54, 0.16);
+    }
+    .btn-primary:hover {
+      background: #143350;
+      transform: translateY(-1px);
+      box-shadow: 0 10px 26px rgba(12, 34, 54, 0.22);
+    }
+    .btn-outline {
+      background: transparent;
+      color: var(--ink);
+      border-color: var(--hairline-strong);
+    }
+    .btn-outline:hover {
+      background: var(--paper-elevated);
+      border-color: var(--ink);
+      transform: translateY(-1px);
+    }
+    .btn-ghost {
+      padding: 8px 14px;
+      font-size: 13px;
+      color: var(--ink-soft);
+      border-color: var(--hairline);
+      background: var(--paper-elevated);
+    }
+    .btn-ghost:hover {
+      color: var(--ink);
+      border-color: var(--ink);
+    }
+
+    /* Hero Section */
+    .hero {
+      padding: 64px 0 72px;
+      border-bottom: 1px solid var(--hairline);
+      position: relative;
+    }
+    .hero-grid {
+      display: grid;
+      grid-template-columns: minmax(0, 1.08fr) minmax(0, 0.92fr);
+      gap: 48px;
+      align-items: center;
+    }
+    .hero-kicker {
+      font-family: var(--mono);
+      font-size: 12px;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--teal);
+      font-weight: 600;
+      margin-bottom: 18px;
+    }
+    .hero h1 {
+      font-family: var(--serif);
+      font-weight: 400;
+      font-size: clamp(2.85rem, 5.4vw, 4.55rem);
+      line-height: 1.03;
+      letter-spacing: -0.025em;
+      margin: 0 0 22px;
+      color: var(--ink);
+    }
+    .hero h1 em {
+      font-style: italic;
+      color: var(--signal);
+    }
+    .hero-lead {
+      font-size: 17px;
+      line-height: 1.65;
+      color: var(--ink-soft);
+      max-width: 56ch;
+      margin: 0 0 30px;
+    }
+    .hero-cta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      margin-bottom: 34px;
+    }
+    .hero-meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 24px;
+      padding-top: 22px;
+      border-top: 1px solid var(--hairline);
+      font-family: var(--mono);
+      font-size: 12px;
+      color: var(--ink-muted);
+    }
+    .hero-meta strong {
+      color: var(--ink);
+      font-weight: 600;
+    }
+
+    /* Interactive Globe Observatory Stage */
+    .globe-stage {
+      position: relative;
+      background: var(--ocean-deep);
+      border-radius: 22px;
+      padding: 20px;
+      color: #e6eef5;
+      box-shadow: 0 28px 64px rgba(11, 27, 43, 0.18), inset 0 1px 0 rgba(255, 255, 255, 0.08);
+      overflow: hidden;
+    }
+    .globe-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-family: var(--mono);
+      font-size: 11px;
+      color: #8ea5ba;
+      margin-bottom: 8px;
+      letter-spacing: 0.04em;
+    }
+    .globe-canvas-wrap {
+      position: relative;
+      width: 100%;
+      aspect-ratio: 1 / 0.92;
+      cursor: grab;
+      user-select: none;
+    }
+    .globe-canvas-wrap:active { cursor: grabbing; }
+    #globeCanvas {
+      width: 100%;
+      height: 100%;
+      display: block;
+    }
+    .globe-tooltip {
+      position: absolute;
+      pointer-events: none;
+      background: rgba(7, 21, 34, 0.94);
+      border: 1px solid rgba(255, 255, 255, 0.14);
+      color: #f8fafc;
+      padding: 10px 12px;
+      border-radius: 10px;
+      font-size: 12px;
+      line-height: 1.45;
+      min-width: 195px;
+      opacity: 0;
+      transform: translateY(6px);
+      transition: opacity 0.2s ease, transform 0.2s var(--ease-out);
+      box-shadow: 0 14px 32px rgba(0, 0, 0, 0.35);
+      z-index: 5;
+    }
+    .globe-tooltip.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+    .globe-tooltip .tt-code {
+      font-family: var(--mono);
+      font-size: 10px;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: #f59e0b;
+      margin-bottom: 2px;
+    }
+    .globe-tooltip .tt-title {
+      font-weight: 600;
+      margin-bottom: 4px;
+    }
+    .globe-tooltip .tt-meta {
+      font-family: var(--mono);
+      font-size: 11px;
+      color: #9cb3c9;
+    }
+    .globe-footer {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 8px;
+      padding-top: 12px;
+      border-top: 1px solid rgba(255, 255, 255, 0.09);
+      font-family: var(--mono);
+      font-size: 11px;
+      color: #8ea5ba;
+    }
+    .globe-legend {
+      display: flex;
+      gap: 14px;
+      align-items: center;
+    }
+    .legend-item {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .legend-dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+    }
+
+    /* Metrics Strip */
+    .metrics-band {
+      background: var(--paper-elevated);
+      border-bottom: 1px solid var(--hairline);
+    }
+    .metrics-grid {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+    }
+    .metric-cell {
+      padding: 32px 22px;
+      border-right: 1px solid var(--hairline);
+      transition: background 0.25s ease;
+    }
+    .metric-cell:last-child { border-right: none; }
+    .metric-cell:hover { background: var(--paper); }
+    .metric-num {
+      font-family: var(--serif);
+      font-size: clamp(2.1rem, 3.2vw, 2.9rem);
+      line-height: 1;
+      letter-spacing: -0.02em;
+      color: var(--ink);
+      margin-bottom: 6px;
+    }
+    .metric-label {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--ink-soft);
+    }
+    .metric-sub {
+      font-family: var(--mono);
+      font-size: 11px;
+      color: var(--ink-muted);
+      margin-top: 4px;
+    }
+
+    /* Sections */
+    section.band {
+      padding: 88px 0;
+      border-bottom: 1px solid var(--hairline);
+    }
+    .section-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-end;
+      gap: 28px;
+      flex-wrap: wrap;
+      margin-bottom: 44px;
+    }
+    .section-eyebrow {
+      font-family: var(--mono);
+      font-size: 11px;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--teal);
+      font-weight: 600;
+      margin-bottom: 10px;
+    }
+    .section-title {
+      font-family: var(--serif);
+      font-weight: 400;
+      font-size: clamp(2rem, 3.6vw, 3.1rem);
+      line-height: 1.08;
+      letter-spacing: -0.02em;
+      margin: 0;
+      max-width: 18ch;
+    }
+    .section-desc {
+      max-width: 46ch;
+      color: var(--ink-soft);
+      font-size: 15px;
+      margin: 0;
+    }
+
+    /* Interactive 6-Stage Scientific Pipeline */
+    .pipeline-shell {
+      background: var(--paper-elevated);
+      border: 1px solid var(--hairline);
+      border-radius: 20px;
+      overflow: hidden;
+      box-shadow: 0 18px 42px rgba(11, 27, 43, 0.05);
+    }
+    .pipeline-steps {
+      display: grid;
+      grid-template-columns: repeat(6, 1fr);
+      border-bottom: 1px solid var(--hairline);
+      background: var(--paper);
+    }
+    .pipe-step {
+      appearance: none;
+      background: transparent;
+      border: none;
+      border-right: 1px solid var(--hairline);
+      padding: 18px 16px;
+      text-align: left;
+      cursor: pointer;
+      position: relative;
+      transition: background 0.2s ease;
+    }
+    .pipe-step:last-child { border-right: none; }
+    .pipe-step::after {
+      content: "";
+      position: absolute;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      height: 2.5px;
+      background: var(--signal);
+      transform: scaleX(0);
+      transform-origin: left;
+      transition: transform 0.35s var(--ease-out);
+    }
+    .pipe-step:hover { background: rgba(255, 255, 255, 0.7); }
+    .pipe-step.active {
+      background: var(--paper-elevated);
+    }
+    .pipe-step.active::after { transform: scaleX(1); }
+    .pipe-idx {
+      font-family: var(--mono);
+      font-size: 11px;
+      color: var(--ink-muted);
+      display: block;
+      margin-bottom: 4px;
+    }
+    .pipe-step.active .pipe-idx { color: var(--signal); font-weight: 600; }
+    .pipe-name {
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--ink);
+      display: block;
+    }
+    .pipeline-body {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) minmax(0, 1.15fr);
+      gap: 0;
+    }
+    .pipeline-info {
+      padding: 34px 36px;
+      border-right: 1px solid var(--hairline);
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      gap: 20px;
+    }
+    .pipeline-info h3 {
+      font-family: var(--serif);
+      font-size: 2rem;
+      font-weight: 400;
+      margin: 0 0 10px;
+      line-height: 1.15;
+    }
+    .pipeline-info p {
+      color: var(--ink-soft);
+      font-size: 15px;
+      margin: 0 0 18px;
+    }
+    .pipe-guarantees {
+      list-style: none;
+      margin: 0;
+      padding: 0;
+      display: grid;
+      gap: 8px;
+    }
+    .pipe-guarantees li {
+      font-size: 13px;
+      color: var(--ink);
+      padding-left: 18px;
+      position: relative;
+    }
+    .pipe-guarantees li::before {
+      content: "→";
+      position: absolute;
+      left: 0;
+      color: var(--teal);
+      font-family: var(--mono);
+    }
+    .pipe-controls {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding-top: 12px;
+      border-top: 1px solid var(--hairline);
+    }
+    .pipeline-code {
+      background: var(--ocean-deep);
+      color: #dbe7f3;
+      padding: 28px 30px;
+      font-family: var(--mono);
+      font-size: 12.5px;
+      line-height: 1.65;
+      overflow-x: auto;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+    .code-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      color: #7e97b0;
+      font-size: 11px;
+      padding-bottom: 14px;
+      margin-bottom: 14px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    }
+    .pipeline-code pre {
+      margin: 0;
+      white-space: pre-wrap;
+      word-break: break-word;
+      transition: opacity 0.2s ease;
+    }
+
+    /* Core Pillars (Clean Editorial 3-Column) */
+    .pillars-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 24px;
+    }
+    .pillar {
+      background: var(--paper-elevated);
+      border: 1px solid var(--hairline);
+      border-radius: var(--radius);
+      padding: 30px 28px;
+      transition: transform 0.3s var(--ease-out), box-shadow 0.3s var(--ease-out);
+    }
+    .pillar:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 18px 36px rgba(11, 27, 43, 0.07);
+    }
+    .pillar-num {
+      font-family: var(--mono);
+      font-size: 12px;
+      color: var(--signal);
+      margin-bottom: 14px;
+      font-weight: 600;
+    }
+    .pillar h3 {
+      font-family: var(--serif);
+      font-size: 1.65rem;
+      font-weight: 400;
+      margin: 0 0 10px;
+      line-height: 1.15;
+    }
+    .pillar p {
+      font-size: 14.5px;
+      color: var(--ink-soft);
+      margin: 0 0 18px;
+    }
+    .pillar-tags {
+      font-family: var(--mono);
+      font-size: 11.5px;
+      color: var(--ink-muted);
+      padding-top: 14px;
+      border-top: 1px solid var(--hairline);
+    }
+
+    /* Filterable 40-Tool Catalog */
+    .filter-bar {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-bottom: 28px;
+    }
+    .filter-tab {
+      background: var(--paper-elevated);
+      border: 1px solid var(--hairline);
+      color: var(--ink-soft);
+      padding: 8px 15px;
+      border-radius: 999px;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s var(--ease-out);
+    }
+    .filter-tab:hover {
+      border-color: var(--ink);
+      color: var(--ink);
+    }
+    .filter-tab.active {
+      background: var(--ocean);
+      border-color: var(--ocean);
+      color: #ffffff;
+    }
+    .tools-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 14px;
+    }
+    .tool-row {
+      background: var(--paper-elevated);
+      border: 1px solid var(--hairline);
+      border-radius: 12px;
+      padding: 16px 18px;
+      transition: transform 0.22s var(--ease-out), border-color 0.22s ease;
+    }
+    .tool-row:hover {
+      transform: translateY(-2px);
+      border-color: var(--hairline-strong);
+    }
+    .tool-name {
+      font-family: var(--mono);
+      font-size: 12.5px;
+      font-weight: 600;
+      color: var(--ink);
+      margin-bottom: 6px;
+      word-break: break-word;
+    }
+    .tool-desc {
+      font-size: 13px;
+      color: var(--ink-soft);
+      margin: 0 0 10px;
+      line-height: 1.45;
+    }
+    .tool-cat {
+      font-family: var(--mono);
+      font-size: 10.5px;
+      text-transform: uppercase;
+      letter-spacing: 0.07em;
+      color: var(--teal);
+    }
+
+    /* Interactive Quickstart Console */
+    .quickstart-band {
+      background: var(--ocean);
+      color: #f1f5f9;
+      padding: 88px 0;
+    }
+    .quickstart-band .section-eyebrow { color: #5eead4; }
+    .quickstart-band .section-title { color: #ffffff; }
+    .quickstart-band .section-desc { color: #a7bccf; }
+    .qs-tabs {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-bottom: 18px;
+    }
+    .qs-tab {
+      background: rgba(255, 255, 255, 0.06);
+      border: 1px solid rgba(255, 255, 255, 0.14);
+      color: #c7d7e6;
+      padding: 9px 16px;
+      border-radius: 999px;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+    .qs-tab:hover { background: rgba(255, 255, 255, 0.12); color: #ffffff; }
+    .qs-tab.active {
+      background: #ffffff;
+      color: var(--ocean);
+      border-color: #ffffff;
+    }
+    .qs-box {
+      background: var(--ocean-deep);
+      border: 1px solid rgba(255, 255, 255, 0.11);
+      border-radius: 16px;
+      overflow: hidden;
+    }
+    .qs-box-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 13px 20px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+      font-family: var(--mono);
+      font-size: 12px;
+      color: #8ea5ba;
+    }
+    .copy-btn {
+      background: rgba(255, 255, 255, 0.09);
+      color: #f8fafc;
+      border: 1px solid rgba(255, 255, 255, 0.16);
+      border-radius: 8px;
+      padding: 5px 12px;
+      font-family: var(--mono);
+      font-size: 11.5px;
+      cursor: pointer;
+      transition: background 0.2s ease;
+    }
+    .copy-btn:hover { background: rgba(255, 255, 255, 0.18); }
+    .qs-pre {
+      margin: 0;
+      padding: 24px 22px;
+      font-family: var(--mono);
+      font-size: 13px;
+      line-height: 1.7;
+      color: #e2edf7;
+      overflow-x: auto;
+    }
+
+    /* Interactive Demos & Live Artifacts Row */
+    .demos-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 20px;
+    }
+    .demo-card {
+      background: var(--paper-elevated);
+      border: 1px solid var(--hairline);
+      border-radius: var(--radius);
+      padding: 26px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      gap: 18px;
+      transition: transform 0.28s var(--ease-out), box-shadow 0.28s var(--ease-out), border-color 0.28s ease;
+    }
+    .demo-card:hover {
+      transform: translateY(-4px);
+      border-color: var(--ink);
+      box-shadow: 0 18px 34px rgba(11, 27, 43, 0.08);
+    }
+    .demo-card h3 {
+      font-family: var(--serif);
+      font-size: 1.55rem;
+      font-weight: 400;
+      margin: 0 0 8px;
+      line-height: 1.15;
+    }
+    .demo-card p {
+      font-size: 14px;
+      color: var(--ink-soft);
+      margin: 0;
+    }
+    .demo-link {
+      font-family: var(--mono);
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--teal);
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .demo-card:hover .demo-link { color: var(--signal); }
+
+    /* Footer */
+    footer {
+      padding: 52px 0 64px;
+      background: var(--paper-warm);
+    }
+    .footer-inner {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      flex-wrap: wrap;
+      gap: 32px;
+    }
+    .footer-brand p {
+      font-size: 13.5px;
+      color: var(--ink-soft);
+      max-width: 44ch;
+      margin: 12px 0 0;
+    }
+    .footer-cols {
+      display: flex;
+      gap: 48px;
+      flex-wrap: wrap;
+    }
+    .footer-col h4 {
+      font-family: var(--mono);
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--ink-muted);
+      margin: 0 0 12px;
+    }
+    .footer-col ul {
+      list-style: none;
+      margin: 0;
+      padding: 0;
+      display: grid;
+      gap: 8px;
+      font-size: 13.5px;
+      color: var(--ink-soft);
+    }
+    .footer-col a:hover { color: var(--ink); text-decoration: underline; }
+
+    /* Scroll Reveal Animations */
+    .reveal {
+      opacity: 0;
+      transform: translateY(22px);
+      transition: opacity 0.72s var(--ease-out), transform 0.72s var(--ease-out);
+    }
+    .reveal.in {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    @media (max-width: 980px) {
+      .hero-grid, .pipeline-body { grid-template-columns: 1fr; }
+      .pipeline-info { border-right: none; border-bottom: 1px solid var(--hairline); }
+      .pipeline-steps { grid-template-columns: repeat(3, 1fr); }
+      .pillars-grid, .tools-grid, .demos-grid { grid-template-columns: repeat(2, 1fr); }
+      .metrics-grid { grid-template-columns: repeat(2, 1fr); }
+      .metric-cell { border-bottom: 1px solid var(--hairline); }
+      .nav-links { display: none; }
+    }
+    @media (max-width: 640px) {
+      .wrap { padding: 0 18px; }
+      .hero { padding: 40px 0 52px; }
+      section.band, .quickstart-band { padding: 60px 0; }
+      .pipeline-steps, .pillars-grid, .tools-grid, .demos-grid { grid-template-columns: 1fr; }
+      .metrics-grid { grid-template-columns: 1fr; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      html { scroll-behavior: auto; }
+      .reveal { opacity: 1; transform: none; transition: none; }
+    }
+  </style>
+</head>
+<body>
+  <header class="site-nav" id="siteNav">
+    <div class="wrap nav-inner">
+      <a class="brand" href="#top" id="brandHome">
+        <span class="brand-mark">DRR</span>
+        <span>DRR Agent Plugin</span>
+      </a>
+      <nav class="nav-links" aria-label="Primary Navigation">
+        <a href="#pipeline">Pipeline</a>
+        <a href="#capabilities">Capabilities</a>
+        <a href="#tools">40 MCP Tools</a>
+        <a href="#quickstart">Quick Start</a>
+        <a href="#demos">Live Demos</a>
+      </nav>
+      <div class="nav-actions">
+        <a class="btn btn-ghost" href="./docs/presentation/gis-map-presentation.html">GIS Console</a>
+        <a class="btn btn-primary" href="https://github.com/sindicatoesp/drr-agent-plugin" target="_blank" rel="noopener noreferrer">GitHub ↗</a>
+      </div>
+    </div>
+  </header>
+
+  <main id="top">
+    <!-- Hero -->
+    <section class="hero">
+      <div class="wrap hero-grid">
+        <div class="reveal in">
+          <div class="hero-kicker">UNDRR Sendai Framework · OASIS CAP v1.2 · MCP 2024-11-05</div>
+          <h1>Deterministic <em>Disaster Risk</em> Intelligence for AI Agents.</h1>
+          <p class="hero-lead">
+            A zero-dependency, provenance-aware analytics engine and Model Context Protocol server bridging real-time USGS, GDACS, Open-Meteo, OCHA HDX/COD-AB, and OpenStreetMap feeds into GEM/HAZUS fragility modeling, humanitarian severity scoring, and governed emergency alerts.
+          </p>
+          <div class="hero-cta">
+            <a class="btn btn-primary" href="#quickstart" id="ctaQuickstart">Start in 60 Seconds</a>
+            <a class="btn btn-outline" href="./docs/presentation/gis-map-presentation.html" id="ctaGis">Launch Offline GIS Map</a>
+            <a class="btn btn-outline" href="./docs/presentation/slides.html" id="ctaSlides">Slide Deck</a>
+          </div>
+          <div class="hero-meta">
+            <span><strong>License:</strong> Apache-2.0</span>
+            <span><strong>Runtime:</strong> Node.js 18+ (0 npm deps)</span>
+            <span><strong>Governance:</strong> Draft CAP &amp; unknown ≠ 0</span>
+          </div>
+        </div>
+
+        <div class="globe-stage reveal in" aria-label="Interactive Global Hazard Telemetry Observatory">
+          <div class="globe-header">
+            <span>GLOBAL TELEMETRY OBSERVATORY</span>
+            <span id="globeCoords">DRAG TO ROTATE · HOVER SIGNALS</span>
+          </div>
+          <div class="globe-canvas-wrap" id="globeWrap">
+            <canvas id="globeCanvas" width="540" height="500"></canvas>
+            <div class="globe-tooltip" id="globeTooltip" role="status" aria-live="polite"></div>
+          </div>
+          <div class="globe-footer">
+            <div class="globe-legend">
+              <span class="legend-item"><span class="legend-dot" style="background:#ef4444"></span>Seismic / PGA</span>
+              <span class="legend-item"><span class="legend-dot" style="background:#38bdf8"></span>Flood / COD-AB</span>
+              <span class="legend-item"><span class="legend-dot" style="background:#f59e0b"></span>Cyclone / Wind</span>
+            </div>
+            <span id="globeStatus">SIMULATED LIVE FEED</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Animated Counters -->
+    <div class="metrics-band">
+      <div class="wrap metrics-grid">
+        <div class="metric-cell reveal">
+          <div class="metric-num" data-count="40">40</div>
+          <div class="metric-label">MCP Tools</div>
+          <div class="metric-sub">JSON-RPC 2.0 stdio</div>
+        </div>
+        <div class="metric-cell reveal">
+          <div class="metric-num" data-count="40">40</div>
+          <div class="metric-label">CLI Subcommands</div>
+          <div class="metric-sub">drr-tool &lt;cmd&gt;</div>
+        </div>
+        <div class="metric-cell reveal">
+          <div class="metric-num" data-count="19">19</div>
+          <div class="metric-label">Domain Skills</div>
+          <div class="metric-sub">agent-plugins.org v1.0</div>
+        </div>
+        <div class="metric-cell reveal">
+          <div class="metric-num" data-count="29">29</div>
+          <div class="metric-label">Test Suites</div>
+          <div class="metric-sub">Hindcast &amp; replay verified</div>
+        </div>
+        <div class="metric-cell reveal">
+          <div class="metric-num" data-count="0">0</div>
+          <div class="metric-label">External Dependencies</div>
+          <div class="metric-sub">Pure Node.js stdlib</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Interactive 6-Stage Pipeline -->
+    <section class="band" id="pipeline">
+      <div class="wrap">
+        <div class="section-head reveal">
+          <div>
+            <div class="section-eyebrow">End-to-End Architecture</div>
+            <h2 class="section-title">From raw telemetry to governed alerts in six deterministic stages.</h2>
+          </div>
+          <p class="section-desc">
+            Every calculation runs locally in pure Node.js with SHA-256 provenance manifests, strict missing-data semantics (<code>unknown ≠ 0</code>), and fail-closed publication gates. Click any stage to inspect its output contract.
+          </p>
+        </div>
+
+        <div class="pipeline-shell reveal" id="pipelineShell">
+          <div class="pipeline-steps" role="tablist" aria-label="Pipeline stages">
+            <button class="pipe-step active" data-stage="0" role="tab" aria-selected="true" id="stageTab0">
+              <span class="pipe-idx">01</span>
+              <span class="pipe-name">Hazard Ingest</span>
+            </button>
+            <button class="pipe-step" data-stage="1" role="tab" aria-selected="false" id="stageTab1">
+              <span class="pipe-idx">02</span>
+              <span class="pipe-name">Exposure &amp; OSM</span>
+            </button>
+            <button class="pipe-step" data-stage="2" role="tab" aria-selected="false" id="stageTab2">
+              <span class="pipe-idx">03</span>
+              <span class="pipe-name">HDX / COD-AB</span>
+            </button>
+            <button class="pipe-step" data-stage="3" role="tab" aria-selected="false" id="stageTab3">
+              <span class="pipe-idx">04</span>
+              <span class="pipe-name">GEM / HAZUS</span>
+            </button>
+            <button class="pipe-step" data-stage="4" role="tab" aria-selected="false" id="stageTab4">
+              <span class="pipe-idx">05</span>
+              <span class="pipe-name">JIAF Severity</span>
+            </button>
+            <button class="pipe-step" data-stage="5" role="tab" aria-selected="false" id="stageTab5">
+              <span class="pipe-idx">06</span>
+              <span class="pipe-name">CAP &amp; DELTA</span>
+            </button>
+          </div>
+          <div class="pipeline-body">
+            <div class="pipeline-info">
+              <div>
+                <h3 id="pipeTitle">Multi-Hazard Telemetry Ingestion</h3>
+                <p id="pipeDesc"></p>
+                <ul class="pipe-guarantees" id="pipeList"></ul>
+              </div>
+              <div class="pipe-controls">
+                <button class="btn btn-ghost" id="pipePrev">← Previous</button>
+                <button class="btn btn-ghost" id="pipeNext">Next Stage →</button>
+                <button class="btn btn-ghost" id="pipeAuto">Pause Auto-Play</button>
+              </div>
+            </div>
+            <div class="pipeline-code">
+              <div class="code-bar">
+                <span id="pipeTool">MCP: drr_usgs_earthquake_fetch</span>
+                <span>DETERMINISTIC OUTPUT</span>
+              </div>
+              <pre id="pipeJson"></pre>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Scientific & Governance Pillars -->
+    <section class="band" id="capabilities">
+      <div class="wrap">
+        <div class="section-head reveal">
+          <div>
+            <div class="section-eyebrow">Built for Operational EOCs</div>
+            <h2 class="section-title">Scientific rigor without cloud lock-in or bloated dependencies.</h2>
+          </div>
+          <p class="section-desc">
+            Designed for national disaster management offices, UN duty stations, and air-gapped emergency operations centers where auditability and offline resilience are non-negotiable.
+          </p>
+        </div>
+
+        <div class="pillars-grid">
+          <article class="pillar reveal">
+            <div class="pillar-num">01 / AUTO-ENRICHMENT</div>
+            <h3>Zero-Gap Exposure Fallbacks</h3>
+            <p>
+              When a <code>YELLOW</code>, <code>ORANGE</code>, or <code>RED</code> event strikes outside your local GIS layer, the monitor automatically queries OpenStreetMap critical infrastructure across 9 Sendai Target D sectors and discovers public OCHA HDX COD-AB &amp; COD-PS datasets with zero API keys.
+            </p>
+            <div class="pillar-tags">OSM Overpass · HDX CKAN v3 · Static Packs</div>
+          </article>
+
+          <article class="pillar reveal">
+            <div class="pillar-num">02 / SCIENTIFIC GOVERNANCE</div>
+            <h3>Honest Uncertainty &amp; Sendai Rules</h3>
+            <p>
+              Missing data is preserved as <code>null</code> (<code>unknown ≠ 0</code>). Modelled population exposure and displacement are kept strictly distinct from Sendai Target B-1 directly affected people, and physical facility damage (D-2..D-4) is separated from lifeline disruption (D-6..D-8).
+            </p>
+            <div class="pillar-tags">Sendai A–D · UNDRR HIPs · Replay Harness</div>
+          </article>
+
+          <article class="pillar reveal">
+            <div class="pillar-num">03 / FAIL-CLOSED ALERTING</div>
+            <h3>Governed CAP v1.2 &amp; DELTA Sync</h3>
+            <p>
+              CAP XML alerts default to <code>Draft</code> status, read-only shadow mode blocks consequential external writes, SSRF guards protect webhooks and custom endpoints, and country scoping prevents foreign events from polluting national UNDRR DELTA Resilience instances.
+            </p>
+            <div class="pillar-tags">OASIS CAP 1.2 · DELTA Guard · Air-Gap Mode</div>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <!-- Interactive 40-Tool Explorer -->
+    <section class="band" id="tools">
+      <div class="wrap">
+        <div class="section-head reveal">
+          <div>
+            <div class="section-eyebrow">Complete Tool Surface</div>
+            <h2 class="section-title">Explore all 40 deterministic MCP tools &amp; CLI adapters.</h2>
+          </div>
+          <p class="section-desc">
+            Every tool is available over JSON-RPC 2.0 stdio (<code>bin/mcp-server.js</code>), as a standalone CLI subcommand (<code>drr-tool</code>), and as a programmatic Node.js module.
+          </p>
+        </div>
+
+        <div class="filter-bar reveal" id="toolFilterBar" role="tablist" aria-label="Tool category filter">
+          <button class="filter-tab active" data-cat="all" id="filterAll">All (40)</button>
+          <button class="filter-tab" data-cat="telemetry" id="filterTelemetry">Telemetry &amp; Hydro (11)</button>
+          <button class="filter-tab" data-cat="spatial" id="filterSpatial">Spatial, COD-AB &amp; Infra (9)</button>
+          <button class="filter-tab" data-cat="impact" id="filterImpact">Fragility, Severity &amp; Sendai (4)</button>
+          <button class="filter-tab" data-cat="governance" id="filterGovernance">Governance &amp; Replay (7)</button>
+          <button class="filter-tab" data-cat="capdelta" id="filterCapDelta">CAP &amp; DELTA (6)</button>
+          <button class="filter-tab" data-cat="appraisal" id="filterAppraisal">Uncertainty &amp; Appraisal (3)</button>
+        </div>
+
+        <div class="tools-grid reveal" id="toolsGrid"></div>
+      </div>
+    </section>
+
+    <!-- Quick Start Band -->
+    <section class="quickstart-band" id="quickstart">
+      <div class="wrap">
+        <div class="section-head reveal">
+          <div>
+            <div class="section-eyebrow">Deploy Anywhere</div>
+            <h2 class="section-title">Run in Antigravity, Cursor, Claude, CLI, or Docker.</h2>
+          </div>
+          <p class="section-desc">
+            Clone once and run immediately — no <code>npm install</code> required. Compatible with Agent Plugins v1.0.0 and MCP stdio hosts.
+          </p>
+        </div>
+
+        <div class="qs-tabs reveal" role="tablist" aria-label="Quick start modes">
+          <button class="qs-tab active" data-qs="cli" id="qsTabCli">CLI &amp; Monitor</button>
+          <button class="qs-tab" data-qs="mcp" id="qsTabMcp">MCP Config</button>
+          <button class="qs-tab" data-qs="static" id="qsTabStatic">Static Infra Packs</button>
+          <button class="qs-tab" data-qs="docker" id="qsTabDocker">Docker Daemon</button>
+        </div>
+
+        <div class="qs-box reveal">
+          <div class="qs-box-head">
+            <span id="qsLabel">Terminal — Zero-Dependency Local Execution</span>
+            <button class="copy-btn" id="qsCopyBtn">Copy</button>
+          </div>
+          <pre class="qs-pre" id="qsCode"></pre>
+        </div>
+      </div>
+    </section>
+
+    <!-- Live Demos & Documentation -->
+    <section class="band" id="demos">
+      <div class="wrap">
+        <div class="section-head reveal">
+          <div>
+            <div class="section-eyebrow">Interactive Previews &amp; Docs</div>
+            <h2 class="section-title">Inspect live reports, offline GIS maps, and full methodology.</h2>
+          </div>
+          <p class="section-desc">
+            Every artifact below is self-contained and hosted directly alongside this repository on GitHub Pages.
+          </p>
+        </div>
+
+        <div class="demos-grid">
+          <a class="demo-card reveal" href="./docs/presentation/gis-map-presentation.html">
+            <div>
+              <h3>Offline GIS Mapping Console</h3>
+              <p>Interactive multi-hazard vector map with ray-casting geodesic buffers, earthquake/flood/cyclone scenarios, and Sendai scorecards.</p>
+            </div>
+            <span class="demo-link">Open GIS Console →</span>
+          </a>
+
+          <a class="demo-card reveal" href="./docs/presentation/slides.html">
+            <div>
+              <h3>Executive Slide Deck</h3>
+              <p>Interactive architecture and methodology walkthrough for EOC directors, humanitarian coordinators, and engineering teams.</p>
+            </div>
+            <span class="demo-link">View Slide Deck →</span>
+          </a>
+
+          <a class="demo-card reveal" href="./examples/earthquake-hazus-scenario/situation-report.html">
+            <div>
+              <h3>Sample Visual SitRep (HTML)</h3>
+              <p>Print-ready Emergency Situation Report generated by <code>lib/cap.js</code> with embedded GIS footprint, damage ratios, and Sendai KPIs.</p>
+            </div>
+            <span class="demo-link">Inspect Sample SitRep →</span>
+          </a>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <div class="wrap footer-inner">
+      <div class="footer-brand">
+        <a class="brand" href="#top">
+          <span class="brand-mark">DRR</span>
+          <span>DRR Agent Plugin</span>
+        </a>
+        <p>
+          Open-source Disaster Risk Reduction analytics plugin licensed under Apache-2.0. Built for UNDRR Sendai Framework monitoring, OASIS CAP v1.2 alerting, and DELTA Resilience interoperability.
+        </p>
+      </div>
+      <div class="footer-cols">
+        <div class="footer-col">
+          <h4>Documentation</h4>
+          <ul>
+            <li><a href="https://github.com/sindicatoesp/drr-agent-plugin/blob/main/README.md">README</a></li>
+            <li><a href="https://github.com/sindicatoesp/drr-agent-plugin/blob/main/docs/configuration.md">Configuration Guide</a></li>
+            <li><a href="https://github.com/sindicatoesp/drr-agent-plugin/blob/main/docs/tool-inventory.md">Tool Inventory (40)</a></li>
+            <li><a href="https://github.com/sindicatoesp/drr-agent-plugin/blob/main/docs/skills-guide.md">Skills Guide (19)</a></li>
+          </ul>
+        </div>
+        <div class="footer-col">
+          <h4>Attribution &amp; Standards</h4>
+          <ul>
+            <li><a href="https://github.com/sindicatoesp/drr-agent-plugin/blob/main/CREDITS.md">CREDITS.md (Data Licenses)</a></li>
+            <li><a href="https://github.com/sindicatoesp/drr-agent-plugin/blob/main/docs/critical-infrastructure-overlay-guide.md">Critical Infra Guide</a></li>
+            <li><a href="https://github.com/sindicatoesp/drr-agent-plugin/blob/main/docs/methodology.md">Scientific Methodology</a></li>
+            <li><a href="https://github.com/sindicatoesp/drr-agent-plugin/issues">Issues &amp; Discussions</a></li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    (function () {
+      "use strict";
+
+      /* ---------------------------------------------------------------
+       * 1. Sticky Nav Elevation & Scroll Reveal + Animated Counters
+       * ------------------------------------------------------------- */
+      var nav = document.getElementById("siteNav");
+      window.addEventListener("scroll", function () {
+        if (!nav) return;
+        if (window.scrollY > 14) nav.classList.add("scrolled");
+        else nav.classList.remove("scrolled");
+      }, { passive: true });
+
+      var prefersReduced = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+      var reveals = document.querySelectorAll(".reveal");
+      if (!prefersReduced && "IntersectionObserver" in window) {
+        var io = new IntersectionObserver(function (entries) {
+          for (var i = 0; i < entries.length; i++) {
+            if (entries[i].isIntersecting) {
+              entries[i].target.classList.add("in");
+              io.unobserve(entries[i].target);
+            }
+          }
+        }, { threshold: 0.12 });
+        for (var r = 0; r < reveals.length; r++) io.observe(reveals[r]);
+      } else {
+        for (var r2 = 0; r2 < reveals.length; r2++) reveals[r2].classList.add("in");
+      }
+
+      var countEls = document.querySelectorAll("[data-count]");
+      function animateCount(el) {
+        var target = parseInt(el.getAttribute("data-count"), 10);
+        if (isNaN(target) || target === 0 || prefersReduced) {
+          el.textContent = String(target);
+          return;
+        }
+        var start = performance.now();
+        var duration = 900;
+        function tick(now) {
+          var p = Math.min(1, (now - start) / duration);
+          var eased = 1 - Math.pow(1 - p, 3);
+          el.textContent = String(Math.round(target * eased));
+          if (p < 1) requestAnimationFrame(tick);
+        }
+        requestAnimationFrame(tick);
+      }
+      if ("IntersectionObserver" in window) {
+        var cio = new IntersectionObserver(function (entries) {
+          for (var i = 0; i < entries.length; i++) {
+            if (entries[i].isIntersecting) {
+              animateCount(entries[i].target);
+              cio.unobserve(entries[i].target);
+            }
+          }
+        }, { threshold: 0.4 });
+        for (var c = 0; c < countEls.length; c++) cio.observe(countEls[c]);
+      }
+
+      /* ---------------------------------------------------------------
+       * 2. Interactive Orthographic Globe Observatory (<canvas>)
+       * ------------------------------------------------------------- */
+      var canvas = document.getElementById("globeCanvas");
+      var wrap = document.getElementById("globeWrap");
+      var tooltip = document.getElementById("globeTooltip");
+      var coordsReadout = document.getElementById("globeCoords");
+
+      if (canvas && canvas.getContext) {
+        var ctx = canvas.getContext("2d");
+        var dpr = Math.min(window.devicePixelRatio || 1, 2);
+
+        function resizeCanvas() {
+          var rect = wrap.getBoundingClientRect();
+          canvas.width = Math.max(300, Math.round(rect.width * dpr));
+          canvas.height = Math.max(280, Math.round(rect.height * dpr));
+        }
+        resizeCanvas();
+        window.addEventListener("resize", resizeCanvas);
+
+        var hazards = [
+          {
+            id: "hatyai",
+            name: "Hat Yai Basin Flood",
+            region: "Songkhla, Thailand",
+            lat: 7.01,
+            lon: 100.47,
+            color: "#38bdf8",
+            code: "FL · ORANGE · HDX/COD-AB",
+            meta: "OSM Infra: 5 exposed · HDX Est: ~80,400"
+          },
+          {
+            id: "palu",
+            name: "Sulawesi Seismic Zone",
+            region: "Central Sulawesi, Indonesia",
+            lat: -0.90,
+            lon: 119.87,
+            color: "#ef4444",
+            code: "EQ · RED · WALD99 PGA",
+            meta: "M 6.8 · Depth 12 km · PGA 0.34g"
+          },
+          {
+            id: "manila",
+            name: "Luzon Super Typhoon Track",
+            region: "Philippines",
+            lat: 14.60,
+            lon: 121.00,
+            color: "#f59e0b",
+            code: "TC · ORANGE · OPEN-METEO",
+            meta: "Wind 178 km/h · 24h Rain 185 mm"
+          },
+          {
+            id: "kathmandu",
+            name: "Himalayan Frontal Thrust",
+            region: "Kathmandu Valley, Nepal",
+            lat: 27.71,
+            lon: 85.32,
+            color: "#ef4444",
+            code: "EQ · ORANGE · GEM/HAZUS",
+            meta: "URM Fragility · CAP v1.2 Draft"
+          },
+          {
+            id: "vanuatu",
+            name: "Port Vila Coastal Surge",
+            region: "Vanuatu, SW Pacific",
+            lat: -17.73,
+            lon: 168.32,
+            color: "#f59e0b",
+            code: "TC · YELLOW · GDACS",
+            meta: "Advisory Brief · DELTA Scoped"
+          },
+          {
+            id: "chile",
+            name: "Maule Subduction Margin",
+            region: "Central Chile",
+            lat: -35.43,
+            lon: -72.60,
+            color: "#ef4444",
+            code: "EQ · YELLOW · FDSN-WS",
+            meta: "M 6.1 · ShakeMap Vs30 Verified"
+          },
+          {
+            id: "caribbean",
+            name: "Lesser Antilles Basin",
+            region: "Eastern Caribbean",
+            lat: 15.30,
+            lon: -61.38,
+            color: "#38bdf8",
+            code: "FL · YELLOW · STAC EO",
+            meta: "Flood Extent · JIAF Phase 3"
+          }
+        ];
+
+        // Simplified continental polyline outlines [lon, lat] for crisp cartographic silhouette
+        var continents = [
+          [[-125,49],[-117,32],[-105,20],[-87,14],[-80,9],[-78,25],[-81,31],[-70,42],[-60,47],[-75,55],[-95,60],[-125,60],[-125,49]],
+          [[-80,9],[-75,11],[-60,6],[-35,-6],[-39,-15],[-53,-34],[-68,-54],[-74,-45],[-71,-18],[-81,-5],[-80,9]],
+          [[-10,36],[0,43],[10,44],[24,38],[30,46],[40,56],[28,60],[12,56],[5,52],[-5,48],[-10,36]],
+          [[-17,15],[-6,35],[11,37],[32,31],[43,12],[51,12],[40,-10],[28,-33],[18,-34],[12,-15],[9,4],[-8,5],[-17,15]],
+          [[32,31],[48,30],[60,25],[72,22],[77,8],[88,22],[100,14],[105,10],[109,21],[121,31],[129,36],[140,42],[135,55],[105,62],[65,62],[40,56],[32,31]],
+          [[114,-22],[130,-12],[142,-11],[153,-26],[148,-38],[136,-35],[115,-34],[114,-22]]
+        ];
+
+        var rotLon = -105 * Math.PI / 180; // start facing Asia-Pacific
+        var rotLat = 16 * Math.PI / 180;
+        var velLon = 0.0024;
+        var dragging = false;
+        var lastX = 0;
+        var lastY = 0;
+        var hovered = null;
+        var screenPoints = [];
+
+        function project(lonDeg, latDeg, cx, cy, R) {
+          var lon = lonDeg * Math.PI / 180 + rotLon;
+          var lat = latDeg * Math.PI / 180;
+          var cosLat = Math.cos(lat);
+          var sinLat = Math.sin(lat);
+          var cosLon = Math.cos(lon);
+          var sinLon = Math.sin(lon);
+          var cosR = Math.cos(rotLat);
+          var sinR = Math.sin(rotLat);
+
+          var x = R * cosLat * sinLon;
+          var y = R * (cosR * sinLat - sinR * cosLat * cosLon);
+          var z = sinR * sinLat + cosR * cosLat * cosLon;
+          return { x: cx + x, y: cy - y, z: z };
+        }
+
+        function drawGlobe(ts) {
+          var w = canvas.width;
+          var h = canvas.height;
+          var cx = w * 0.5;
+          var cy = h * 0.5;
+          var R = Math.min(w, h) * 0.41;
+
+          ctx.clearRect(0, 0, w, h);
+
+          // Soft oceanic halo
+          var grad = ctx.createRadialGradient(cx - R * 0.25, cy - R * 0.25, R * 0.12, cx, cy, R * 1.15);
+          grad.addColorStop(0, "rgba(28, 72, 108, 0.52)");
+          grad.addColorStop(0.75, "rgba(12, 34, 54, 0.92)");
+          grad.addColorStop(1, "rgba(7, 21, 34, 0)");
+          ctx.fillStyle = grad;
+          ctx.beginPath();
+          ctx.arc(cx, cy, R * 1.12, 0, Math.PI * 2);
+          ctx.fill();
+
+          // Sphere body
+          ctx.beginPath();
+          ctx.arc(cx, cy, R, 0, Math.PI * 2);
+          ctx.fillStyle = "#0a1c2e";
+          ctx.fill();
+          ctx.strokeStyle = "rgba(148, 179, 206, 0.28)";
+          ctx.lineWidth = 1.2 * dpr;
+          ctx.stroke();
+
+          // Graticule meridians & parallels
+          ctx.strokeStyle = "rgba(148, 179, 206, 0.10)";
+          ctx.lineWidth = 0.85 * dpr;
+          for (var latG = -60; latG <= 60; latG += 30) {
+            ctx.beginPath();
+            var started = false;
+            for (var lonG = -180; lonG <= 180; lonG += 6) {
+              var p = project(lonG, latG, cx, cy, R);
+              if (p.z > 0) {
+                if (!started) { ctx.moveTo(p.x, p.y); started = true; }
+                else ctx.lineTo(p.x, p.y);
+              } else {
+                started = false;
+              }
+            }
+            ctx.stroke();
+          }
+          for (var lonM = -180; lonM < 180; lonM += 30) {
+            ctx.beginPath();
+            var startedM = false;
+            for (var latM = -84; latM <= 84; latM += 6) {
+              var pm = project(lonM, latM, cx, cy, R);
+              if (pm.z > 0) {
+                if (!startedM) { ctx.moveTo(pm.x, pm.y); startedM = true; }
+                else ctx.lineTo(pm.x, pm.y);
+              } else {
+                startedM = false;
+              }
+            }
+            ctx.stroke();
+          }
+
+          // Continental silhouettes
+          ctx.strokeStyle = "rgba(94, 234, 212, 0.34)";
+          ctx.lineWidth = 1.3 * dpr;
+          for (var cIdx = 0; cIdx < continents.length; cIdx++) {
+            var poly = continents[cIdx];
+            ctx.beginPath();
+            var drawn = false;
+            for (var v = 0; v < poly.length; v++) {
+              var pv = project(poly[v][0], poly[v][1], cx, cy, R);
+              if (pv.z > -0.04) {
+                if (!drawn) { ctx.moveTo(pv.x, pv.y); drawn = true; }
+                else ctx.lineTo(pv.x, pv.y);
+              } else {
+                drawn = false;
+              }
+            }
+            ctx.stroke();
+          }
+
+          // Animated hazard pulses
+          screenPoints = [];
+          var t = (ts || 0) * 0.001;
+          for (var i = 0; i < hazards.length; i++) {
+            var hz = hazards[i];
+            var ph = project(hz.lon, hz.lat, cx, cy, R);
+            if (ph.z <= 0.02) continue;
+
+            screenPoints.push({ hz: hz, x: ph.x / dpr, y: ph.y / dpr });
+
+            var phase1 = (t * 0.65 + i * 0.37) % 1;
+            var phase2 = (t * 0.65 + i * 0.37 + 0.5) % 1;
+            var maxRing = (hovered && hovered.id === hz.id ? 26 : 19) * dpr;
+
+            ctx.strokeStyle = hz.color;
+            ctx.globalAlpha = (1 - phase1) * 0.72;
+            ctx.lineWidth = 1.4 * dpr;
+            ctx.beginPath();
+            ctx.arc(ph.x, ph.y, 4 * dpr + phase1 * maxRing, 0, Math.PI * 2);
+            ctx.stroke();
+
+            ctx.globalAlpha = (1 - phase2) * 0.45;
+            ctx.beginPath();
+            ctx.arc(ph.x, ph.y, 4 * dpr + phase2 * maxRing, 0, Math.PI * 2);
+            ctx.stroke();
+
+            ctx.globalAlpha = 1;
+            ctx.fillStyle = hz.color;
+            ctx.beginPath();
+            ctx.arc(ph.x, ph.y, (hovered && hovered.id === hz.id ? 5.2 : 3.8) * dpr, 0, Math.PI * 2);
+            ctx.fill();
+
+            ctx.fillStyle = "#ffffff";
+            ctx.beginPath();
+            ctx.arc(ph.x, ph.y, 1.5 * dpr, 0, Math.PI * 2);
+            ctx.fill();
+          }
+
+          if (!dragging && !prefersReduced) {
+            rotLon += velLon;
+            velLon = velLon * 0.96 + 0.0022 * 0.04;
+          }
+          if (!prefersReduced) {
+            requestAnimationFrame(drawGlobe);
+          }
+        }
+
+        wrap.addEventListener("pointerdown", function (e) {
+          dragging = true;
+          lastX = e.clientX;
+          lastY = e.clientY;
+          wrap.setPointerCapture(e.pointerId);
+        });
+        wrap.addEventListener("pointermove", function (e) {
+          var rect = wrap.getBoundingClientRect();
+          var mx = e.clientX - rect.left;
+          var my = e.clientY - rect.top;
+
+          if (dragging) {
+            var dx = e.clientX - lastX;
+            var dy = e.clientY - lastY;
+            rotLon += dx * 0.008;
+            rotLat = Math.max(-0.9, Math.min(0.9, rotLat + dy * 0.006));
+            velLon = dx * 0.003;
+            lastX = e.clientX;
+            lastY = e.clientY;
+            if (prefersReduced) drawGlobe(performance.now());
+            return;
+          }
+
+          var found = null;
+          for (var i = 0; i < screenPoints.length; i++) {
+            var sp = screenPoints[i];
+            var dist = Math.hypot(mx - sp.x, my - sp.y);
+            if (dist < 18) {
+              found = sp;
+              break;
+            }
+          }
+          hovered = found ? found.hz : null;
+          if (found) {
+            tooltip.innerHTML =
+              '<div class="tt-code">' + found.hz.code + '</div>' +
+              '<div class="tt-title">' + found.hz.name + '</div>' +
+              '<div class="tt-meta">' + found.hz.region + '<br>' + found.hz.meta + '</div>';
+            tooltip.style.left = Math.min(rect.width - 210, Math.max(10, found.x + 14)) + "px";
+            tooltip.style.top = Math.max(10, found.y - 18) + "px";
+            tooltip.classList.add("visible");
+            coordsReadout.textContent = found.hz.lat.toFixed(2) + "° N, " + found.hz.lon.toFixed(2) + "° E";
+          } else {
+            tooltip.classList.remove("visible");
+            coordsReadout.textContent = "DRAG TO ROTATE · HOVER SIGNALS";
+          }
+        });
+        wrap.addEventListener("pointerup", function () { dragging = false; });
+        wrap.addEventListener("pointerleave", function () {
+          dragging = false;
+          hovered = null;
+          tooltip.classList.remove("visible");
+        });
+
+        drawGlobe(0);
+      }
+
+      /* ---------------------------------------------------------------
+       * 3. Interactive 6-Stage Scientific Pipeline Simulator
+       * ------------------------------------------------------------- */
+      var stages = [
+        {
+          title: "Multi-Hazard Telemetry Ingestion",
+          desc: "Ingests real-time USGS FDSN-WS earthquakes (with Wald99 GMICE PGA), GDACS multi-hazard GeoJSON, Open-Meteo precipitation/wind forecasts, national ShakeMap bundles, OGC SensorThings gauges, and STAC EO flood rasters.",
+          guarantees: [
+            "SSRF host guards + untrusted text prompt-injection sanitization",
+            "SHA-256 payload hashing & source freshness validation",
+            "Tiered alert gating: GREEN suppressed, YELLOW advisory, ORANGE/RED full emergency"
+          ],
+          tool: "MCP: drr_usgs_earthquake_fetch · drr_gdacs_fetch",
+          json: '{\n  "eventId": "us6000ucly",\n  "alertLevel": "orange",\n  "magnitude": 6.4,\n  "depthKm": 12.0,\n  "estimatedPgaG": 0.284,\n  "reportMode": "full_emergency",\n  "provenance": { "sha256": "8f2a...91c4", "status": "fresh" }\n}'
+        },
+        {
+          title: "Spatial Exposure & Auto OSM Interim Fallback",
+          desc: "Performs deterministic ray-casting and geodesic buffer joins against your local GeoJSON layer. If no local exposure covers the footprint, automatically queries OpenStreetMap Overpass API across 9 Sendai Target D sectors.",
+          guarantees: [
+            "Preserves unknown ≠ 0 (never prints 0 exposed when outside coverage)",
+            "Tags interim OSM layers external_unverified with ODbL-1.0 attribution",
+            "Supports pre-built static Global & Regional infrastructure packs"
+          ],
+          tool: "MCP: drr_spatial_exposure_join · drr_osm_critical_infra_fetch",
+          json: '{\n  "exposureCoverage": {\n    "status": "interim_osm_fallback",\n    "evaluatedAssets": 5,\n    "verificationStatus": "external_unverified",\n    "license": "ODbL-1.0"\n  },\n  "sectorCounts": { "health": 1, "energy": 1, "education": 1, "water": 1, "flood_protection": 1 }\n}'
+        },
+        {
+          title: "OCHA HDX HAPI, CKAN v3 & COD-AB Population",
+          desc: "Intersects hazard polygons with OCHA COD-AB administrative boundaries and joins HDX HAPI v2 population statistics via areal interpolation — or discovers public COD-AB/COD-PS datasets via HDX CKAN v3 with zero API keys.",
+          guarantees: [
+            "Reports both area-weighted and full-unit baseline totals per P-code",
+            "Explicitly separates modelled exposure from Sendai Target B-1 (C-01)",
+            "Public HDX CKAN v3 discovery requires no API key"
+          ],
+          tool: "MCP: drr_hdx_polygon_population_estimate · drr_hdx_catalog_search",
+          json: '{\n  "overlappingAdminUnits": 2,\n  "totalAreaWeightedExposedPopulation": 80412,\n  "totalFullUnitBaselinePopulation": 160000,\n  "topUnit": { "pcode": "TH9001", "name": "Hat Yai", "overlapFraction": 0.50 },\n  "sendaiMappingNote": "Modelled exposure != Sendai Target B-1"\n}'
+        },
+        {
+          title: "GEM / HAZUS Fragility & Sendai Loss Accounting",
+          desc: "Evaluates lognormal seismic fragility curves (URM, C1, C2, W1, S1), JRC flood depth-damage functions, and cyclone wind curves to compute deterministic Mean Damage Ratios and Sendai Framework Targets B, C, and D.",
+          guarantees: [
+            "Pure mathematical CDFs — zero hallucinated numbers",
+            "Separates physical facility damage (D-2..D-4) from service disruption (D-6..D-8)",
+            "Monte Carlo uncertainty propagation & EAL / CBA appraisal"
+          ],
+          tool: "MCP: drr_fragility_eval · drr_vulnerability_matrix_calc",
+          json: '{\n  "taxonomy": "URM",\n  "meanDamageRatio": 0.418,\n  "damageStates": { "slight": 0.89, "moderate": 0.67, "extensive": 0.34, "complete": 0.12 },\n  "targetD_CriticalInfrastructure": {\n    "physicalDamage": { "damagedFacilities": 2 },\n    "serviceDisruption": { "disruptionStatus": "requires_operational_assessment" }\n  }\n}'
+        },
+        {
+          title: "JIAF / INFORM Humanitarian Severity Assessment",
+          desc: "Combines hazard intensity, exposed population share, baseline vulnerability, and coping capacity deficit into an auditable 1–5 humanitarian severity phase with explicit data-confidence grading.",
+          guarantees: [
+            "Weighted multi-factor aggregation aligned with JIAF 2.0 & INFORM",
+            "Missing dimensions lower confidence rather than defaulting to 0",
+            "Deterministic replay & GeoDisaster-style benchmark verification"
+          ],
+          tool: "MCP: drr_humanitarian_severity_assess · drr_benchmark_run",
+          json: '{\n  "pcode": "TH9001",\n  "compositeSeverityScore": 7.12,\n  "severityPhase": 4,\n  "phaseLabel": "Extreme",\n  "dataConfidence": "high",\n  "reportingEligibility": "screening_only"\n}'
+        },
+        {
+          title: "OASIS CAP v1.2, Visual SitRep & DELTA Bridge",
+          desc: "Generates schema-validated OASIS CAP v1.2 XML (defaulting to Draft), Markdown Situation Briefs, interactive HTML SitReps, live alerts/index.html dashboards, and country-scoped UNDRR DELTA Resilience draft records.",
+          guarantees: [
+            "Fail-closed publication gate (DRR_ENABLE_PRODUCTION_PUBLISH=false default)",
+            "Strict national country scoping blocks foreign events from DELTA",
+            "Live /alerts/ dashboard served via make serve"
+          ],
+          tool: "MCP: drr_cap_alert_generate_validate · drr_delta_push_draft_record",
+          json: '{\n  "capIdentifier": "DRR-MONITOR-us6000ucly",\n  "capStatus": "Draft",\n  "schemaValid": true,\n  "artifacts": ["brief.md", "sitrep.html", "cap.xml", "assessment.json", "alerts/index.html"],\n  "deltaPush": { "approvalStatus": "draft", "countryGuard": "passed" }\n}'
+        }
+      ];
+
+      var activeStage = 0;
+      var autoPlay = !prefersReduced;
+      var autoTimer = null;
+      var stepBtns = document.querySelectorAll(".pipe-step");
+      var pipeTitle = document.getElementById("pipeTitle");
+      var pipeDesc = document.getElementById("pipeDesc");
+      var pipeList = document.getElementById("pipeList");
+      var pipeTool = document.getElementById("pipeTool");
+      var pipeJson = document.getElementById("pipeJson");
+      var pipeAutoBtn = document.getElementById("pipeAuto");
+
+      function renderStage(idx) {
+        activeStage = (idx + stages.length) % stages.length;
+        var st = stages[activeStage];
+        for (var i = 0; i < stepBtns.length; i++) {
+          var isAct = i === activeStage;
+          stepBtns[i].classList.toggle("active", isAct);
+          stepBtns[i].setAttribute("aria-selected", isAct ? "true" : "false");
+        }
+        pipeTitle.textContent = st.title;
+        pipeDesc.textContent = st.desc;
+        pipeTool.textContent = st.tool;
+        pipeList.innerHTML = st.guarantees.map(function (g) { return "<li>" + g + "</li>"; }).join("");
+        pipeJson.style.opacity = "0.25";
+        setTimeout(function () {
+          pipeJson.textContent = st.json;
+          pipeJson.style.opacity = "1";
+        }, 120);
+      }
+
+      for (var s = 0; s < stepBtns.length; s++) {
+        stepBtns[s].addEventListener("click", function (e) {
+          var idx = parseInt(e.currentTarget.getAttribute("data-stage"), 10);
+          renderStage(idx);
+          if (autoTimer) { clearInterval(autoTimer); autoTimer = null; autoPlay = false; pipeAutoBtn.textContent = "Resume Auto-Play"; }
+        });
+      }
+      document.getElementById("pipePrev").addEventListener("click", function () { renderStage(activeStage - 1); });
+      document.getElementById("pipeNext").addEventListener("click", function () { renderStage(activeStage + 1); });
+      pipeAutoBtn.addEventListener("click", function () {
+        autoPlay = !autoPlay;
+        pipeAutoBtn.textContent = autoPlay ? "Pause Auto-Play" : "Resume Auto-Play";
+        if (autoPlay) startAuto();
+        else if (autoTimer) { clearInterval(autoTimer); autoTimer = null; }
+      });
+
+      function startAuto() {
+        if (autoTimer) clearInterval(autoTimer);
+        if (!autoPlay) return;
+        autoTimer = setInterval(function () { renderStage(activeStage + 1); }, 5500);
+      }
+      renderStage(0);
+      if (autoPlay) startAuto();
+      else pipeAutoBtn.textContent = "Resume Auto-Play";
+
+      /* ---------------------------------------------------------------
+       * 4. Filterable 40-Tool Catalog
+       * ------------------------------------------------------------- */
+      var toolsData = [
+        { name: "drr_gdacs_fetch", cat: "telemetry", desc: "Ingest & filter UN OCHA / JRC GDACS global alerts (EQ, TC, FL, VO)." },
+        { name: "drr_usgs_earthquake_fetch", cat: "telemetry", desc: "Query USGS FDSN-WS seismic events with Wald99 GMICE PGA." },
+        { name: "drr_fdsn_shakemap_fetch", cat: "telemetry", desc: "Ingest national FDSN-WS catalogs & ShakeMap PGA/Vs30 grids." },
+        { name: "drr_openmeteo_forecast", cat: "telemetry", desc: "Anticipatory rainfall & wind screening via Open-Meteo NWP." },
+        { name: "drr_sensorthings_fetch", cat: "telemetry", desc: "Ingest OGC SensorThings API v1.1 in-situ river & tide gauges." },
+        { name: "drr_stac_hazard_fetch", cat: "telemetry", desc: "Query STAC v1.0.0 EO catalogs & validated flood depth grids." },
+        { name: "drr_hdx_hapi_fetch", cat: "telemetry", desc: "Query OCHA HDX HAPI v2 population, needs, IDPs & presence." },
+        { name: "drr_hdx_catalog_search", cat: "telemetry", desc: "Search public HDX CKAN v3 catalog (no API key) for COD & geodata." },
+        { name: "drr_basin_rainfall_aggregate", cat: "telemetry", desc: "Aggregate multi-point catchment rainfall totals & exceedances." },
+        { name: "drr_river_discharge_screen", cat: "telemetry", desc: "Screen GloFAS / Open-Meteo river discharge against return periods." },
+        { name: "drr_monitor_check", cat: "telemetry", desc: "Execute bounded shadow-mode monitoring cycle with auto-enrichment." },
+
+        { name: "drr_spatial_exposure_join", cat: "spatial", desc: "Deterministic ray-casting & geodesic buffer exposure intersection." },
+        { name: "drr_critical_infra_overlay", cat: "spatial", desc: "Sendai Target D 9-sector overlay & lifeline cascade screening." },
+        { name: "drr_osm_critical_infra_fetch", cat: "spatial", desc: "OpenStreetMap Overpass API interim critical infrastructure fallback." },
+        { name: "drr_cod_boundary_validate", cat: "spatial", desc: "Validate OCHA COD-AB P-codes, hierarchy & DELTA reconciliation." },
+        { name: "drr_hdx_polygon_population_estimate", cat: "spatial", desc: "Areal-interpolated exposed population via COD-AB + HDX HAPI." },
+        { name: "drr_geojson_validate", cat: "spatial", desc: "RFC 7946 GeoJSON topology, winding & antimeridian validation." },
+        { name: "drr_geometry_repair", cat: "spatial", desc: "Opt-in ring closure, winding & self-intersection geometry repair." },
+        { name: "drr_crs_transform", cat: "spatial", desc: "Deterministic EPSG:4326, EPSG:3857 & UTM coordinate transforms." },
+        { name: "drr_raster_zonal_stats", cat: "spatial", desc: "Zonal statistics for gridded population & hazard depth rasters." },
+
+        { name: "drr_fragility_eval", cat: "impact", desc: "GEM/HAZUS seismic, JRC flood & cyclone wind fragility curves." },
+        { name: "drr_vulnerability_matrix_calc", cat: "impact", desc: "Aggregate direct economic loss, displacement & Sendai Targets B–D." },
+        { name: "drr_humanitarian_severity_assess", cat: "impact", desc: "JIAF 2.0 / INFORM multi-factor humanitarian severity (Phases 1–5)." },
+        { name: "drr_sendai_validate", cat: "impact", desc: "Semantic guard enforcing Sendai Target A–D reporting definitions." },
+
+        { name: "drr_input_contract_validate", cat: "governance", desc: "Strict unit, range & missing-data (unknown != 0) contract checks." },
+        { name: "drr_source_provenance_manifest", cat: "governance", desc: "SHA-256 provenance, licensing & evidence-basis manifest builder." },
+        { name: "drr_model_registry_list", cat: "governance", desc: "Inspect registered scientific methods, versions & limitations." },
+        { name: "drr_assessment_replay_validate", cat: "governance", desc: "Deterministic replay verification against historical benchmarks." },
+        { name: "drr_benchmark_run", cat: "governance", desc: "Run GeoDisaster-style multi-step DRR agent trajectory benchmarks." },
+        { name: "drr_hazard_crosswalk", cat: "governance", desc: "Map GDACS, USGS & GLIDE codes to UNDRR-ISC HIP taxonomy." },
+        { name: "drr_event_match_deduplicate", cat: "governance", desc: "Spatiotemporal multi-source event identity & deduplication." },
+
+        { name: "drr_cap_alert_generate_validate", cat: "capdelta", desc: "Generate & validate OASIS CAP v1.2 XML (defaults to Draft)." },
+        { name: "drr_cap_publish", cat: "capdelta", desc: "Fail-closed CAP publication adapter with signed approval binding." },
+        { name: "drr_delta_push_draft_record", cat: "capdelta", desc: "Country-scoped draft disaster record sync to UNDRR DELTA." },
+        { name: "drr_delta_fetch_exposure", cat: "capdelta", desc: "Retrieve authoritative national exposure registries from DELTA." },
+        { name: "drr_delta_docs", cat: "capdelta", desc: "Query DELTA Resilience schema documentation & field mappings." },
+        { name: "drr_delta_schema_validate", cat: "capdelta", desc: "Validate relational disaster loss bundles against DELTA contracts." },
+
+        { name: "drr_uncertainty_propagate", cat: "appraisal", desc: "Monte Carlo uncertainty bounds (P10/P50/P90) on loss estimates." },
+        { name: "drr_expected_annual_loss", cat: "appraisal", desc: "Exceedance probability curve integration for Expected Annual Loss." },
+        { name: "drr_mitigation_cost_benefit", cat: "appraisal", desc: "Discounted BCR & NPV appraisal for resilience investments." }
+      ];
+
+      var toolsGrid = document.getElementById("toolsGrid");
+      var filterTabs = document.querySelectorAll(".filter-tab");
+
+      function renderTools(category) {
+        var filtered = category === "all"
+          ? toolsData
+          : toolsData.filter(function (t) { return t.cat === category; });
+        toolsGrid.innerHTML = filtered.map(function (t) {
+          return '<div class="tool-row">' +
+            '<div class="tool-name">' + t.name + '</div>' +
+            '<p class="tool-desc">' + t.desc + '</p>' +
+            '<span class="tool-cat">' + t.cat + '</span>' +
+          '</div>';
+        }).join("");
+      }
+      for (var f = 0; f < filterTabs.length; f++) {
+        filterTabs[f].addEventListener("click", function (e) {
+          for (var j = 0; j < filterTabs.length; j++) filterTabs[j].classList.remove("active");
+          e.currentTarget.classList.add("active");
+          renderTools(e.currentTarget.getAttribute("data-cat"));
+        });
+      }
+      renderTools("all");
+
+      /* ---------------------------------------------------------------
+       * 5. Quick Start Switcher & Copy-to-Clipboard
+       * ------------------------------------------------------------- */
+      var qsSnippets = {
+        cli: {
+          label: "Terminal — Zero-Dependency CLI & Live Alerts Dashboard",
+          code: [
+            "git clone https://github.com/sindicatoesp/drr-agent-plugin.git",
+            "cd drr-agent-plugin && make config-init",
+            "",
+            "# Run a single read-only shadow monitor check (auto-enriches with OSM & HDX)",
+            "make monitor-once",
+            "",
+            "# Browse alerts/index.html, SitReps, and the offline GIS map on http://localhost:3300/alerts/",
+            "make serve"
+          ].join("\n")
+        },
+        mcp: {
+          label: "mcp.json — Connect 40 DRR Tools to Antigravity, Cursor, or Claude",
+          code: [
+            "{",
+            '  "mcpServers": {',
+            '    "drr-analytics": {',
+            '      "command": "node",',
+            '      "args": ["/path/to/drr-agent-plugin/bin/mcp-server.js"],',
+            '      "env": {',
+            '        "USGS_MIN_MAGNITUDE": "5.0",',
+            '        "DRR_OFFLINE_MODE": "false"',
+            "      }",
+            "    }",
+            "  }",
+            "}"
+          ].join("\n")
+        },
+        static: {
+          label: "Terminal — Pre-Build Static Global or Regional Critical Infrastructure GeoJSON",
+          code: [
+            "# Option A: Single Global Major Infrastructure file (WRI Power Plants + OurAirports)",
+            "make infra-build-global",
+            "",
+            "# Option B: Tiled Regional OSM Critical Infrastructure Extract",
+            "make infra-build-regional PRESET=southeast-asia",
+            "",
+            "# Search public OCHA HDX CKAN v3 for COD-AB boundaries (no API key needed)",
+            "node bin/cli.js hdx-search --iso3 PHL --cod-level cod-ab"
+          ].join("\n")
+        },
+        docker: {
+          label: "Docker Compose — Autonomous Early Warning Monitoring Daemon",
+          code: [
+            "# Initialize .env and alerts-config.json",
+            "make config-init",
+            "",
+            "# Start background monitoring container & stream logs",
+            "make docker-up",
+            "make docker-logs"
+          ].join("\n")
+        }
+      };
+
+      var qsTabs = document.querySelectorAll(".qs-tab");
+      var qsLabel = document.getElementById("qsLabel");
+      var qsCode = document.getElementById("qsCode");
+      var qsCopyBtn = document.getElementById("qsCopyBtn");
+
+      function renderQs(key) {
+        var item = qsSnippets[key] || qsSnippets.cli;
+        qsLabel.textContent = item.label;
+        qsCode.textContent = item.code;
+        qsCopyBtn.textContent = "Copy";
+      }
+      for (var q = 0; q < qsTabs.length; q++) {
+        qsTabs[q].addEventListener("click", function (e) {
+          for (var j = 0; j < qsTabs.length; j++) qsTabs[j].classList.remove("active");
+          e.currentTarget.classList.add("active");
+          renderQs(e.currentTarget.getAttribute("data-qs"));
+        });
+      }
+      qsCopyBtn.addEventListener("click", function () {
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+          navigator.clipboard.writeText(qsCode.textContent).then(function () {
+            qsCopyBtn.textContent = "Copied!";
+            setTimeout(function () { qsCopyBtn.textContent = "Copy"; }, 1800);
+          });
+        }
+      });
+      renderQs("cli");
+    })();
+  </script>
+</body>
+</html>
