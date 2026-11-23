@@ -40,6 +40,7 @@ description: Groups critical infrastructure assets by the 9 UNDRR Sendai Framewo
 
 ## Allowed Executable Tools
 * `drr_critical_infra_overlay`
+* `drr_osm_critical_infra_fetch`
 * `drr_spatial_exposure_join`
 * `drr_delta_fetch_exposure`
 * `drr_sendai_validate`

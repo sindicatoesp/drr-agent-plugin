@@ -6,7 +6,7 @@ Complete technical specification of all **33 MCP tools** provided by `bin/mcp-se
 
 ---
 
-# Part 1: Model Context Protocol (MCP) Tools (33 Tools)
+# Part 1: Model Context Protocol (MCP) Tools (39 Tools)
 
 ## 1. `drr_gdacs_fetch`
 Ingests and filters active GDACS alerts by severity, hazard type (`EQ`, `TC`, `FL`, `VO`, `DR`), or country, with untrusted feed sanitization (`promptInjectionFlagged`), `sourceIssuedAt`, `retrievedAt`, and `payloadHash`.
@@ -433,16 +433,97 @@ Groups critical infrastructure assets by the **9 UNDRR Sendai Framework Target D
 }
 ```
 
+## 34. `drr_hdx_hapi_fetch`
+Queries and normalizes **OCHA HDX Humanitarian API (HAPI v2)** indicators (`population-social/population`, `affected-people/humanitarian-needs`, `affected-people/idps`, `affected-people/refugees-persons-of-concern`, `coordination-context/operational-presence`, `metadata/*`; registered method `telemetry.hdx.hapi_v1`) with ISO3/P-code validation, freshness screening (`maxAgeDays`), open-license redistribution checks, SSRF protection, and SHA-256 provenance.
+
+```json
+{
+  "resource": "population-social/population",
+  "locationCode": "THA",
+  "adminLevel": 2,
+  "maxAgeDays": 365,
+  "samplePayload": {}
+}
+```
+
+## 35. `drr_cod_boundary_validate`
+Validates **OCHA COD-AB** administrative boundary GeoJSON or metadata records (`spatial.cod_ab.validation_v1`) for ISO3 alignment, P-code syntax & uniqueness, parent-child hierarchy nesting, release freshness, RFC 7946 geometry validity, and optional reconciliation against UNDRR DELTA administrative divisions.
+
+```json
+{
+  "boundaryGeoJSON": {},
+  "expectedIso3": "THA",
+  "expectedAdminLevel": 2,
+  "boundarySource": "OCHA ROAP COD-AB",
+  "deltaDivisions": ["TH9001", "TH9002"]
+}
+```
+
+## 36. `drr_humanitarian_severity_assess`
+Evaluates a **JIAF 2.0 / INFORM-aligned** multi-factor humanitarian rapid impact and severity assessment (phases 1–5; registered method `assessment.humanitarian.severity_v1`), explicitly separating `hazardIntensity`, `exposure`, `vulnerability`, `copingCapacityDeficit`, and `dataConfidence` without reducing severity to hazard magnitude alone or coercing missing dimensions to `0`. Supports single-area assessments or multi-unit ADM1/ADM2 priority ranking (`units[]`).
+
+```json
+{
+  "pcode": "TH9001",
+  "unitName": "Hat Yai",
+  "hazardType": "flood",
+  "hazardIntensity": 7.5,
+  "affectedPopulation": 42000,
+  "totalPopulation": 160000,
+  "vulnerability": 6.2,
+  "copingCapacityDeficit": 5.8
+}
+```
+
+## 37. `drr_benchmark_run`
+Runs the curated GeoDisaster-inspired multi-step DRR agent benchmark suite (`tests/benchmarks/geodisaster-scenarios.json`) to score tool selection, numerical accuracy, non-goal compliance, provenance coverage, and schema validity across deterministic reference trajectories or external LLM agent traces.
+
+```json
+{
+  "category": "humanitarian_severity_and_cod",
+  "scenarioId": "geo-04-hdx-cod-severity",
+  "trajectories": {}
+}
+```
+
+## 38. `drr_hdx_polygon_population_estimate`
+Estimates exposed population inside an arbitrary hazard polygon (or `epicenter` + `bufferKm`) by intersecting it with **OCHA COD-AB** administrative boundaries and joining **OCHA HDX HAPI v2** population counts by P-code via deterministic areal interpolation (`exposure.hdx.polygon_population_v1`). Reports both area-weighted and full-unit totals, preserves missing HAPI counts as `null` (`R-02`), separates modelled exposure from Sendai `B-1` (`C-01`), and flags uniform-density caveats.
+
+```json
+{
+  "hazardGeoJSON": {},
+  "epicenter": [100.45, 7.0],
+  "bufferKm": 15,
+  "codBoundaryGeoJSON": {},
+  "hapiSamplePayload": {},
+  "expectedIso3": "THA",
+  "expectedAdminLevel": 2,
+  "gridResolution": 25
+}
+```
+
+## 39. `drr_osm_critical_infra_fetch`
+Interim open-source critical infrastructure fallback via **OpenStreetMap (Overpass API)** mapped to the 9 UNDRR Sendai Target D sectors (`exposure.osm.interim_critical_infra_v1`; SSRF-guarded, max 5° × 5° bbox span). Returns a Sendai-normalized GeoJSON FeatureCollection with `verificationStatus: "external_unverified"`, `reportingEligibility: "screening_only"`, and ODbL-1.0 attribution, and can optionally invoke `drr_critical_infra_overlay` directly when `hazardGeoJSON` or `epicenter` + `bufferKm` is provided.
+
+```json
+{
+  "bbox": [100.40, 6.95, 100.55, 7.08],
+  "sectors": ["health", "energy", "water", "protective_infrastructure"],
+  "hazardGeoJSON": {},
+  "samplePayload": {}
+}
+```
+
 ---
 
-# Part 2: Command-Line Interface (CLI) Reference (33 Subcommands)
+# Part 2: Command-Line Interface (CLI) Reference (39 Subcommands)
 
 Run `node bin/cli.js --help` (or `drr-tool --help`) for usage.
 
-* **Telemetry & Hydro**: `gdacs`, `usgs`, `fdsn-shakemap`, `forecast`, `sensorthings`, `stac-hazard`, `basin-rainfall`, `river-discharge`, `monitor`
-* **Contracts, Registry & Replay**: `validate-input`, `registry`, `replay-validate`
-* **Spatial, CRS, Overlay & Raster**: `spatial-join`, `infra-overlay`, `geojson-validate`, `geometry-repair`, `crs-transform`, `raster-zonal-stats`
-* **Fragility, Vulnerability & Sendai**: `fragility` *(requires `--intensity`)*, `vulnerability` *(requires `--spatial` and `--intensity`)*, `sendai-validate`
+* **Telemetry & Hydro**: `gdacs`, `usgs`, `fdsn-shakemap`, `forecast`, `sensorthings`, `stac-hazard`, `hdx-hapi`, `basin-rainfall`, `river-discharge`, `monitor`
+* **Contracts, Registry, Replay & Benchmarks**: `validate-input`, `registry`, `replay-validate`, `benchmark`
+* **Spatial, COD-AB, Overlay & Raster**: `spatial-join`, `infra-overlay`, `osm-infra`, `cod-validate`, `hdx-polygon-pop`, `geojson-validate`, `geometry-repair`, `crs-transform`, `raster-zonal-stats`
+* **Fragility, Vulnerability, Severity & Sendai**: `fragility` *(requires `--intensity`)*, `vulnerability` *(requires `--spatial` and `--intensity`)*, `severity-assess`, `sendai-validate`
 * **Taxonomy & Event Identity**: `hazard-crosswalk`, `event-dedup`
 * **Uncertainty & Appraisal**: `uncertainty`, `eal`, `cba`
 * **CAP & SitRep**: `cap-generate` *(defaults to `--status Draft`)*, `cap-validate`, `sitrep`

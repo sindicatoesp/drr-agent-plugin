@@ -72,8 +72,10 @@ const TEST_MAPPING = {
 	drr_stac_hazard_fetch: "tests/test-stac.js, tests/test-mcp-server.js",
 	drr_fdsn_shakemap_fetch: "tests/test-shakemap.js, tests/test-mcp-server.js",
 	drr_critical_infra_overlay: "tests/test-infra-overlay.js, tests/test-mcp-server.js",
+	drr_osm_critical_infra_fetch: "tests/test-osm-infra.js, tests/test-mcp-server.js",
 	drr_hdx_hapi_fetch: "tests/test-hdx-cod.js, tests/test-mcp-server.js",
 	drr_cod_boundary_validate: "tests/test-hdx-cod.js, tests/test-mcp-server.js",
+	drr_hdx_polygon_population_estimate: "tests/test-hdx-cod.js, tests/test-mcp-server.js",
 	drr_humanitarian_severity_assess: "tests/test-severity.js, tests/test-mcp-server.js",
 	drr_benchmark_run: "tests/test-benchmarks.js, tests/test-mcp-server.js",
 };
@@ -90,7 +92,9 @@ const NETWORK_READ_TOOLS = new Set([
 	"drr_stac_hazard_fetch",
 	"drr_fdsn_shakemap_fetch",
 	"drr_critical_infra_overlay",
+	"drr_osm_critical_infra_fetch",
 	"drr_hdx_hapi_fetch",
+	"drr_hdx_polygon_population_estimate",
 ]);
 
 function parseSkillMarkdown(relPath, content, registeredToolSet) {

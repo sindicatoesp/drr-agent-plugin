@@ -31,14 +31,16 @@ function runCli(args, expectFailure = false) {
 const helpOut = runCli(["--help"]);
 assert(helpOut.includes("replay-validate"), "CLI --help must list new commands");
 assert(helpOut.includes("sendai-validate"), "CLI --help must list sendai-validate");
+assert(helpOut.includes("osm-infra"), "CLI --help must list osm-infra");
 assert(helpOut.includes("hdx-hapi"), "CLI --help must list hdx-hapi");
 assert(helpOut.includes("cod-validate"), "CLI --help must list cod-validate");
+assert(helpOut.includes("hdx-polygon-pop"), "CLI --help must list hdx-polygon-pop");
 assert(helpOut.includes("severity-assess"), "CLI --help must list severity-assess");
 assert(helpOut.includes("benchmark"), "CLI --help must list benchmark");
 
 const cliCmds = extractCliCommands();
-assert.strictEqual(TOOLS.length, 37, "MCP server must expose 37 tools");
-assert.strictEqual(cliCmds.length, 37, "CLI must register 37 subcommands");
+assert.strictEqual(TOOLS.length, 39, "MCP server must expose 39 tools");
+assert.strictEqual(cliCmds.length, 39, "CLI must register 39 subcommands");
 
 const invMd = generateInventoryMarkdown();
 for (const tool of TOOLS) {
@@ -51,7 +53,7 @@ for (const cmd of cliCmds) {
 const manifest = generateSkillsManifest();
 assert.strictEqual(manifest.valid, true, `Skills manifest invalid: ${manifest.validationErrors.join("; ")}`);
 assert.strictEqual(manifest.skillCount, 19, "Skills manifest must index 19 skills");
-assert.strictEqual(manifest.registeredToolCount, 37);
+assert.strictEqual(manifest.registeredToolCount, 39);
 const manifestOnDisk = JSON.parse(fs.readFileSync(path.join(ROOT, "skills-manifest.json"), "utf8"));
 assert.strictEqual(manifestOnDisk.skillCount, manifest.skillCount, "skills-manifest.json on disk must stay synced");
 assert.strictEqual(manifestOnDisk.valid, true);
@@ -125,6 +127,12 @@ const infraOut = JSON.parse(
 assert.strictEqual(infraOut.summary.totalFacilities, 10);
 assert.strictEqual(infraOut.summary.cascadingServiceRiskCount, 2);
 
+const osmOut = JSON.parse(
+	runCli(["osm-infra", "--file", "examples/critical-infra-overlay/sample-osm-overpass.json"]),
+);
+assert.strictEqual(osmOut.interimFallback, true);
+assert.strictEqual(osmOut.summary.totalFacilities, 5);
+
 const hapiOut = JSON.parse(
 	runCli(["hdx-hapi", "--file", "examples/hdx-hapi-cod/sample-hapi-population.json", "--iso3", "THA"]),
 );
@@ -136,6 +144,24 @@ const codOut = JSON.parse(
 );
 assert.strictEqual(codOut.valid, true);
 assert.strictEqual(codOut.summary.uniquePcodeCount, 2);
+
+const polyPopOut = JSON.parse(
+	runCli([
+		"hdx-polygon-pop",
+		"--cod",
+		"examples/hdx-hapi-cod/sample-cod-ab.geojson",
+		"--hapi-file",
+		"examples/hdx-hapi-cod/sample-hapi-population.json",
+		"--epicenter",
+		"100.45,7.0",
+		"--buffer-km",
+		"15",
+		"--iso3",
+		"THA",
+	]),
+);
+assert(polyPopOut.summary.overlappingAdminUnits >= 1);
+assert(polyPopOut.summary.totalAreaWeightedExposedPopulation > 0);
 
 const sevOut = JSON.parse(
 	runCli([

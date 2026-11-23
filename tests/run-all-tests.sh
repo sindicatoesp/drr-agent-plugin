@@ -30,11 +30,12 @@ node "$DIR/test-sensorthings.js"
 node "$DIR/test-stac.js"
 node "$DIR/test-shakemap.js"
 node "$DIR/test-infra-overlay.js"
+node "$DIR/test-osm-infra.js"
 node "$DIR/test-hdx-cod.js"
 node "$DIR/test-severity.js"
 node "$DIR/test-benchmarks.js"
 
 echo "=================================================="
-echo " 🎉 ALL 27 TEST SUITES PASSED SUCCESSFULLY!"
+echo " 🎉 ALL 28 TEST SUITES PASSED SUCCESSFULLY!"
 echo "=================================================="
 

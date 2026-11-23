@@ -1,10 +1,10 @@
 {
   "schemaVersion": "1.0.0",
   "pluginName": "drr-analytics",
-  "pluginVersion": "1.5.0",
+  "pluginVersion": "1.6.0",
   "mcpServer": "drr-analytics-mcp",
   "mcpProtocolVersion": "2024-11-05",
-  "registeredToolCount": 37,
+  "registeredToolCount": 39,
   "skillCount": 19,
   "safetyTiers": {
     "read_only_analytics": "Pure local deterministic computation, spatial validation, or benchmark verification.",
@@ -34,6 +34,7 @@
       "safetyTier": "external_network_read",
       "allowedTools": [
         "drr_critical_infra_overlay",
+        "drr_osm_critical_infra_fetch",
         "drr_spatial_exposure_join",
         "drr_delta_fetch_exposure",
         "drr_sendai_validate"
@@ -174,6 +175,7 @@
       "allowedTools": [
         "drr_hdx_hapi_fetch",
         "drr_cod_boundary_validate",
+        "drr_hdx_polygon_population_estimate",
         "drr_geojson_validate",
         "drr_geometry_repair",
         "drr_delta_fetch_exposure"
