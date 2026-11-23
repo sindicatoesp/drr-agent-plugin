@@ -138,7 +138,7 @@ node bin/cli.js osm-infra \
 
 ---
 
-## Pre-Building Static Global & Regional Infrastructure Packs
+## Pre-Building Static Global & Regional Infrastructure Packs (Offline Use)
 
 Instead of querying Overpass live per event, you can pre-build a single local GeoJSON file once using [`scripts/build-static-infra.js`](../scripts/build-static-infra.js) and point `defaultExposureFile` in `alerts-config.json` to it:
 
@@ -148,15 +148,38 @@ make infra-build-global
 # or: node scripts/build-static-infra.js --mode global --extra-geojson ./my-healthsites.geojson
 
 # 2. Regional / Multi-Country Static Extract (auto-tiled <= 4° Overpass queries)
+# Presets: thailand, philippines, indonesia, southeast-asia, nepal, caribbean, pacific-islands
 make infra-build-regional PRESET=southeast-asia
 # or custom bbox: node scripts/build-static-infra.js --mode regional --bbox 97.3,5.6,105.7,20.5
+
+# 3. 100% Air-Gapped / Manual Offline Build (no outbound internet required)
+# Download raw CSVs/GeoJSONs on another machine (WRI Power Plants CSV, OurAirports CSV,
+# or HDX/HOTOSM geodata discovered via `drr-tool hdx-search --iso3 PHL --geodata-only`)
+# and convert/merge them locally:
+node scripts/build-static-infra.js --mode global \
+  --wri-file ./downloads/global_power_plant_database.csv \
+  --airports-file ./downloads/airports.csv \
+  --extra-geojson ./downloads/hotosm-health.geojson \
+  --output data/static-critical-infra-offline.geojson
+
+# Or convert a local Overpass JSON extract offline:
+node scripts/build-static-infra.js --mode regional \
+  --overpass-file ./downloads/region-overpass.json \
+  --output data/static-critical-infra-region.geojson
 ```
 
-Then configure `alerts-config.json`:
+Then configure `alerts-config.json` (set `autoOsmInterimInfra: false` for strictly static/offline joins, or keep `true` for hybrid fallback outside your static file):
 ```json
 {
-  "defaultExposureFile": "./data/static-critical-infra-global.geojson"
+  "defaultExposureFile": "./data/static-critical-infra-global.geojson",
+  "enrichment": {
+    "autoOsmInterimInfra": false,
+    "autoHdxPolygonPop": true,
+    "autoHdxCatalogDiscovery": false,
+    "codBoundaryFile": null
+  }
 }
 ```
+For strictly air-gapped EOC deployments, also set `DRR_OFFLINE_MODE=true` in `.env`.
 
 See **[CREDITS.md](../CREDITS.md)** for full license and attribution requirements (`ODbL-1.0`, `CC-BY-4.0`, `Public Domain`).
