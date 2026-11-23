@@ -25,7 +25,7 @@ This plugin equips AI coding assistants and autonomous agents with sourced domai
 * **End-User Skills & Prompting Guide**: See **[docs/skills-guide.md](docs/skills-guide.md)** (ready-to-use prompt examples & specific DRR use cases for all **19 domain skills**, plus multi-skill chains).
 * **Machine-Readable Skills Manifest**: See **[skills-manifest.json](skills-manifest.json)** (auto-generated skill catalog with safety tiers and validated MCP tool bindings).
 * **Programmatic Inventory**: See **[docs/tool-inventory.md](docs/tool-inventory.md)** (generated directly from executable registration sources via `npm run generate:inventory`).
-* **MCP & CLI Specification**: See **[docs/api-reference.md](docs/api-reference.md)** (38 MCP tools and 38 CLI commands).
+* **MCP & CLI Specification**: See **[docs/api-reference.md](docs/api-reference.md)** (39 MCP tools and 39 CLI commands).
 * **Scientific Methodology & Boundaries**: See **[docs/methodology.md](docs/methodology.md)**.
 * **Operational Playbook**: See **[docs/operational-playbook.md](docs/operational-playbook.md)**.
 
@@ -46,10 +46,10 @@ drr-agent-plugin/
 ├── README.md                   # Master documentation
 ├── LICENSE                     # Apache 2.0
 ├── bin/
-│   ├── mcp-server.js           # Zero-dependency Node.js MCP server (38 active tools)
-│   ├── cli.js                  # Direct CLI for shell & CI/CD (38 subcommands)
+│   ├── mcp-server.js           # Zero-dependency Node.js MCP server (39 active tools)
+│   ├── cli.js                  # Direct CLI for shell & CI/CD (39 subcommands)
 │   └── serve.js                # Local static preview server
-├── lib/                        # Pure stdlib computational & governance modules (31 JS modules + HIP data)
+├── lib/                        # Pure stdlib computational & governance modules (32 JS modules + HIP data)
 │   ├── contracts.js            # Input contracts, unit conversions, C-03 provenance manifests (R-02/R-03)
 │   ├── registry.js             # Scientific method registry & illustrative vs production gate (R-04)
 │   ├── replay.js               # Frozen-input synthetic & hindcast replay validation (R-05)
@@ -73,6 +73,7 @@ drr-agent-plugin/
 │   ├── stac.js                 # STAC v1.0.0 EO hazard catalog & validated flood depth grid adapter
 │   ├── shakemap.js             # Custom national FDSN-WS & ShakeMap PGA/Vs30 contour/grid adapter
 │   ├── infra-overlay.js        # Sendai Target D 9-sector critical infrastructure overlay & cascades
+│   ├── osm-infra.js            # OpenStreetMap (Overpass API) interim critical infrastructure fallback
 │   ├── hdx.js                  # OCHA HDX HAPI v2 ingestion, COD-AB validator & polygon pop estimator
 │   ├── severity.js             # JIAF 2.0 / INFORM-aligned multi-factor humanitarian severity engine
 │   ├── benchmarks.js           # GeoDisaster-style multi-step DRR agent trajectory benchmark runner
@@ -89,7 +90,7 @@ drr-agent-plugin/
 │   └── next-version.js         # Automated SemVer calculator for dev -> main releases
 ├── docs/
 │   ├── skills-guide.md         # End-user prompt examples & specific use cases for all 19 skills
-│   ├── api-reference.md        # 38 MCP tools & 38 CLI subcommands specification
+│   ├── api-reference.md        # 39 MCP tools & 39 CLI subcommands specification
 │   ├── tool-inventory.md       # Programmatically generated capability & test inventory
 │   ├── methodology.md          # Scientific equations, bounds & C-01..C-08 governance
 │   ├── operational-playbook.md # Personas, timelines & operational workflows
@@ -116,7 +117,7 @@ drr-agent-plugin/
 │   ├── undrr-hip-hazard-classification/
 │   └── vulnerability-matrix/
 ├── examples/                   # Executable real-world scenarios & fixtures
-└── tests/                      # Full automated test suite (27 test suites + benchmarks/)
+└── tests/                      # Full automated test suite (28 test suites + benchmarks/)
     ├── benchmarks/
     │   └── geodisaster-scenarios.json
     └── run-all-tests.sh
@@ -136,7 +137,7 @@ npm run generate:inventory
 ```
 
 ### 2. Direct Command-Line Interface (CLI) Highlights
-For all 38 MCP tools and 38 CLI subcommands, see **[docs/api-reference.md](docs/api-reference.md)** and **[docs/tool-inventory.md](docs/tool-inventory.md)**.
+For all 39 MCP tools and 39 CLI subcommands, see **[docs/api-reference.md](docs/api-reference.md)** and **[docs/tool-inventory.md](docs/tool-inventory.md)**.
 
 ```bash
 # Real-time telemetry & screening
@@ -144,7 +145,8 @@ node bin/cli.js usgs --min-mag 5.0 --limit 10
 node bin/cli.js forecast --lat -6.2 --lon 106.8 --days 5
 node bin/cli.js gdacs --min-level Orange
 
-# OCHA HDX/HAPI, COD-AB validation, polygon population, humanitarian severity & benchmarks
+# Interim OSM critical infra, OCHA HDX/HAPI, COD-AB validation, polygon population, severity & benchmarks
+node bin/cli.js osm-infra --file examples/critical-infra-overlay/sample-osm-overpass.json
 node bin/cli.js hdx-hapi --file examples/hdx-hapi-cod/sample-hapi-population.json --iso3 THA
 node bin/cli.js cod-validate --file examples/hdx-hapi-cod/sample-cod-ab.geojson --iso3 THA --admin-level 2
 node bin/cli.js hdx-polygon-pop --cod examples/hdx-hapi-cod/sample-cod-ab.geojson --hapi-file examples/hdx-hapi-cod/sample-hapi-population.json --epicenter 100.45,7.0 --buffer-km 15 --iso3 THA
@@ -171,15 +173,15 @@ node bin/cli.js cap-generate \
 
 ---
 
-## MCP Server Tools (38 Tools)
+## MCP Server Tools (39 Tools)
 
-The MCP server (`bin/mcp-server.js`) exposes **38 deterministic, provenance-aware tools**:
+The MCP server (`bin/mcp-server.js`) exposes **39 deterministic, provenance-aware tools**:
 
 | Category | MCP Tools |
 | :--- | :--- |
 | **Telemetry & Hydrology** | `drr_gdacs_fetch`, `drr_usgs_earthquake_fetch`, `drr_fdsn_shakemap_fetch`, `drr_openmeteo_forecast`, `drr_sensorthings_fetch`, `drr_stac_hazard_fetch`, `drr_hdx_hapi_fetch`, `drr_basin_rainfall_aggregate`, `drr_river_discharge_screen`, `drr_monitor_check` |
 | **Contracts, Governance & Benchmarks** | `drr_input_contract_validate`, `drr_source_provenance_manifest`, `drr_model_registry_list`, `drr_assessment_replay_validate`, `drr_benchmark_run` |
-| **Spatial, COD-AB, Overlay & Raster** | `drr_spatial_exposure_join`, `drr_critical_infra_overlay`, `drr_cod_boundary_validate`, `drr_hdx_polygon_population_estimate`, `drr_geojson_validate`, `drr_geometry_repair`, `drr_crs_transform`, `drr_raster_zonal_stats` |
+| **Spatial, COD-AB, Overlay & Raster** | `drr_spatial_exposure_join`, `drr_critical_infra_overlay`, `drr_osm_critical_infra_fetch`, `drr_cod_boundary_validate`, `drr_hdx_polygon_population_estimate`, `drr_geojson_validate`, `drr_geometry_repair`, `drr_crs_transform`, `drr_raster_zonal_stats` |
 | **Fragility, Loss, Severity & Sendai** | `drr_fragility_eval`, `drr_vulnerability_matrix_calc`, `drr_humanitarian_severity_assess`, `drr_sendai_validate` |
 | **Taxonomy & Event Identity** | `drr_hazard_crosswalk`, `drr_event_match_deduplicate` |
 | **CAP & DELTA Interoperability** | `drr_cap_alert_generate_validate`, `drr_cap_publish`, `drr_delta_push_draft_record`, `drr_delta_fetch_exposure`, `drr_delta_docs`, `drr_delta_schema_validate` |

@@ -32,6 +32,7 @@ const { ingestSensorThings, toSensorGeoJSON } = require("../lib/sensorthings");
 const { ingestStacHazardCatalog, toStacFootprintGeoJSON } = require("../lib/stac");
 const { ingestFdsnShakeMap, toShakeMapGeoJSON } = require("../lib/shakemap");
 const { ingestCriticalInfraOverlay } = require("../lib/infra-overlay");
+const { ingestOsmInterimCriticalInfra } = require("../lib/osm-infra");
 const { ingestHdxHapiData, validateCodBoundaries, estimateHdxPolygonPopulation } = require("../lib/hdx");
 const { evaluateHumanitarianSeverity } = require("../lib/severity");
 const { runBenchmarkSuite } = require("../lib/benchmarks");
@@ -40,7 +41,7 @@ const pkg = require("../package.json");
 function printHelp() {
 	console.log(`
 DRR Analytics & Agent Plugin CLI v${pkg.version}
-Disaster Risk Reduction Tools: GDACS, USGS, FDSN-WS/ShakeMap, Open-Meteo, OGC SensorThings, STAC EO Grids, Sendai Infra Overlay, HDX/HAPI & COD-AB, Humanitarian Severity, Benchmarks, Hydro, Spatial/CRS/Raster, Fragility, CAP Alerts, Sendai, DELTA, Uncertainty, Appraisal & Replay
+Disaster Risk Reduction Tools: GDACS, USGS, FDSN-WS/ShakeMap, Open-Meteo, OGC SensorThings, STAC EO Grids, Sendai Infra Overlay, OSM Interim Infra, HDX/HAPI & COD-AB, Humanitarian Severity, Benchmarks, Hydro, Spatial/CRS/Raster, Fragility, CAP Alerts, Sendai, DELTA, Uncertainty, Appraisal & Replay
 
 Usage:
   drr-tool <command> [options]
@@ -53,6 +54,7 @@ Commands:
   sensorthings         Ingest custom government/private OGC SensorThings API v1.1 gauges
   stac-hazard          Ingest STAC v1.0.0 EO catalogs & validated flood depth grids (C-05)
   infra-overlay        Group & overlay Sendai Target D 9-sector critical infrastructure (OGC API - Features / GeoJSON)
+  osm-infra            Interim open-source critical infrastructure fallback via OpenStreetMap (Overpass API)
   hdx-hapi             Query or parse OCHA HDX Humanitarian API (HAPI v2) indicators with freshness & license checks
   cod-validate         Validate OCHA COD-AB administrative boundaries, P-code hierarchy & DELTA reconciliation
   hdx-polygon-pop      Estimate exposed population inside a hazard polygon via COD-AB overlap & HDX HAPI areal interpolation
@@ -691,6 +693,39 @@ async function main() {
 					audience: options.audience || "eoc_internal",
 				});
 				const output = options["as-geojson"] ? report.overlayGeoJSON : report;
+				console.log(JSON.stringify(output, null, 2));
+				break;
+			}
+
+			case "osm-infra": {
+				const samplePayload = options.file
+					? JSON.parse(fs.readFileSync(options.file, "utf8"))
+					: undefined;
+				const bbox = options.bbox
+					? options.bbox.split(",").map((n) => parseFloat(n.trim()))
+					: undefined;
+				const sectors = options.sectors
+					? options.sectors.split(",").map((s) => s.trim()).filter(Boolean)
+					: undefined;
+				const hazardGeoJSON = options.hazard
+					? JSON.parse(fs.readFileSync(options.hazard, "utf8"))
+					: undefined;
+				const epicenter = options.epicenter
+					? options.epicenter.split(",").map((n) => parseFloat(n.trim()))
+					: undefined;
+				const report = await ingestOsmInterimCriticalInfra({
+					bbox,
+					sectors,
+					endpointUrl: options.url,
+					timeoutSec: options.timeout ? parseInt(options.timeout, 10) : undefined,
+					maxElements: options.limit ? parseInt(options.limit, 10) : undefined,
+					hazardGeoJSON,
+					epicenter,
+					bufferKm: options["buffer-km"] ? parseFloat(options["buffer-km"]) : undefined,
+					audience: options.audience || "eoc_internal",
+					samplePayload,
+				});
+				const output = options["as-geojson"] ? report.infraGeoJSON : report;
 				console.log(JSON.stringify(output, null, 2));
 				break;
 			}

@@ -40,6 +40,7 @@ A template configuration is provided in [`drr-agent-plugin/.env.example`](../.en
 | **`OGC_FEATURES_API_URL`** | *None (empty)* | Default OGC API – Features (OGC 17-069r4) root or `/items` endpoint for national/municipal critical infrastructure overlays. |
 | **`OGC_FEATURES_API_KEY`** | *None (empty)* | Optional API key sent when querying authenticated OGC API – Features endpoints (redacted from logs and provenance hashes). |
 | **`OGC_FEATURES_API_KEY_HEADER`** | `X-API-Key` | HTTP header name used to transmit `OGC_FEATURES_API_KEY` (e.g., `X-API-Key` or `Authorization`). |
+| **`OSM_OVERPASS_URL`** | `https://overpass-api.de/api/interpreter` | Overpass API interpreter endpoint for interim OpenStreetMap critical infrastructure fallback (`drr_osm_critical_infra_fetch`; SSRF-guarded). |
 | **`HDX_HAPI_URL`** | `https://hapi.humdata.org/api/v2` | Base URL for OCHA HDX Humanitarian API (HAPI v2) indicator queries (SSRF-guarded). |
 | **`HAPI_APP_IDENTIFIER`** | *None (empty)* | Registered OCHA HAPI `app_identifier` query parameter required for live requests to `hapi.humdata.org`. |
 | **`DELTA_API_URL`** | `http://localhost:3000/en/api/mcp` | Target endpoint for connecting to DELTA Resilience core application MCP server. |

@@ -29,6 +29,7 @@ const { ingestSensorThings, toSensorGeoJSON } = require("../lib/sensorthings");
 const { ingestStacHazardCatalog, toStacFootprintGeoJSON } = require("../lib/stac");
 const { ingestFdsnShakeMap, toShakeMapGeoJSON } = require("../lib/shakemap");
 const { ingestCriticalInfraOverlay } = require("../lib/infra-overlay");
+const { ingestOsmInterimCriticalInfra } = require("../lib/osm-infra");
 const { ingestHdxHapiData, validateCodBoundaries, estimateHdxPolygonPopulation } = require("../lib/hdx");
 const { evaluateHumanitarianSeverity } = require("../lib/severity");
 const { runBenchmarkSuite } = require("../lib/benchmarks");
@@ -870,6 +871,60 @@ const TOOLS = [
 		},
 	},
 	{
+		name: "drr_osm_critical_infra_fetch",
+		description:
+			"Interim open-source critical infrastructure fallback via OpenStreetMap (Overpass API) mapped to the 9 UNDRR Sendai Target D sectors (verificationStatus='external_unverified', ODbL-1.0 attribution, SSRF & bbox-span guarded). Produces a GeoJSON FeatureCollection compatible with drr_critical_infra_overlay and can optionally run the hazard overlay directly.",
+		inputSchema: {
+			type: "object",
+			properties: {
+				bbox: {
+					type: "array",
+					items: { type: "number" },
+					description: "WGS84 bounding box [minLon, minLat, maxLon, maxLat] (max 5° x 5° span; required when samplePayload is omitted)",
+				},
+				sectors: {
+					type: "array",
+					items: { type: "string" },
+					description: "Optional filter of Sendai Target D sectors (e.g. ['health', 'energy', 'water', 'protective_infrastructure'])",
+				},
+				endpointUrl: {
+					type: "string",
+					description: "Optional custom Overpass API interpreter URL (defaults to https://overpass-api.de/api/interpreter; SSRF-guarded)",
+				},
+				timeoutSec: {
+					type: "number",
+					description: "Overpass query timeout in seconds (5..60, default: 25)",
+				},
+				maxElements: {
+					type: "number",
+					description: "Maximum OSM elements returned (1..2000, default: 500)",
+				},
+				hazardGeoJSON: {
+					type: "object",
+					description: "Optional hazard footprint GeoJSON to immediately run drr_critical_infra_overlay on the retrieved OSM facilities",
+				},
+				epicenter: {
+					type: "array",
+					items: { type: "number" },
+					description: "Optional [lon, lat] epicenter paired with bufferKm for immediate overlay",
+				},
+				bufferKm: {
+					type: "number",
+					description: "Optional geodesic buffer radius in km paired with epicenter",
+				},
+				audience: {
+					type: "string",
+					enum: ["eoc_internal", "public"],
+					description: "Optional audience passed through when running immediate overlay",
+				},
+				samplePayload: {
+					type: "object",
+					description: "Optional offline Overpass API JSON `{ elements: [...] }` payload",
+				},
+			},
+		},
+	},
+	{
 		name: "drr_hdx_hapi_fetch",
 		description:
 			"Query and normalize OCHA HDX Humanitarian API (HAPI v2) indicators (population, humanitarian needs, IDPs, refugees, operational presence, metadata) with ISO3/P-code validation, freshness screening, license/redistribution checks, SSRF protection, and SHA-256 provenance.",
@@ -1137,6 +1192,21 @@ async function handleToolCall(name, args) {
 				category: args.category,
 				scenarioId: args.scenarioId,
 				trajectories: args.trajectories,
+			});
+		}
+
+		case "drr_osm_critical_infra_fetch": {
+			return ingestOsmInterimCriticalInfra({
+				bbox: args.bbox,
+				sectors: args.sectors,
+				endpointUrl: args.endpointUrl,
+				timeoutSec: args.timeoutSec,
+				maxElements: args.maxElements,
+				hazardGeoJSON: args.hazardGeoJSON,
+				epicenter: args.epicenter,
+				bufferKm: args.bufferKm,
+				audience: args.audience,
+				samplePayload: args.samplePayload,
 			});
 		}
 
