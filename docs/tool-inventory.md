@@ -4,12 +4,12 @@
 
 ## Baseline & Manifest Reconciliation
 
-- **Package**: `@sindicatoesp/drr-agent-plugin` v1.7.1
-- **Plugin Manifest**: `drr-analytics` v1.7.1
-- **MCP Server**: `drr-analytics-mcp` v1.7.1 (protocol `2024-11-05`)
-- **Git Branch**: `feat/hdx-ckan-catalog-search`
-- **Reference Baseline Commit (`origin/dev`)**: `175253bfeb7e02499aef49cc9f684211f4b8554a`
-- **Current HEAD Commit**: `f7ce7f9f34d5ed6b913044fae23efd1efa071c21`
+- **Package**: `@sindicatoesp/drr-agent-plugin` v1.8.0
+- **Plugin Manifest**: `drr-analytics` v1.8.0
+- **MCP Server**: `drr-analytics-mcp` v1.8.0 (protocol `2024-11-05`)
+- **Git Branch**: `main`
+- **Reference Baseline Commit (`origin/dev`)**: `6dd292be3b636099c988fe13da196082e164c868`
+- **Current HEAD Commit**: `7c31357e8befaf716a46f0cf07ed8ba297220160`
 - **Registered MCP Tools**: 40
 - **Registered CLI Subcommands**: 40
 - **Library Modules (`lib/*.js`)**: 32
