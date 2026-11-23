@@ -6,6 +6,11 @@
   "webhookUrl": "${MONITOR_WEBHOOK_URL}",
   "defaultExposureFile": "./examples/earthquake-hazus-scenario/input-exposure.json",
   "autoPushToDelta": true,
+  "reportPolicy": {
+    "minReportAlertLevel": "Yellow",
+    "writeFullPackageOnYellow": false,
+    "maxEventAgeHours": 72
+  },
   "countryFilter": {
     "enabled": true,
     "targetCountries": ["*"],

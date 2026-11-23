@@ -60,6 +60,7 @@ A template configuration is provided in [`drr-agent-plugin/.env.example`](../.en
 | **`DRR_ALLOW_PRIVATE_WEBHOOKS`** | `false` | When `false` (default), blocks webhook delivery to loopback, RFC 1918 private networks, and cloud metadata IPs (SSRF guard). |
 | **`DRR_OFFLINE_MODE`** | `false` | When set to `true`, blocks all outgoing network calls and requires offline sample payloads (ideal for air-gapped EOCs and secure sandboxes). |
 | **`DRR_ENABLE_PRODUCTION_PUBLISH`** | `false` | Fail-closed publication gate. Must be explicitly set to `true` (in addition to signed `approvalToken` / tenant checks) before `drr_cap_publish` or `drr_delta_push_draft_record` can execute live production writes. |
+| **`DRR_CAP_SENDER`** | `alerts@drr-agent-plugin.local` / `monitor@drr-agent-plugin.local` | Default OASIS CAP v1.2 `<sender>` identifier used when generating CAP XML alerts (`drr_cap_alert_generate_validate`, `drr_monitor_check`). |
 | **`DRR_ENV_FILE`** | *None (auto-discovered)* | Optional explicit path to a `.env` file loaded before workspace/plugin `.env` defaults. |
 
 ---
