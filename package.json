@@ -1,6 +1,6 @@
 {
   "name": "@sindicatoesp/drr-agent-plugin",
-  "version": "1.8.0",
+  "version": "1.9.0",
   "description": "Standalone Agent Plugin for Disaster Risk Reduction (DRR) analytics, hazard exposure, GEM/HAZUS fragility modeling, and OASIS CAP alerts.",
   "main": "lib/index.js",
   "repository": {
