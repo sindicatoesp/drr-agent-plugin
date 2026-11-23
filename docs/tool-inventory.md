@@ -4,12 +4,12 @@
 
 ## Baseline & Manifest Reconciliation
 
-- **Package**: `@sindicatoesp/drr-agent-plugin` v1.9.0
-- **Plugin Manifest**: `drr-analytics` v1.9.0
-- **MCP Server**: `drr-analytics-mcp` v1.9.0 (protocol `2024-11-05`)
-- **Git Branch**: `feat/dpg-standard-alignment`
-- **Reference Baseline Commit (`origin/dev`)**: `unknown`
-- **Current HEAD Commit**: `23c54e89cc61f43e25dc2d450a5719808693d683`
+- **Package**: `@sindicatoesp/drr-agent-plugin` v1.10.0
+- **Plugin Manifest**: `drr-analytics` v1.10.0
+- **MCP Server**: `drr-analytics-mcp` v1.10.0 (protocol `2024-11-05`)
+- **Git Branch**: `main`
+- **Reference Baseline Commit (`origin/dev`)**: `08f6cafb6dbc2e3bf40c80e3b55ff708fcd68e8b`
+- **Current HEAD Commit**: `42e71c7d95cc67249fefb3e6977a24e824d22b26`
 - **Registered MCP Tools**: 40
 - **Registered CLI Subcommands**: 40
 - **Library Modules (`lib/*.js`)**: 32
