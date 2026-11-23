@@ -5,6 +5,7 @@
   "outputDirectory": "./alerts",
   "webhookUrl": "${MONITOR_WEBHOOK_URL}",
   "defaultExposureFile": "./examples/earthquake-hazus-scenario/input-exposure.json",
+  "capSender": "monitor@drr-agent-plugin.local",
   "autoPushToDelta": true,
   "reportPolicy": {
     "minReportAlertLevel": "Yellow",
