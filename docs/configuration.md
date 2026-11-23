@@ -276,6 +276,35 @@ Country "Chile" does not match national DELTA instance ["Indonesia", "ID", "IDN"
 
 ---
 
+## 5b. Report Tiering (`reportPolicy`) & Automatic Enrichment (`enrichment`)
+
+In `alerts-config.json`, you can control alert report verbosity and automatic open-source enrichment for qualifying `YELLOW`, `ORANGE`, and `RED` events:
+
+```json
+{
+  "reportPolicy": {
+    "minReportAlertLevel": "Yellow",
+    "writeFullPackageOnYellow": false,
+    "maxEventAgeHours": 72
+  },
+  "enrichment": {
+    "autoOsmInterimInfra": true,
+    "osmMaxElements": 250,
+    "osmTimeoutSec": 15,
+    "autoHdxPolygonPop": true,
+    "codBoundaryFile": null
+  }
+}
+```
+
+* **`reportPolicy.minReportAlertLevel`**: Minimum alert level (`Green`, `Yellow`, `Orange`, `Red`) that generates files in `alerts/`. Events below this level (e.g., routine `GREEN` quakes) are suppressed to `ledger_only` and do not trigger enrichment calls.
+* **`reportPolicy.writeFullPackageOnYellow`**: When `false` (default), `YELLOW` events write a concise 2-file advisory (`.brief.md` + `.assessment.json`), while `ORANGE`/`RED`/tsunami events write the full 4-file emergency package (`.cap.xml`, `.brief.md`, `.sitrep.html`, `.assessment.json`).
+* **`reportPolicy.maxEventAgeHours`**: Maximum event age (default `72` hours for live runs) to avoid backfilling historical catalog events.
+* **`enrichment.autoOsmInterimInfra`**: When `true` (default) and no local exposure layer covers the hazard footprint (`no_exposure_layer` or `outside_exposure_coverage`), automatically queries OpenStreetMap Overpass API (`drr_osm_critical_infra_fetch`) for interim critical infrastructure across 9 Sendai Target D sectors (`external_unverified`, `ODbL-1.0`). Disabled automatically in `DRR_OFFLINE_MODE=true` or mock runs.
+* **`enrichment.autoHdxPolygonPop`** & **`enrichment.codBoundaryFile`**: When `codBoundaryFile` points to a local OCHA COD-AB admin boundary GeoJSON file (and `HAPI_APP_IDENTIFIER` is configured in `.env`), automatically estimates area-weighted exposed population via OCHA HDX HAPI v2 (`drr_hdx_polygon_population_estimate`, `screening_only`, distinct from Sendai B-1).
+
+---
+
 ## 6. Scheduled Single-Run Shadow Monitoring & Durable Persistence Contract
 
 When operating via scheduled workflows (e.g. `.github/workflows/scheduled-monitor.yml`) or `drr-tool monitor --once`, the monitor executes a bounded single-run pipeline (`runOnce`) in **read-only shadow mode** (`readOnly: true` by default).

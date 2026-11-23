@@ -12,6 +12,13 @@
     "writeFullPackageOnYellow": false,
     "maxEventAgeHours": 72
   },
+  "enrichment": {
+    "autoOsmInterimInfra": true,
+    "osmMaxElements": 250,
+    "osmTimeoutSec": 15,
+    "autoHdxPolygonPop": true,
+    "codBoundaryFile": null
+  },
   "countryFilter": {
     "enabled": true,
     "targetCountries": ["*"],
