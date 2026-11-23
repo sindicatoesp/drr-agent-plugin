@@ -223,6 +223,8 @@ Run continuous feed polling against custom threshold rules:
 | `make config-check` | Validates environment variables, active API URLs, and JSON rules syntax. |
 | `make config-show` | Displays current active configuration while masking confidential secrets. |
 | `make alerts-validate` | Verifies declarative threshold rule count and structure. |
+| `make infra-build-global` | Downloads & builds a single static Global Major Infrastructure GeoJSON (`WRI` + `OurAirports`) into `data/`. |
+| `make infra-build-regional PRESET=thailand` | Builds a tiled Regional OSM Critical Infrastructure GeoJSON (`southeast-asia`, `philippines`, `indonesia`, `thailand`, `nepal`, `caribbean`, `pacific-islands`) into `data/`. |
 | `make clean-alerts` | Removes temporary generated CAP XMLs and alert artifacts from `alerts/`. |
 
 ---

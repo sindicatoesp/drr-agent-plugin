@@ -218,3 +218,10 @@ Each skill in `skills/*/SKILL.md` encodes DRR scientific guardrails, tool orches
 * **Alerting Standard**: OASIS Common Alerting Protocol v1.2 / ITU-T Recommendation X.1303.
 * **Hazard Taxonomy**: UNDRR-ISC Hazard Information Profiles (HIP 2020 + 2025 revision flags).
 * **Disaster Loss Reporting**: UN Sendai Framework for Disaster Risk Reduction (2015–2030) Targets A, B, C, and D.
+
+---
+
+## Credits, Data Sources & Static Infrastructure Packs
+
+* **[CREDITS.md](CREDITS.md)** — Full attribution and license references for all upstream data sources (USGS, GDACS, Open-Meteo, OpenStreetMap/Overpass, OCHA HDX HAPI & COD-AB, WRI Global Power Plant Database, OurAirports, Healthsites.io), open standards (OASIS CAP, OGC, STAC, FDSN), and scientific methodologies (HAZUS-MH, GEM, JRC, JIAF/INFORM).
+* **Pre-building Static Critical Infrastructure Layers**: Use `node scripts/build-static-infra.js --mode global` (or `--mode regional --preset <region>`) / `make infra-build-global` / `make infra-build-regional PRESET=southeast-asia` to generate a single local GeoJSON file for `defaultExposureFile` in `alerts-config.json`.

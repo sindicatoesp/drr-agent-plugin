@@ -34,8 +34,9 @@ node "$DIR/test-osm-infra.js"
 node "$DIR/test-hdx-cod.js"
 node "$DIR/test-severity.js"
 node "$DIR/test-benchmarks.js"
+node "$DIR/test-static-infra.js"
 
 echo "=================================================="
-echo " 🎉 ALL 28 TEST SUITES PASSED SUCCESSFULLY!"
+echo " 🎉 ALL 29 TEST SUITES PASSED SUCCESSFULLY!"
 echo "=================================================="
 
