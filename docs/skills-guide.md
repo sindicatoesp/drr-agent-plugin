@@ -8,7 +8,7 @@ This guide explains how end users—**EOC Duty Officers, Anticipatory Action Lea
 
 Each skill in `skills/<skill-name>/SKILL.md` provides your AI assistant with:
 1. **Domain Methodology & Guardrails** (what is scientifically valid and what is strictly forbidden, such as fabricating flood depths from rainfall or auto-publishing live CAP sirens).
-2. **Exact Tool Orchestration** (which of the **37 deterministic MCP tools** to call instead of letting the LLM guess numbers).
+2. **Exact Tool Orchestration** (which of the **38 deterministic MCP tools** to call instead of letting the LLM guess numbers).
 3. **Escalation & Governance Rules** (when the assistant must stop and ask a human Duty Officer, Hydrologist, or National Focal Point for review or approval).
 
 ### Tips for Effective Prompts
@@ -40,7 +40,7 @@ Each skill in `skills/<skill-name>/SKILL.md` provides your AI assistant with:
 | 15 | [`stac-eo-hazard-grids`](#15-stac-eo-hazard-grids) | EO / GIS Flood Analyst | Copernicus EMS & ICEYE SAR flood depth grid validation & zonal exposure | `drr_stac_hazard_fetch`, `drr_raster_zonal_stats`, `drr_spatial_exposure_join`, `drr_vulnerability_matrix_calc` |
 | 16 | [`fdsn-shakemap-seismic`](#16-fdsn-shakemap-seismic) | National Seismologist / EOC | PHIVOLCS/BMKG FDSN-WS & ShakeMap PGA/PGV/$V_{s30}$ contour/grid ingestion | `drr_fdsn_shakemap_fetch`, `drr_raster_zonal_stats`, `drr_spatial_exposure_join`, `drr_fragility_eval` |
 | 17 | [`critical-infrastructure-overlay`](#17-critical-infrastructure-overlay) | EOC Operations / GIS Lead | Sendai 9-sector critical infrastructure overlay, lifeline cascades & CIP redaction | `drr_critical_infra_overlay`, `drr_spatial_exposure_join`, `drr_delta_fetch_exposure`, `drr_sendai_validate` |
-| 18 | [`hdx-hapi-and-cod-boundaries`](#18-hdx-hapi-and-cod-boundaries) | UN OCHA IM / GIS Officer | HDX HAPI v2 population baseline audit & COD-AB ADM2 P-code / DELTA reconciliation | `drr_hdx_hapi_fetch`, `drr_cod_boundary_validate`, `drr_geojson_validate`, `drr_geometry_repair`, `drr_delta_fetch_exposure` |
+| 18 | [`hdx-hapi-and-cod-boundaries`](#18-hdx-hapi-and-cod-boundaries) | UN OCHA IM / GIS Officer | HDX HAPI v2 population baseline audit, COD-AB ADM2 reconciliation & polygon population estimate | `drr_hdx_hapi_fetch`, `drr_cod_boundary_validate`, `drr_hdx_polygon_population_estimate`, `drr_geojson_validate`, `drr_geometry_repair`, `drr_delta_fetch_exposure` |
 | 19 | [`humanitarian-rapid-impact-severity`](#19-humanitarian-rapid-impact-severity) | Inter-Cluster / Rapid Assessment Lead | JIAF/INFORM multi-factor flood severity ranking (ADM2) & agent benchmark verification | `drr_humanitarian_severity_assess`, `drr_spatial_exposure_join`, `drr_critical_infra_overlay`, `drr_vulnerability_matrix_calc`, `drr_hdx_hapi_fetch`, `drr_cod_boundary_validate`, `drr_benchmark_run` |
 
 ---

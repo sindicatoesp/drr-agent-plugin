@@ -29,7 +29,7 @@ const { ingestSensorThings, toSensorGeoJSON } = require("../lib/sensorthings");
 const { ingestStacHazardCatalog, toStacFootprintGeoJSON } = require("../lib/stac");
 const { ingestFdsnShakeMap, toShakeMapGeoJSON } = require("../lib/shakemap");
 const { ingestCriticalInfraOverlay } = require("../lib/infra-overlay");
-const { ingestHdxHapiData, validateCodBoundaries } = require("../lib/hdx");
+const { ingestHdxHapiData, validateCodBoundaries, estimateHdxPolygonPopulation } = require("../lib/hdx");
 const { evaluateHumanitarianSeverity } = require("../lib/severity");
 const { runBenchmarkSuite } = require("../lib/benchmarks");
 
@@ -959,6 +959,74 @@ const TOOLS = [
 		},
 	},
 	{
+		name: "drr_hdx_polygon_population_estimate",
+		description:
+			"Estimate population exposed inside an arbitrary hazard polygon (or epicenter + bufferKm) by intersecting it with OCHA COD-AB administrative boundaries and joining OCHA HDX HAPI population statistics by P-code via deterministic areal interpolation (reporting both area-weighted and full-unit totals, preserving null !== 0, and flagging uniform-density caveats).",
+		inputSchema: {
+			type: "object",
+			properties: {
+				hazardGeoJSON: {
+					type: "object",
+					description: "Hazard footprint GeoJSON (Polygon, MultiPolygon, Feature, or FeatureCollection)",
+				},
+				epicenter: {
+					type: "array",
+					items: { type: "number" },
+					description: "Optional [lon, lat] epicenter when using bufferKm instead of hazardGeoJSON",
+				},
+				bufferKm: {
+					type: "number",
+					description: "Optional geodesic buffer radius in km paired with epicenter",
+				},
+				codBoundaryGeoJSON: {
+					type: "object",
+					description: "OCHA COD-AB administrative boundary GeoJSON FeatureCollection with P-codes",
+				},
+				hapiSamplePayload: {
+					type: "object",
+					description: "Optional offline HDX HAPI v2 `{ data: [...] }` population payload",
+				},
+				populationByPcode: {
+					type: "object",
+					description: "Optional pre-fetched map of `{ [pcode]: populationNumber }`",
+				},
+				expectedIso3: {
+					type: "string",
+					description: "Optional ISO3 country code (e.g. 'THA')",
+				},
+				expectedAdminLevel: {
+					type: "number",
+					description: "Optional administrative level (0, 1, 2)",
+				},
+				gridResolution: {
+					type: "number",
+					description: "Deterministic grid sample density per axis for areal overlap (10..60, default: 25)",
+				},
+				endpointUrl: {
+					type: "string",
+					description: "Optional custom HDX HAPI v2 base URL (SSRF-guarded)",
+				},
+				appIdentifier: {
+					type: "string",
+					description: "Optional HAPI app_identifier for live fetches",
+				},
+				gender: {
+					type: "string",
+					description: "Optional HAPI gender disaggregation filter (e.g. 'f', 'm', 'all')",
+				},
+				ageRange: {
+					type: "string",
+					description: "Optional HAPI age_range filter (e.g. '0-4', '60+', 'all')",
+				},
+				maxAgeDays: {
+					type: "number",
+					description: "Freshness threshold in days for HAPI & COD-AB screening",
+				},
+			},
+			required: ["codBoundaryGeoJSON"],
+		},
+	},
+	{
 		name: "drr_humanitarian_severity_assess",
 		description:
 			"Evaluate a JIAF 2.0 / INFORM-aligned multi-factor humanitarian rapid impact and severity assessment (phases 1-5), explicitly separating hazard intensity, exposure, vulnerability, coping capacity deficit, and data confidence without reducing severity to hazard magnitude alone or coercing missing dimensions to 0.",
@@ -1038,6 +1106,25 @@ async function handleToolCall(name, args) {
 				maxAgeDays: args.maxAgeDays,
 				boundarySource: args.boundarySource,
 				deltaDivisions: args.deltaDivisions,
+			});
+		}
+
+		case "drr_hdx_polygon_population_estimate": {
+			return estimateHdxPolygonPopulation({
+				hazardGeoJSON: args.hazardGeoJSON,
+				epicenter: args.epicenter,
+				bufferKm: args.bufferKm,
+				codBoundaryGeoJSON: args.codBoundaryGeoJSON,
+				hapiSamplePayload: args.hapiSamplePayload,
+				populationByPcode: args.populationByPcode,
+				expectedIso3: args.expectedIso3,
+				expectedAdminLevel: args.expectedAdminLevel,
+				gridResolution: args.gridResolution,
+				endpointUrl: args.endpointUrl,
+				appIdentifier: args.appIdentifier,
+				gender: args.gender,
+				ageRange: args.ageRange,
+				maxAgeDays: args.maxAgeDays,
 			});
 		}
 

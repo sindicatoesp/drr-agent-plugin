@@ -74,6 +74,7 @@ const TEST_MAPPING = {
 	drr_critical_infra_overlay: "tests/test-infra-overlay.js, tests/test-mcp-server.js",
 	drr_hdx_hapi_fetch: "tests/test-hdx-cod.js, tests/test-mcp-server.js",
 	drr_cod_boundary_validate: "tests/test-hdx-cod.js, tests/test-mcp-server.js",
+	drr_hdx_polygon_population_estimate: "tests/test-hdx-cod.js, tests/test-mcp-server.js",
 	drr_humanitarian_severity_assess: "tests/test-severity.js, tests/test-mcp-server.js",
 	drr_benchmark_run: "tests/test-benchmarks.js, tests/test-mcp-server.js",
 };
@@ -91,6 +92,7 @@ const NETWORK_READ_TOOLS = new Set([
 	"drr_fdsn_shakemap_fetch",
 	"drr_critical_infra_overlay",
 	"drr_hdx_hapi_fetch",
+	"drr_hdx_polygon_population_estimate",
 ]);
 
 function parseSkillMarkdown(relPath, content, registeredToolSet) {

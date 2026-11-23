@@ -6,22 +6,27 @@ const {
 	parseHdxHapiPayload,
 	ingestHdxHapiData,
 	validateCodBoundaries,
+	estimateHdxPolygonPopulation,
 } = require("../lib/hdx");
 
 console.log("Testing OCHA HDX HAPI v2 Adapter & COD-AB P-Code Boundary Validator...");
 
 async function run() {
-	// 1. URL builder + SSRF protection
+	// 1. URL builder + SSRF protection + gender/ageRange filters
 	const url = buildHdxHapiUrl({
 		resource: "population-social/population",
 		locationCode: "tha",
 		adminLevel: 2,
+		gender: "f",
+		ageRange: "0-4",
 		appIdentifier: "drr-test-app",
 		limit: 50,
 	});
 	assert(url.includes("https://hapi.humdata.org/api/v2/population-social/population"));
 	assert(url.includes("location_code=THA"));
 	assert(url.includes("admin_level=2"));
+	assert(url.includes("gender=f"));
+	assert(url.includes("age_range=0-4"));
 	assert(url.includes("app_identifier=drr-test-app"));
 
 	assert.throws(() => buildHdxHapiUrl({ resource: "invalid/resource" }), /Unsupported HDX HAPI resource/);
@@ -101,7 +106,51 @@ async function run() {
 	assert.strictEqual(badCod.deltaReconciliation.reconciled, false);
 	assert.deepStrictEqual(badCod.deltaReconciliation.unmatchedInDelta, ["TH9099"]);
 
-	console.log("✅ OCHA HDX HAPI v2 & COD-AB Boundary tests passed!");
+	// 5. Polygon population estimation via COD-AB overlap + HDX HAPI areal interpolation
+	// Hazard covers exactly the northern half of TH9001 ([100.3..100.6, 7.0..7.1]) and none of TH9002
+	const halfHatYaiHazard = {
+		type: "Polygon",
+		coordinates: [[[100.3, 7.0], [100.6, 7.0], [100.6, 7.1], [100.3, 7.1], [100.3, 7.0]]],
+	};
+	const polyEst = await estimateHdxPolygonPopulation({
+		hazardGeoJSON: halfHatYaiHazard,
+		codBoundaryGeoJSON: codGeo,
+		hapiSamplePayload: samplePayload,
+		expectedIso3: "THA",
+		expectedAdminLevel: 2,
+		gridResolution: 20,
+		referenceTime: "2026-11-22T00:00:00Z",
+	});
+	assert.strictEqual(polyEst.summary.overlappingAdminUnits, 1);
+	assert.strictEqual(polyEst.summary.matchedPopulationUnits, 1);
+	assert.strictEqual(polyEst.overlappingUnits[0].pcode, "TH9001");
+	assert(Math.abs(polyEst.overlappingUnits[0].overlapFraction - 0.5) < 0.06, "Expected ~0.5 overlap fraction");
+	assert(
+		polyEst.summary.totalAreaWeightedExposedPopulation >= 70000 &&
+			polyEst.summary.totalAreaWeightedExposedPopulation <= 90000,
+		"Expected ~80,000 area-weighted exposed population",
+	);
+	assert.strictEqual(polyEst.summary.totalFullUnitBaselinePopulation, 160000);
+	assert.strictEqual(polyEst.provenance.approvalStatus, "draft");
+	assert(polyEst.warnings.some((w) => w.includes("uniform population density")));
+
+	// 6. Epicenter + bufferKm + missing HAPI population preserved as null (R-02)
+	const bufferEst = await estimateHdxPolygonPopulation({
+		epicenter: [100.45, 6.95],
+		bufferKm: 20,
+		codBoundaryGeoJSON: codGeo,
+		populationByPcode: { TH9001: 160000 }, // TH9002 intentionally omitted
+		gridResolution: 20,
+	});
+	assert.strictEqual(bufferEst.summary.overlappingAdminUnits, 2);
+	assert.strictEqual(bufferEst.summary.matchedPopulationUnits, 1);
+	assert.strictEqual(bufferEst.summary.missingPopulationUnits, 1);
+	const missingUnit = bufferEst.overlappingUnits.find((u) => u.pcode === "TH9002");
+	assert.strictEqual(missingUnit.baselinePopulation, null, "Missing HAPI population must stay null, never 0");
+	assert.strictEqual(missingUnit.areaWeightedExposedPopulation, null);
+	assert.strictEqual(missingUnit.populationStatus, "missing_hapi_population");
+
+	console.log("✅ OCHA HDX HAPI v2, COD-AB Boundary & Polygon Population tests passed!");
 }
 
 run().catch((err) => {

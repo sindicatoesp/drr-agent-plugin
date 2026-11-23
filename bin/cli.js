@@ -32,7 +32,7 @@ const { ingestSensorThings, toSensorGeoJSON } = require("../lib/sensorthings");
 const { ingestStacHazardCatalog, toStacFootprintGeoJSON } = require("../lib/stac");
 const { ingestFdsnShakeMap, toShakeMapGeoJSON } = require("../lib/shakemap");
 const { ingestCriticalInfraOverlay } = require("../lib/infra-overlay");
-const { ingestHdxHapiData, validateCodBoundaries } = require("../lib/hdx");
+const { ingestHdxHapiData, validateCodBoundaries, estimateHdxPolygonPopulation } = require("../lib/hdx");
 const { evaluateHumanitarianSeverity } = require("../lib/severity");
 const { runBenchmarkSuite } = require("../lib/benchmarks");
 const pkg = require("../package.json");
@@ -55,6 +55,7 @@ Commands:
   infra-overlay        Group & overlay Sendai Target D 9-sector critical infrastructure (OGC API - Features / GeoJSON)
   hdx-hapi             Query or parse OCHA HDX Humanitarian API (HAPI v2) indicators with freshness & license checks
   cod-validate         Validate OCHA COD-AB administrative boundaries, P-code hierarchy & DELTA reconciliation
+  hdx-polygon-pop      Estimate exposed population inside a hazard polygon via COD-AB overlap & HDX HAPI areal interpolation
   severity-assess      Evaluate JIAF/INFORM multi-factor humanitarian rapid impact & severity (phases 1-5)
   benchmark            Run curated GeoDisaster-inspired multi-step DRR agent benchmark suite
   basin-rainfall       Aggregate rainfall forecasts (mm) across catchment polygon/points
@@ -730,6 +731,38 @@ async function main() {
 					maxAgeDays: options["max-age-days"] !== undefined ? parseInt(options["max-age-days"], 10) : undefined,
 					boundarySource: options.source,
 					deltaDivisions,
+				});
+				console.log(JSON.stringify(report, null, 2));
+				break;
+			}
+
+			case "hdx-polygon-pop": {
+				const codPath = options.cod || options.boundaries;
+				if (!codPath) throw new Error("hdx-polygon-pop requires --cod <path-to-cod-ab.geojson>");
+				const codBoundaryGeoJSON = JSON.parse(fs.readFileSync(codPath, "utf8"));
+				const hazardGeoJSON = options.hazard
+					? JSON.parse(fs.readFileSync(options.hazard, "utf8"))
+					: undefined;
+				const epicenter = options.epicenter
+					? options.epicenter.split(",").map((n) => parseFloat(n.trim()))
+					: undefined;
+				const hapiSamplePayload = options["hapi-file"]
+					? JSON.parse(fs.readFileSync(options["hapi-file"], "utf8"))
+					: undefined;
+				const report = await estimateHdxPolygonPopulation({
+					hazardGeoJSON,
+					epicenter,
+					bufferKm: options["buffer-km"] ? parseFloat(options["buffer-km"]) : undefined,
+					codBoundaryGeoJSON,
+					hapiSamplePayload,
+					expectedIso3: options.iso3,
+					expectedAdminLevel: options["admin-level"] !== undefined ? parseInt(options["admin-level"], 10) : undefined,
+					gridResolution: options["grid-res"] ? parseInt(options["grid-res"], 10) : undefined,
+					endpointUrl: options.url,
+					appIdentifier: options["app-id"],
+					gender: options.gender,
+					ageRange: options["age-range"],
+					maxAgeDays: options["max-age-days"] !== undefined ? parseInt(options["max-age-days"], 10) : undefined,
 				});
 				console.log(JSON.stringify(report, null, 2));
 				break;
