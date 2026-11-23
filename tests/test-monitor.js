@@ -307,6 +307,9 @@ async function testTieredReportingAndExposureCoverage() {
 	assert(fs.existsSync(redRes.filesCreated.capXml));
 	assert(fs.existsSync(redRes.filesCreated.sitrepHtml));
 	const redCap = fs.readFileSync(redRes.filesCreated.capXml, "utf8");
+	assert(redCap.includes("<identifier>DRR-MONITOR-usgs_red_tsunami</identifier>"));
+	assert(redCap.includes("<sender>monitor@drr-agent-plugin.local</sender>"));
+	assert(!redCap.includes("preventionweb.net"));
 	assert(redCap.includes("<severity>Extreme</severity>"));
 	assert(redCap.includes("<urgency>Immediate</urgency>"));
 
