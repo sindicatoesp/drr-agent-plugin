@@ -209,10 +209,116 @@ async function testCountryFilter() {
 	console.log("✅ Country filtering and DELTA push guard tests passed!");
 }
 
+async function testTieredReportingAndExposureCoverage() {
+	const { processQualifyingEvent } = require("../lib/monitor");
+	const tmpAlertsDir = path.join(__dirname, "tmp-tiered-alerts");
+	fs.rmSync(tmpAlertsDir, { recursive: true, force: true });
+
+	const unrelatedExposure = {
+		type: "FeatureCollection",
+		features: [
+			{
+				type: "Feature",
+				properties: { id: "b1", name: "Remote Building", population: 500, valueUsd: 1000000 },
+				geometry: { type: "Point", coordinates: [100.5, 13.5] },
+			},
+		],
+	};
+
+	// 1. GREEN event -> suppressed (ledger_only), 0 files written to disk
+	const greenRes = await processQualifyingEvent(
+		{
+			id: "usgs_green_fiji",
+			title: "M 5.5 - Fiji region",
+			place: "Fiji region",
+			magnitude: 5.5,
+			magType: "mww",
+			depthKm: 469.9,
+			mmi: 1.73,
+			estimatedPgaG: 0.0078,
+			alertLevel: "green",
+			tsunamiAlert: false,
+			coordinates: [-177.82, -19.56],
+			source: "USGS",
+		},
+		{ outputDirectory: tmpAlertsDir, reportPolicy: { minReportAlertLevel: "Yellow" } },
+		{ exposureGeoJSON: unrelatedExposure, mock: true },
+	);
+	assert.strictEqual(greenRes.reportMode, "ledger_only");
+	assert.strictEqual(greenRes.reportSuppressed, true);
+	assert.strictEqual(greenRes.filesCreated, null);
+	assert.strictEqual(greenRes.exposureCoverage.status, "outside_exposure_coverage");
+	assert(!fs.existsSync(tmpAlertsDir), "GREEN event must not create alert report files by default");
+
+	// 2. YELLOW event -> advisory mode (brief.md + assessment.json only, no CAP/SitRep), rich metadata + honest coverage
+	const yellowRes = await processQualifyingEvent(
+		{
+			id: "usgs_yellow_china",
+			title: "M 5.9 - 238 km SW of Yanglong, China",
+			place: "238 km SW of Yanglong, China",
+			magnitude: 5.9,
+			magType: "mww",
+			depthKm: 10.0,
+			mmi: 7.5,
+			estimatedPgaG: 0.3239,
+			alertLevel: "yellow",
+			tsunamiAlert: false,
+			time: "2026-11-22T12:00:00Z",
+			url: "https://earthquake.usgs.gov/earthquakes/eventpage/us6000ucly",
+			coordinates: [97.5, 37.2],
+			source: "USGS",
+		},
+		{ outputDirectory: tmpAlertsDir, reportPolicy: { minReportAlertLevel: "Yellow", writeFullPackageOnYellow: false } },
+		{ exposureGeoJSON: unrelatedExposure, mock: true },
+	);
+	assert.strictEqual(yellowRes.reportMode, "advisory");
+	assert.strictEqual(yellowRes.reportSuppressed, false);
+	assert(yellowRes.filesCreated.brief && yellowRes.filesCreated.assessment);
+	assert.strictEqual(yellowRes.filesCreated.capXml, undefined);
+	assert(fs.existsSync(yellowRes.filesCreated.brief));
+	assert(!fs.existsSync(path.join(tmpAlertsDir, "usgs_yellow_china.cap.xml")));
+
+	const yellowBrief = fs.readFileSync(yellowRes.filesCreated.brief, "utf8");
+	assert(yellowBrief.includes("🟡 Hazard Advisory Brief"), "YELLOW brief must use yellow badge and advisory heading");
+	assert(yellowBrief.includes("M 5.9 (mww)"), "Brief must include magnitude & type");
+	assert(yellowBrief.includes("10.0 km"), "Brief must include focal depth");
+	assert(yellowBrief.includes("DATA UNAVAILABLE (unknown ≠ 0)"), "Brief must not falsely report 0 exposed when exposure layer is outside region");
+	assert(!yellowBrief.includes("Activate civil defense reception centers for approximately **0**"), "Brief must never advise opening shelters for 0 displaced");
+
+	// 3. RED / tsunami event -> full_emergency (all 4 files)
+	const redRes = await processQualifyingEvent(
+		{
+			id: "usgs_red_tsunami",
+			title: "M 7.4 - Offshore Tsunami Event",
+			place: "Offshore",
+			magnitude: 7.4,
+			depthKm: 15.0,
+			estimatedPgaG: 0.45,
+			alertLevel: "green",
+			tsunamiAlert: true,
+			coordinates: [100.5, 13.5],
+			source: "USGS",
+		},
+		{ outputDirectory: tmpAlertsDir, reportPolicy: { minReportAlertLevel: "Yellow" } },
+		{ exposureGeoJSON: unrelatedExposure, mock: true },
+	);
+	assert.strictEqual(redRes.reportMode, "full_emergency");
+	assert.strictEqual(redRes.reportSuppressed, false);
+	assert(fs.existsSync(redRes.filesCreated.capXml));
+	assert(fs.existsSync(redRes.filesCreated.sitrepHtml));
+	const redCap = fs.readFileSync(redRes.filesCreated.capXml, "utf8");
+	assert(redCap.includes("<severity>Extreme</severity>"));
+	assert(redCap.includes("<urgency>Immediate</urgency>"));
+
+	fs.rmSync(tmpAlertsDir, { recursive: true, force: true });
+	console.log("✅ Tiered reporting policy & honest exposure coverage tests passed!");
+}
+
 async function run() {
 	await testWebhook();
 	await testCycle();
 	await testCountryFilter();
+	await testTieredReportingAndExposureCoverage();
 }
 
 run().catch((err) => {
