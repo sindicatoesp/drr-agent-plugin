@@ -33,14 +33,15 @@ assert(helpOut.includes("replay-validate"), "CLI --help must list new commands")
 assert(helpOut.includes("sendai-validate"), "CLI --help must list sendai-validate");
 assert(helpOut.includes("osm-infra"), "CLI --help must list osm-infra");
 assert(helpOut.includes("hdx-hapi"), "CLI --help must list hdx-hapi");
+assert(helpOut.includes("hdx-search"), "CLI --help must list hdx-search");
 assert(helpOut.includes("cod-validate"), "CLI --help must list cod-validate");
 assert(helpOut.includes("hdx-polygon-pop"), "CLI --help must list hdx-polygon-pop");
 assert(helpOut.includes("severity-assess"), "CLI --help must list severity-assess");
 assert(helpOut.includes("benchmark"), "CLI --help must list benchmark");
 
 const cliCmds = extractCliCommands();
-assert.strictEqual(TOOLS.length, 39, "MCP server must expose 39 tools");
-assert.strictEqual(cliCmds.length, 39, "CLI must register 39 subcommands");
+assert.strictEqual(TOOLS.length, 40, "MCP server must expose 40 tools");
+assert.strictEqual(cliCmds.length, 40, "CLI must register 40 subcommands");
 
 const invMd = generateInventoryMarkdown();
 for (const tool of TOOLS) {
@@ -53,7 +54,7 @@ for (const cmd of cliCmds) {
 const manifest = generateSkillsManifest();
 assert.strictEqual(manifest.valid, true, `Skills manifest invalid: ${manifest.validationErrors.join("; ")}`);
 assert.strictEqual(manifest.skillCount, 19, "Skills manifest must index 19 skills");
-assert.strictEqual(manifest.registeredToolCount, 39);
+assert.strictEqual(manifest.registeredToolCount, 40);
 const manifestOnDisk = JSON.parse(fs.readFileSync(path.join(ROOT, "skills-manifest.json"), "utf8"));
 assert.strictEqual(manifestOnDisk.skillCount, manifest.skillCount, "skills-manifest.json on disk must stay synced");
 assert.strictEqual(manifestOnDisk.valid, true);
@@ -162,6 +163,20 @@ const polyPopOut = JSON.parse(
 );
 assert(polyPopOut.summary.overlappingAdminUnits >= 1);
 assert(polyPopOut.summary.totalAreaWeightedExposedPopulation > 0);
+
+const ckanOut = JSON.parse(
+	runCli([
+		"hdx-search",
+		"--file",
+		"examples/hdx-hapi-cod/sample-ckan-search.json",
+		"--iso3",
+		"THA",
+		"--query",
+		"population",
+	]),
+);
+assert.strictEqual(ckanOut.summary.returnedDatasets, 3);
+assert.strictEqual(ckanOut.provenance.requiresApiKey, false);
 
 const sevOut = JSON.parse(
 	runCli([

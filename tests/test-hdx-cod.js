@@ -150,7 +150,41 @@ async function run() {
 	assert.strictEqual(missingUnit.areaWeightedExposedPopulation, null);
 	assert.strictEqual(missingUnit.populationStatus, "missing_hapi_population");
 
-	console.log("✅ OCHA HDX HAPI v2, COD-AB Boundary & Polygon Population tests passed!");
+	// 7. Public OCHA HDX CKAN Action API v3 Catalog Discovery (no API key required)
+	const { buildHdxCkanSearchUrl, searchHdxCkanCatalog } = require("../lib/hdx");
+	const ckanUrl = buildHdxCkanSearchUrl({
+		query: "population",
+		countryIso3: "THA",
+		codLevel: "cod-ab",
+		format: "GeoJSON",
+		geodataOnly: true,
+		rows: 5,
+	});
+	assert(ckanUrl.startsWith("https://data.humdata.org/api/3/action/package_search?"));
+	assert(ckanUrl.includes("q=population"));
+	assert(ckanUrl.includes("groups%3Atha"));
+	assert(ckanUrl.includes("cod_level%3Acod-ab"));
+	assert(ckanUrl.includes("has_geodata%3Atrue"));
+
+	assert.throws(
+		() => buildHdxCkanSearchUrl({ endpointUrl: "http://127.0.0.1:8080/api/3/action/package_search" }),
+		/SSRF guard blocked/i,
+		"HDX CKAN URL builder must block private/loopback hosts",
+	);
+
+	const sampleCkan = JSON.parse(
+		fs.readFileSync(path.join(__dirname, "..", "examples", "hdx-hapi-cod", "sample-ckan-search.json"), "utf8"),
+	);
+	const ckanReport = await searchHdxCkanCatalog({ samplePayload: sampleCkan });
+	assert.strictEqual(ckanReport.mode, "offline_sample");
+	assert.strictEqual(ckanReport.summary.totalMatchingDatasets, 3);
+	assert.strictEqual(ckanReport.summary.returnedDatasets, 3);
+	assert.strictEqual(ckanReport.summary.codDatasetsCount, 2);
+	assert.strictEqual(ckanReport.summary.geodataDatasetsCount, 2);
+	assert.strictEqual(ckanReport.provenance.requiresApiKey, false);
+	assert(ckanReport.datasets[0].resources[0].downloadUrl.startsWith("https://data.humdata.org/"));
+
+	console.log("✅ OCHA HDX HAPI v2, CKAN v3 Catalog, COD-AB Boundary & Polygon Population tests passed!");
 }
 
 run().catch((err) => {

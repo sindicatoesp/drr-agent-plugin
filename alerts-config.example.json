@@ -17,6 +17,7 @@
     "osmMaxElements": 250,
     "osmTimeoutSec": 15,
     "autoHdxPolygonPop": true,
+    "autoHdxCatalogDiscovery": true,
     "codBoundaryFile": null
   },
   "countryFilter": {

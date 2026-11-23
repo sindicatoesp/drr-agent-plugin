@@ -425,8 +425,39 @@ async function testAutoOsmAndHdxEnrichment() {
 	assert(indexHtml.includes("Interim OSM Infra (5)"), "alerts/index.html must display Interim OSM Infra badge");
 	assert(indexHtml.includes("HDX Pop Est: ~"), "alerts/index.html must display HDX Pop Est badge");
 
+	// 3. YELLOW event without local COD-AB file -> triggers public HDX CKAN catalog discovery (no API key)
+	const hdxCatalogSamplePayload = JSON.parse(
+		fs.readFileSync(path.join(__dirname, "..", "examples", "hdx-hapi-cod", "sample-ckan-search.json"), "utf8"),
+	);
+	const catalogRes = await processQualifyingEvent(
+		{
+			id: "usgs_yellow_hatyai_catalog",
+			title: "M 5.6 - Near Hat Yai, Thailand",
+			place: "Hat Yai, Thailand",
+			magnitude: 5.6,
+			estimatedPgaG: 0.16,
+			alertLevel: "yellow",
+			coordinates: [100.474, 7.008],
+			source: "USGS",
+		},
+		{
+			outputDirectory: tmpAlertsDir,
+			reportPolicy: { minReportAlertLevel: "Yellow" },
+			enrichment: { autoOsmInterimInfra: false, autoHdxCatalogDiscovery: true },
+		},
+		{
+			exposureGeoJSON: unrelatedExposure,
+			hdxCatalogSamplePayload,
+			mock: true,
+		},
+	);
+	assert(catalogRes.hdxCatalogReport && catalogRes.hdxCatalogReport.datasets.length === 3);
+	const catBrief = fs.readFileSync(catalogRes.filesCreated.brief, "utf8");
+	assert(catBrief.includes("OCHA HDX CKAN Catalog Discovery (no API key)"), "Brief must surface discovered HDX CKAN datasets");
+	assert(catBrief.includes("Thailand - Subnational Population Statistics"), "Brief must link discovered COD-PS dataset");
+
 	fs.rmSync(tmpAlertsDir, { recursive: true, force: true });
-	console.log("✅ Automatic OSM interim infra & HDX polygon population enrichment tests passed!");
+	console.log("✅ Automatic OSM interim infra, HDX polygon pop & HDX CKAN catalog discovery tests passed!");
 }
 
 async function run() {

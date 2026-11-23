@@ -148,6 +148,7 @@ node bin/cli.js gdacs --min-level Orange
 # Interim OSM critical infra, OCHA HDX/HAPI, COD-AB validation, polygon population, severity & benchmarks
 node bin/cli.js osm-infra --file examples/critical-infra-overlay/sample-osm-overpass.json
 node bin/cli.js hdx-hapi --file examples/hdx-hapi-cod/sample-hapi-population.json --iso3 THA
+node bin/cli.js hdx-search --file examples/hdx-hapi-cod/sample-ckan-search.json --iso3 THA --query population
 node bin/cli.js cod-validate --file examples/hdx-hapi-cod/sample-cod-ab.geojson --iso3 THA --admin-level 2
 node bin/cli.js hdx-polygon-pop --cod examples/hdx-hapi-cod/sample-cod-ab.geojson --hapi-file examples/hdx-hapi-cod/sample-hapi-population.json --epicenter 100.45,7.0 --buffer-km 15 --iso3 THA
 node bin/cli.js severity-assess --pcode TH9001 --hazard flood --hazard-intensity 7.5 --affected-pop 42000 --total-pop 160000 --vulnerability 6.2 --coping-deficit 5.8
@@ -173,13 +174,13 @@ node bin/cli.js cap-generate \
 
 ---
 
-## MCP Server Tools (39 Tools)
+## MCP Server Tools (40 Tools)
 
-The MCP server (`bin/mcp-server.js`) exposes **39 deterministic, provenance-aware tools**:
+The MCP server (`bin/mcp-server.js`) exposes **40 deterministic, provenance-aware tools**:
 
 | Category | MCP Tools |
 | :--- | :--- |
-| **Telemetry & Hydrology** | `drr_gdacs_fetch`, `drr_usgs_earthquake_fetch`, `drr_fdsn_shakemap_fetch`, `drr_openmeteo_forecast`, `drr_sensorthings_fetch`, `drr_stac_hazard_fetch`, `drr_hdx_hapi_fetch`, `drr_basin_rainfall_aggregate`, `drr_river_discharge_screen`, `drr_monitor_check` |
+| **Telemetry & Hydrology** | `drr_gdacs_fetch`, `drr_usgs_earthquake_fetch`, `drr_fdsn_shakemap_fetch`, `drr_openmeteo_forecast`, `drr_sensorthings_fetch`, `drr_stac_hazard_fetch`, `drr_hdx_hapi_fetch`, `drr_hdx_catalog_search`, `drr_basin_rainfall_aggregate`, `drr_river_discharge_screen`, `drr_monitor_check` |
 | **Contracts, Governance & Benchmarks** | `drr_input_contract_validate`, `drr_source_provenance_manifest`, `drr_model_registry_list`, `drr_assessment_replay_validate`, `drr_benchmark_run` |
 | **Spatial, COD-AB, Overlay & Raster** | `drr_spatial_exposure_join`, `drr_critical_infra_overlay`, `drr_osm_critical_infra_fetch`, `drr_cod_boundary_validate`, `drr_hdx_polygon_population_estimate`, `drr_geojson_validate`, `drr_geometry_repair`, `drr_crs_transform`, `drr_raster_zonal_stats` |
 | **Fragility, Loss, Severity & Sendai** | `drr_fragility_eval`, `drr_vulnerability_matrix_calc`, `drr_humanitarian_severity_assess`, `drr_sendai_validate` |
