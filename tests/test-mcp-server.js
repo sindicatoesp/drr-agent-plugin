@@ -56,7 +56,7 @@ async function run() {
 	send({ jsonrpc: "2.0", id: 2, method: "tools/list", params: {} });
 	const listRes = await waitForResponse(2);
 	assert(listRes, "Expected tools/list response");
-	assert.strictEqual(listRes.result.tools.length, 33);
+	assert.strictEqual(listRes.result.tools.length, 37);
 
 	// 3. tools/call: drr_fragility_eval
 	send({
@@ -402,6 +402,44 @@ async function run() {
 	assert.strictEqual(infraRes.summary.totalFacilities, 10);
 	assert.strictEqual(infraRes.summary.cascadingServiceRiskCount, 2);
 
+	const hapiSample = JSON.parse(
+		fs.readFileSync(path.join(__dirname, "../examples/hdx-hapi-cod/sample-hapi-population.json"), "utf8"),
+	);
+	const hapiRes = await callTool(31, "drr_hdx_hapi_fetch", {
+		samplePayload: hapiSample,
+		locationCode: "THA",
+	});
+	assert.strictEqual(hapiRes.summary.recordCount, 2);
+	assert.strictEqual(hapiRes.summary.totalIndicatorValue, 282000);
+
+	const codSample = JSON.parse(
+		fs.readFileSync(path.join(__dirname, "../examples/hdx-hapi-cod/sample-cod-ab.geojson"), "utf8"),
+	);
+	const codRes = await callTool(32, "drr_cod_boundary_validate", {
+		boundaryGeoJSON: codSample,
+		expectedIso3: "THA",
+		expectedAdminLevel: 2,
+		deltaDivisions: ["TH9001", "TH9002"],
+	});
+	assert.strictEqual(codRes.valid, true);
+	assert.strictEqual(codRes.deltaReconciliation.reconciled, true);
+
+	const sevRes = await callTool(33, "drr_humanitarian_severity_assess", {
+		pcode: "TH9001",
+		hazardType: "flood",
+		hazardIntensity: 7.5,
+		affectedPopulation: 42000,
+		totalPopulation: 160000,
+		vulnerability: 6.2,
+		copingCapacityDeficit: 5.8,
+	});
+	assert.strictEqual(sevRes.dataConfidence, "high");
+	assert(sevRes.severityPhase >= 3);
+
+	const benchRes = await callTool(34, "drr_benchmark_run", {});
+	assert.strictEqual(benchRes.allPassed, true);
+	assert(benchRes.totalScenarios >= 6);
+
 	// 10. Error propagation verification for invalid input
 	send({
 		jsonrpc: "2.0",
@@ -417,7 +455,7 @@ async function run() {
 
 	fs.rmSync(path.join(__dirname, "../alerts"), { recursive: true, force: true });
 	child.kill();
-	console.log("✅ MCP Server Stdio tests passed (33 tools + error handling verified)!");
+	console.log("✅ MCP Server Stdio tests passed (37 tools + error handling verified)!");
 }
 
 run().catch((err) => {

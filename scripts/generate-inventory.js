@@ -72,7 +72,135 @@ const TEST_MAPPING = {
 	drr_stac_hazard_fetch: "tests/test-stac.js, tests/test-mcp-server.js",
 	drr_fdsn_shakemap_fetch: "tests/test-shakemap.js, tests/test-mcp-server.js",
 	drr_critical_infra_overlay: "tests/test-infra-overlay.js, tests/test-mcp-server.js",
+	drr_hdx_hapi_fetch: "tests/test-hdx-cod.js, tests/test-mcp-server.js",
+	drr_cod_boundary_validate: "tests/test-hdx-cod.js, tests/test-mcp-server.js",
+	drr_humanitarian_severity_assess: "tests/test-severity.js, tests/test-mcp-server.js",
+	drr_benchmark_run: "tests/test-benchmarks.js, tests/test-mcp-server.js",
 };
+
+const WRITE_GATED_TOOLS = new Set(["drr_cap_publish", "drr_delta_push_draft_record"]);
+const NETWORK_READ_TOOLS = new Set([
+	"drr_gdacs_fetch",
+	"drr_usgs_earthquake_fetch",
+	"drr_openmeteo_forecast",
+	"drr_monitor_check",
+	"drr_delta_fetch_exposure",
+	"drr_delta_docs",
+	"drr_sensorthings_fetch",
+	"drr_stac_hazard_fetch",
+	"drr_fdsn_shakemap_fetch",
+	"drr_critical_infra_overlay",
+	"drr_hdx_hapi_fetch",
+]);
+
+function parseSkillMarkdown(relPath, content, registeredToolSet) {
+	const fmMatch = content.match(/^---\r?\n([\s\S]*?)\r?\n---/);
+	const frontmatter = {};
+	if (fmMatch) {
+		for (const line of fmMatch[1].split(/\r?\n/)) {
+			const idx = line.indexOf(":");
+			if (idx > 0) {
+				const key = line.slice(0, idx).trim();
+				const val = line.slice(idx + 1).trim().replace(/^["']|["']$/g, "");
+				frontmatter[key] = val;
+			}
+		}
+	}
+
+	const getSection = (heading) => {
+		const re = new RegExp(`##\\s+${heading}\\s*\\r?\\n([\\s\\S]*?)(?=\\r?\\n##\\s+|$)`, "i");
+		const m = content.match(re);
+		return m ? m[1] : "";
+	};
+
+	const allowedSection = getSection("Allowed Executable Tools");
+	const allowedTools = [];
+	const toolMatches = allowedSection.matchAll(/`([a-z0-9_]+)`/g);
+	for (const m of toolMatches) {
+		if (m[1].startsWith("drr_") && !allowedTools.includes(m[1])) {
+			allowedTools.push(m[1]);
+		}
+	}
+
+	const countBullets = (sec) =>
+		sec
+			.split(/\r?\n/)
+			.filter((l) => /^\s*[-*]\s+/.test(l))
+			.length;
+
+	const unknownTools = allowedTools.filter((t) => !registeredToolSet.has(t));
+	let safetyTier = "read_only_analytics";
+	if (allowedTools.some((t) => WRITE_GATED_TOOLS.has(t))) {
+		safetyTier = "governance_write_gated";
+	} else if (allowedTools.some((t) => NETWORK_READ_TOOLS.has(t))) {
+		safetyTier = "external_network_read";
+	}
+
+	return {
+		name: frontmatter.name || path.basename(path.dirname(relPath)),
+		description: frontmatter.description || "",
+		path: relPath,
+		safetyTier,
+		allowedTools,
+		unknownTools,
+		hasNonGoals: countBullets(getSection("Non-Goals")) > 0,
+		nonGoalCount: countBullets(getSection("Non-Goals")),
+		triggerCount: countBullets(getSection("Triggers")),
+		escalationCount: countBullets(getSection("Escalation Conditions")),
+	};
+}
+
+function generateSkillsManifest() {
+	const registeredToolSet = new Set(TOOLS.map((t) => t.name));
+	const skillDirs = listFilesSorted("skills", (_name, full) => fs.statSync(full).isDirectory());
+	const skills = [];
+	const validationErrors = [];
+
+	for (const dir of skillDirs) {
+		const relPath = `skills/${dir}/SKILL.md`;
+		const fullPath = path.join(ROOT, relPath);
+		if (!fs.existsSync(fullPath)) {
+			validationErrors.push(`Missing SKILL.md in skills/${dir}`);
+			continue;
+		}
+		const content = fs.readFileSync(fullPath, "utf8");
+		const parsed = parseSkillMarkdown(relPath, content, registeredToolSet);
+		if (!parsed.description) {
+			validationErrors.push(`Skill '${parsed.name}' is missing frontmatter description.`);
+		}
+		if (parsed.unknownTools.length > 0) {
+			validationErrors.push(`Skill '${parsed.name}' references unregistered MCP tools: ${parsed.unknownTools.join(", ")}`);
+		}
+		skills.push({
+			name: parsed.name,
+			description: parsed.description,
+			path: parsed.path,
+			safetyTier: parsed.safetyTier,
+			allowedTools: parsed.allowedTools,
+			nonGoalCount: parsed.nonGoalCount,
+			triggerCount: parsed.triggerCount,
+			escalationCount: parsed.escalationCount,
+		});
+	}
+
+	return {
+		schemaVersion: "1.0.0",
+		pluginName: pluginManifest.name,
+		pluginVersion: pkg.version,
+		mcpServer: SERVER_NAME,
+		mcpProtocolVersion: PROTOCOL_VERSION,
+		registeredToolCount: TOOLS.length,
+		skillCount: skills.length,
+		safetyTiers: {
+			read_only_analytics: "Pure local deterministic computation, spatial validation, or benchmark verification.",
+			external_network_read: "Reads external hazard/humanitarian APIs with SSRF guards and prompt-injection sanitization.",
+			governance_write_gated: "Includes state-mutating or publication tools gated by Draft-default, approval tokens, or explicit production flags.",
+		},
+		valid: validationErrors.length === 0,
+		validationErrors,
+		skills,
+	};
+}
 
 function generateInventoryMarkdown() {
 	const headSha = safeGit(["rev-parse", "HEAD"]);
@@ -102,6 +230,7 @@ function generateInventoryMarkdown() {
 	lines.push(`- **Library Modules (\`lib/*.js\`)**: ${libModules.length}`);
 	lines.push(`- **Public Exports (\`lib/index.js\`)**: ${exportedSymbols.length}`);
 	lines.push(`- **Skills (\`skills/*/SKILL.md\`)**: ${skillDirs.length}`);
+	lines.push(`- **Skills Manifest**: \`skills-manifest.json\``);
 	lines.push(`- **Test Suites (\`tests/test-*.js\`)**: ${testFiles.length}`);
 	lines.push("");
 	lines.push("### Documentation Reconciliation Note");
@@ -153,11 +282,22 @@ if (require.main === module) {
 	const outPath = path.join(ROOT, "docs", "tool-inventory.md");
 	const content = generateInventoryMarkdown();
 	fs.writeFileSync(outPath, content, "utf8");
+
+	const manifestPath = path.join(ROOT, "skills-manifest.json");
+	const manifest = generateSkillsManifest();
+	fs.writeFileSync(manifestPath, JSON.stringify(manifest, null, 2) + "\n", "utf8");
+
 	console.log(`✅ Generated ${path.relative(ROOT, outPath)} (${TOOLS.length} MCP tools, ${extractCliCommands().length} CLI commands)`);
+	console.log(`✅ Generated ${path.relative(ROOT, manifestPath)} (${manifest.skillCount} skills, valid=${manifest.valid})`);
+	if (!manifest.valid) {
+		console.error(`❌ Skills manifest validation errors:\n- ${manifest.validationErrors.join("\n- ")}`);
+		process.exit(1);
+	}
 }
 
 module.exports = {
 	generateInventoryMarkdown,
+	generateSkillsManifest,
 	extractCliCommands,
 	TOOLS,
 };

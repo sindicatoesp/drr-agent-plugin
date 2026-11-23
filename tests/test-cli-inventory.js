@@ -1,8 +1,9 @@
 const assert = require("assert");
+const fs = require("fs");
 const path = require("path");
 const { execFileSync } = require("child_process");
 const { TOOLS } = require("../bin/mcp-server");
-const { generateInventoryMarkdown, extractCliCommands } = require("../scripts/generate-inventory");
+const { generateInventoryMarkdown, generateSkillsManifest, extractCliCommands } = require("../scripts/generate-inventory");
 
 console.log("Testing CLI Subcommands & Programmatic Inventory Generator (R-01)...");
 
@@ -30,10 +31,14 @@ function runCli(args, expectFailure = false) {
 const helpOut = runCli(["--help"]);
 assert(helpOut.includes("replay-validate"), "CLI --help must list new commands");
 assert(helpOut.includes("sendai-validate"), "CLI --help must list sendai-validate");
+assert(helpOut.includes("hdx-hapi"), "CLI --help must list hdx-hapi");
+assert(helpOut.includes("cod-validate"), "CLI --help must list cod-validate");
+assert(helpOut.includes("severity-assess"), "CLI --help must list severity-assess");
+assert(helpOut.includes("benchmark"), "CLI --help must list benchmark");
 
 const cliCmds = extractCliCommands();
-assert.strictEqual(TOOLS.length, 33, "MCP server must expose 33 tools");
-assert.strictEqual(cliCmds.length, 33, "CLI must register 33 subcommands");
+assert.strictEqual(TOOLS.length, 37, "MCP server must expose 37 tools");
+assert.strictEqual(cliCmds.length, 37, "CLI must register 37 subcommands");
 
 const invMd = generateInventoryMarkdown();
 for (const tool of TOOLS) {
@@ -42,6 +47,14 @@ for (const tool of TOOLS) {
 for (const cmd of cliCmds) {
 	assert(invMd.includes(`\`drr-tool ${cmd}\``), `Inventory markdown missing CLI command ${cmd}`);
 }
+
+const manifest = generateSkillsManifest();
+assert.strictEqual(manifest.valid, true, `Skills manifest invalid: ${manifest.validationErrors.join("; ")}`);
+assert.strictEqual(manifest.skillCount, 19, "Skills manifest must index 19 skills");
+assert.strictEqual(manifest.registeredToolCount, 37);
+const manifestOnDisk = JSON.parse(fs.readFileSync(path.join(ROOT, "skills-manifest.json"), "utf8"));
+assert.strictEqual(manifestOnDisk.skillCount, manifest.skillCount, "skills-manifest.json on disk must stay synced");
+assert.strictEqual(manifestOnDisk.valid, true);
 
 // 2. CLI computational & validation commands
 const fragOut = JSON.parse(runCli(["fragility", "--hazard", "earthquake", "--intensity", "0.35", "--taxonomy", "URM"]));
@@ -111,5 +124,43 @@ const infraOut = JSON.parse(
 );
 assert.strictEqual(infraOut.summary.totalFacilities, 10);
 assert.strictEqual(infraOut.summary.cascadingServiceRiskCount, 2);
+
+const hapiOut = JSON.parse(
+	runCli(["hdx-hapi", "--file", "examples/hdx-hapi-cod/sample-hapi-population.json", "--iso3", "THA"]),
+);
+assert.strictEqual(hapiOut.summary.recordCount, 2);
+assert.strictEqual(hapiOut.summary.totalIndicatorValue, 282000);
+
+const codOut = JSON.parse(
+	runCli(["cod-validate", "--file", "examples/hdx-hapi-cod/sample-cod-ab.geojson", "--iso3", "THA", "--admin-level", "2"]),
+);
+assert.strictEqual(codOut.valid, true);
+assert.strictEqual(codOut.summary.uniquePcodeCount, 2);
+
+const sevOut = JSON.parse(
+	runCli([
+		"severity-assess",
+		"--pcode",
+		"TH9001",
+		"--hazard",
+		"flood",
+		"--hazard-intensity",
+		"7.5",
+		"--affected-pop",
+		"42000",
+		"--total-pop",
+		"160000",
+		"--vulnerability",
+		"6.2",
+		"--coping-deficit",
+		"5.8",
+	]),
+);
+assert.strictEqual(sevOut.dataConfidence, "high");
+assert(sevOut.severityPhase >= 3);
+
+const benchOut = JSON.parse(runCli(["benchmark"]));
+assert.strictEqual(benchOut.allPassed, true);
+assert(benchOut.totalScenarios >= 6);
 
 console.log("✅ CLI subcommands & programmatic inventory tests passed!");
