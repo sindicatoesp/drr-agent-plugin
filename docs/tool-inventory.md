@@ -8,15 +8,15 @@
 - **Plugin Manifest**: `drr-analytics` v1.8.0
 - **MCP Server**: `drr-analytics-mcp` v1.8.0 (protocol `2024-11-05`)
 - **Git Branch**: `main`
-- **Reference Baseline Commit (`origin/dev`)**: `6dd292be3b636099c988fe13da196082e164c868`
-- **Current HEAD Commit**: `7c31357e8befaf716a46f0cf07ed8ba297220160`
+- **Reference Baseline Commit (`origin/dev`)**: `unknown`
+- **Current HEAD Commit**: `fbb8ccc7fc87d947dfab9ea501cbb50ca5aace78`
 - **Registered MCP Tools**: 40
 - **Registered CLI Subcommands**: 40
 - **Library Modules (`lib/*.js`)**: 32
 - **Public Exports (`lib/index.js`)**: 246
 - **Skills (`skills/*/SKILL.md`)**: 19
 - **Skills Manifest**: `skills-manifest.json`
-- **Test Suites (`tests/test-*.js`)**: 29
+- **Test Suites (`tests/test-*.js`)**: 30
 
 ### Documentation Reconciliation Note
 - **Historical 10-vs-11 discrepancy (`origin/dev`)**: `bin/mcp-server.js` registered 11 tools (including `drr_delta_docs`), whereas `docs/api-reference.md` documented 10 tools and omitted `drr_delta_docs`. Both `docs/api-reference.md` and `README.md` are now reconciled with the expanded registration baseline of **29 MCP tools**.
@@ -41,7 +41,7 @@
 | 14 | `drr_input_contract_validate` | `input` | `strictMissingData` | `tests/test-contracts-registry.js, tests/test-mcp-server.js` | Validate DRR assessment inputs across hazard intensity/units, coordinate order, temporal intervals, currency/valuationYear, and missing-data semantics (unknown !== zero). |
 | 15 | `drr_source_provenance_manifest` | — | `sourceIds`, `method`, `inputsSnapshot`, `evidenceBasis`, `verificationStatus`, `approvalStatus`, `seed` | `tests/test-contracts-registry.js, tests/test-mcp-server.js` | Generate a secret-sanitized provenance and independent C-03 governance manifest (evidenceBasis, verificationStatus, approvalStatus, reportingEligibility, SHA-256 snapshot hash). |
 | 16 | `drr_model_registry_list` | — | `methodId`, `value`, `assetClass`, `mode` | `tests/test-contracts-registry.js, tests/test-mcp-server.js` | List all registered scientific models, empirical bounds, units, and illustrative vs. production applicability status (or check applicability of a specific methodId). |
-| 17 | `drr_assessment_replay_validate` | — | `suite` | `tests/test-sendai-replay.js, tests/test-mcp-server.js` | Run deterministic frozen-input replay verification suite covering mathematical invariants, unit conversions, missing-data semantics, CAP XML, Sendai rules, and hindcast benchmarks. |
+| 17 | `drr_assessment_replay_validate` | — | `suite` | `tests/test-sendai-replay.js, tests/test-mcp-server.js` | Run deterministic frozen-input replay verification suite covering L0/L1 mathematical invariants, L2 reference model verification, and L3 multi-event historical hindcast & FbF trigger skill benchmarks. |
 | 18 | `drr_sendai_validate` | `payload` | `requireCalibratedMethodology` | `tests/test-sendai-replay.js, tests/test-mcp-server.js` | Validate UNDRR Sendai Framework Monitor semantics: separates displacement from B-1 directly affected, physical damage (D-2..D-4) from disruption (D-6..D-8), enforces denominators for per-100k metrics, and separates C-03 states. |
 | 19 | `drr_hazard_crosswalk` | `query` | `sourceSystem`, `candidateLimit` | `tests/test-events-crosswalk.js, tests/test-mcp-server.js` | Versioned UNDRR-ISC HIP hazard crosswalk: performs deterministic resolution on exact IDs/codes/aliases while returning human-reviewed candidates for ambiguous free-text queries. |
 | 20 | `drr_event_match_deduplicate` | `incomingEvents` | `existingCatalog`, `spatialRadiusKm`, `timeWindowHours` | `tests/test-events-crosswalk.js, tests/test-mcp-server.js` | Multi-source event identity & deduplication engine classifying exact ID matches, revision updates, possible cross-source duplicates (held for review), and non-causal cascading candidates. |
@@ -166,7 +166,7 @@
 - `skills/undrr-hip-hazard-classification/SKILL.md`
 - `skills/vulnerability-matrix/SKILL.md`
 
-## Automated Test Suites (29)
+## Automated Test Suites (30)
 
 - `tests/test-benchmarks.js`
 - `tests/test-cap.js`
@@ -180,6 +180,7 @@
 - `tests/test-hdx-cod.js`
 - `tests/test-hindcast-regression.js`
 - `tests/test-infra-overlay.js`
+- `tests/test-l2-l3-validation.js`
 - `tests/test-mcp-server.js`
 - `tests/test-monitor.js`
 - `tests/test-openmeteo.js`

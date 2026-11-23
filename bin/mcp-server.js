@@ -445,13 +445,13 @@ const TOOLS = [
 	{
 		name: "drr_assessment_replay_validate",
 		description:
-			"Run deterministic frozen-input replay verification suite covering mathematical invariants, unit conversions, missing-data semantics, CAP XML, Sendai rules, and hindcast benchmarks.",
+			"Run deterministic frozen-input replay verification suite covering L0/L1 mathematical invariants, L2 reference model verification, and L3 multi-event historical hindcast & FbF trigger skill benchmarks.",
 		inputSchema: {
 			type: "object",
 			properties: {
 				suite: {
 					type: "string",
-					enum: ["all", "synthetic_reference", "hindcast_benchmark"],
+					enum: ["all", "synthetic_reference", "reference_model", "hindcast_benchmark"],
 					description: "Subset of replay cases to execute (default: all)",
 				},
 			},
