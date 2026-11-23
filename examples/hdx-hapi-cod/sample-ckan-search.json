@@ -1,0 +1,108 @@
+{
+  "help": "https://data.humdata.org/api/3/action/help_show?name=package_search",
+  "success": true,
+  "result": {
+    "count": 3,
+    "results": [
+      {
+        "id": "cod-ps-tha-001",
+        "name": "cod-ps-tha",
+        "title": "Thailand - Subnational Population Statistics",
+        "organization": {
+          "name": "ocha-roap",
+          "title": "OCHA Regional Office for Asia and the Pacific (ROAP)"
+        },
+        "groups": [
+          { "name": "tha", "title": "Thailand" }
+        ],
+        "cod_level": "cod-ps",
+        "has_geodata": false,
+        "subnational": "1",
+        "dataset_date": "[2024-01-01T00:00:00 TO 2024-12-31T23:59:59]",
+        "last_modified": "2025-10-15T08:30:00.000000",
+        "data_update_frequency": "365",
+        "license_id": "cc-by-igo",
+        "license_title": "Creative Commons Attribution for Intergovernmental Organisations",
+        "caveats": "Subnational population estimates disaggregated by ADM1/ADM2 P-codes.",
+        "resources": [
+          {
+            "id": "res-tha-adm2-csv",
+            "name": "tha_admpop_adm2_2024.csv",
+            "format": "CSV",
+            "download_url": "https://data.humdata.org/dataset/cod-ps-tha/resource/res-tha-adm2-csv/download/tha_admpop_adm2_2024.csv",
+            "size": 148290,
+            "hash": "a1b2c3d4e5f6",
+            "last_modified": "2025-10-15T08:30:00.000000",
+            "datastore_active": true
+          }
+        ]
+      },
+      {
+        "id": "cod-ab-tha-002",
+        "name": "cod-ab-tha",
+        "title": "Thailand - Subnational Administrative Boundaries",
+        "organization": {
+          "name": "ocha-roap",
+          "title": "OCHA Regional Office for Asia and the Pacific (ROAP)"
+        },
+        "groups": [
+          { "name": "tha", "title": "Thailand" }
+        ],
+        "cod_level": "cod-ab",
+        "has_geodata": true,
+        "subnational": "1",
+        "dataset_date": "[2025-01-01T00:00:00 TO 2025-10-01T23:59:59]",
+        "last_modified": "2025-10-01T12:00:00.000000",
+        "data_update_frequency": "365",
+        "license_id": "cc-by-igo",
+        "license_title": "Creative Commons Attribution for Intergovernmental Organisations",
+        "caveats": "Official OCHA COD-AB WGS84 administrative boundaries (ADM0-ADM3).",
+        "resources": [
+          {
+            "id": "res-tha-adm2-geojson",
+            "name": "tha_admbnda_adm2_rtsd.geojson",
+            "format": "GeoJSON",
+            "download_url": "https://data.humdata.org/dataset/cod-ab-tha/resource/res-tha-adm2-geojson/download/tha_admbnda_adm2_rtsd.geojson",
+            "size": 4215800,
+            "hash": "f6e5d4c3b2a1",
+            "last_modified": "2025-10-01T12:00:00.000000",
+            "datastore_active": false
+          }
+        ]
+      },
+      {
+        "id": "kontur-pop-global-003",
+        "name": "kontur-population-dataset",
+        "title": "Kontur Population: Global Population Density for 400m H3 Hexagons",
+        "organization": {
+          "name": "kontur",
+          "title": "Kontur"
+        },
+        "groups": [
+          { "name": "world", "title": "World" }
+        ],
+        "cod_level": null,
+        "has_geodata": true,
+        "subnational": "0",
+        "dataset_date": "[2023-10-01T00:00:00 TO 2023-10-31T23:59:59]",
+        "last_modified": "2023-10-31T00:00:00.000000",
+        "data_update_frequency": "365",
+        "license_id": "cc-by",
+        "license_title": "Creative Commons Attribution International",
+        "caveats": "Derived from GHS-POP, HRSL, and Microsoft Buildings on 400m H3 hexagons.",
+        "resources": [
+          {
+            "id": "res-kontur-gpkg",
+            "name": "kontur_population_20231101.gpkg.gz",
+            "format": "Geopackage",
+            "download_url": "https://data.humdata.org/dataset/kontur-population-dataset/resource/res-kontur-gpkg/download/kontur_population_20231101.gpkg.gz",
+            "size": 1950000000,
+            "hash": "998877665544",
+            "last_modified": "2023-10-31T00:00:00.000000",
+            "datastore_active": false
+          }
+        ]
+      }
+    ]
+  }
+}

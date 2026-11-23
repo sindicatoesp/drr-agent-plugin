@@ -313,8 +313,151 @@ async function testTieredReportingAndExposureCoverage() {
 	assert(redCap.includes("<severity>Extreme</severity>"));
 	assert(redCap.includes("<urgency>Immediate</urgency>"));
 
+	// 4. Verify alerts/index.html dashboard was auto-generated with links to reports
+	const indexHtmlPath = path.join(tmpAlertsDir, "index.html");
+	assert(fs.existsSync(indexHtmlPath), "alerts/index.html must be auto-generated");
+	const indexHtml = fs.readFileSync(indexHtmlPath, "utf8");
+	assert(indexHtml.includes("usgs_yellow_china.brief.md"), "index.html must link to yellow brief.md");
+	assert(indexHtml.includes("usgs_red_tsunami.sitrep.html"), "index.html must link to red sitrep.html");
+	assert(indexHtml.includes("usgs_red_tsunami.cap.xml"), "index.html must link to red cap.xml");
+	assert(indexHtml.includes("usgs_red_tsunami.assessment.json"), "index.html must link to assessment.json");
+
 	fs.rmSync(tmpAlertsDir, { recursive: true, force: true });
-	console.log("✅ Tiered reporting policy & honest exposure coverage tests passed!");
+	console.log("✅ Tiered reporting policy, honest exposure coverage & alerts/index.html tests passed!");
+}
+
+async function testAutoOsmAndHdxEnrichment() {
+	console.log("Testing Automatic OSM Interim Infra & HDX Polygon Population Enrichment...");
+	const os = require("os");
+	const { processQualifyingEvent } = require("../lib/monitor");
+	const tmpAlertsDir = path.join(os.tmpdir(), `drr-monitor-enrich-${Date.now()}`);
+	const osmSamplePayload = JSON.parse(
+		fs.readFileSync(path.join(__dirname, "..", "examples", "critical-infra-overlay", "sample-osm-overpass.json"), "utf8"),
+	);
+	const codBoundaryGeoJSON = JSON.parse(
+		fs.readFileSync(path.join(__dirname, "..", "examples", "hdx-hapi-cod", "sample-cod-ab.geojson"), "utf8"),
+	);
+	const hapiSamplePayload = JSON.parse(
+		fs.readFileSync(path.join(__dirname, "..", "examples", "hdx-hapi-cod", "sample-hapi-population.json"), "utf8"),
+	);
+
+	// Unrelated California exposure layer (far from Hat Yai, Thailand)
+	const unrelatedExposure = {
+		type: "FeatureCollection",
+		features: [
+			{
+				type: "Feature",
+				properties: { name: "Distant Asset", occupancy_type: "RES", population: 500, replacement_value_usd: 1000000 },
+				geometry: { type: "Point", coordinates: [-122.4, 37.7] },
+			},
+		],
+	};
+
+	// 1. Suppressed GREEN event must NOT trigger OSM/HDX enrichment
+	const greenRes = await processQualifyingEvent(
+		{
+			id: "usgs_green_hatyai",
+			title: "M 4.6 - Near Hat Yai, Thailand",
+			place: "Hat Yai, Thailand",
+			magnitude: 4.6,
+			estimatedPgaG: 0.05,
+			alertLevel: "green",
+			coordinates: [100.474, 7.008],
+			source: "USGS",
+		},
+		{ outputDirectory: tmpAlertsDir, reportPolicy: { minReportAlertLevel: "Yellow" } },
+		{
+			exposureGeoJSON: unrelatedExposure,
+			osmSamplePayload,
+			codBoundaryGeoJSON,
+			hapiSamplePayload,
+			mock: true,
+		},
+	);
+	assert.strictEqual(greenRes.reportSuppressed, true);
+	assert.strictEqual(greenRes.osmInterimReport, null, "Suppressed GREEN event must not run OSM enrichment");
+	assert.strictEqual(greenRes.hdxPopulationReport, null, "Suppressed GREEN event must not run HDX enrichment");
+
+	// 2. ORANGE event with outside_exposure_coverage -> triggers OSM interim infra + HDX polygon pop
+	const orangeRes = await processQualifyingEvent(
+		{
+			id: "usgs_orange_hatyai",
+			title: "M 6.4 - Near Hat Yai, Songkhla, Thailand",
+			place: "Hat Yai, Songkhla, Thailand",
+			magnitude: 6.4,
+			depthKm: 12.0,
+			estimatedPgaG: 0.28,
+			alertLevel: "orange",
+			coordinates: [100.474, 7.008],
+			source: "USGS",
+		},
+		{
+			outputDirectory: tmpAlertsDir,
+			reportPolicy: { minReportAlertLevel: "Yellow" },
+			enrichment: { autoOsmInterimInfra: true, autoHdxPolygonPop: true },
+		},
+		{
+			exposureGeoJSON: unrelatedExposure,
+			osmSamplePayload,
+			codBoundaryGeoJSON,
+			hapiSamplePayload,
+			mock: true,
+		},
+	);
+	assert.strictEqual(orangeRes.reportMode, "full_emergency");
+	assert.strictEqual(orangeRes.exposureCoverage.status, "interim_osm_fallback");
+	assert(orangeRes.osmInterimReport && orangeRes.osmInterimReport.summary.totalFacilities === 5);
+	assert(orangeRes.spatialReport.summary.totalExposedAssets === 5);
+	assert(orangeRes.hdxPopulationReport && orangeRes.hdxPopulationReport.summary.totalAreaWeightedExposedPopulation > 0);
+
+	const brief = fs.readFileSync(orangeRes.filesCreated.brief, "utf8");
+	assert(brief.includes("## Interim Open-Source Enrichment"), "Brief must include Interim Open-Source Enrichment section");
+	assert(brief.includes("ODbL-1.0"), "Brief must preserve OSM ODbL-1.0 attribution");
+	assert(brief.includes("external_unverified"), "Brief must flag interim OSM data as external_unverified");
+	assert(brief.includes("HDX/COD-AB areal est., ≠ B-1"), "Brief must surface HDX areal estimate with != B-1 caveat");
+	assert(brief.includes("Unknown (no local asset valuation layer)"), "Brief must not report $0 USD for interim OSM without valuation");
+
+	const capXml = fs.readFileSync(orangeRes.filesCreated.capXml, "utf8");
+	assert(capXml.includes("Interim OSM critical infrastructure exposed: 5"), "CAP XML description must reflect interim OSM infra count");
+	assert(capXml.includes("HDX/COD-AB areal est."), "CAP XML description must reflect HDX population estimate");
+
+	const indexHtml = fs.readFileSync(path.join(tmpAlertsDir, "index.html"), "utf8");
+	assert(indexHtml.includes("Interim OSM Infra (5)"), "alerts/index.html must display Interim OSM Infra badge");
+	assert(indexHtml.includes("HDX Pop Est: ~"), "alerts/index.html must display HDX Pop Est badge");
+
+	// 3. YELLOW event without local COD-AB file -> triggers public HDX CKAN catalog discovery (no API key)
+	const hdxCatalogSamplePayload = JSON.parse(
+		fs.readFileSync(path.join(__dirname, "..", "examples", "hdx-hapi-cod", "sample-ckan-search.json"), "utf8"),
+	);
+	const catalogRes = await processQualifyingEvent(
+		{
+			id: "usgs_yellow_hatyai_catalog",
+			title: "M 5.6 - Near Hat Yai, Thailand",
+			place: "Hat Yai, Thailand",
+			magnitude: 5.6,
+			estimatedPgaG: 0.16,
+			alertLevel: "yellow",
+			coordinates: [100.474, 7.008],
+			source: "USGS",
+		},
+		{
+			outputDirectory: tmpAlertsDir,
+			reportPolicy: { minReportAlertLevel: "Yellow" },
+			enrichment: { autoOsmInterimInfra: false, autoHdxCatalogDiscovery: true },
+		},
+		{
+			exposureGeoJSON: unrelatedExposure,
+			hdxCatalogSamplePayload,
+			mock: true,
+		},
+	);
+	assert(catalogRes.hdxCatalogReport && catalogRes.hdxCatalogReport.datasets.length === 3);
+	const catBrief = fs.readFileSync(catalogRes.filesCreated.brief, "utf8");
+	assert(catBrief.includes("OCHA HDX CKAN Catalog Discovery (no API key)"), "Brief must surface discovered HDX CKAN datasets");
+	assert(catBrief.includes("Thailand - Subnational Population Statistics"), "Brief must link discovered COD-PS dataset");
+
+	fs.rmSync(tmpAlertsDir, { recursive: true, force: true });
+	console.log("✅ Automatic OSM interim infra, HDX polygon pop & HDX CKAN catalog discovery tests passed!");
 }
 
 async function run() {
@@ -322,6 +465,7 @@ async function run() {
 	await testCycle();
 	await testCountryFilter();
 	await testTieredReportingAndExposureCoverage();
+	await testAutoOsmAndHdxEnrichment();
 }
 
 run().catch((err) => {

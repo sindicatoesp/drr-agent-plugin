@@ -5,11 +5,20 @@
   "outputDirectory": "./alerts",
   "webhookUrl": "${MONITOR_WEBHOOK_URL}",
   "defaultExposureFile": "./examples/earthquake-hazus-scenario/input-exposure.json",
+  "capSender": "monitor@drr-agent-plugin.local",
   "autoPushToDelta": true,
   "reportPolicy": {
     "minReportAlertLevel": "Yellow",
     "writeFullPackageOnYellow": false,
     "maxEventAgeHours": 72
+  },
+  "enrichment": {
+    "autoOsmInterimInfra": true,
+    "osmMaxElements": 250,
+    "osmTimeoutSec": 15,
+    "autoHdxPolygonPop": true,
+    "autoHdxCatalogDiscovery": true,
+    "codBoundaryFile": null
   },
   "countryFilter": {
     "enabled": true,

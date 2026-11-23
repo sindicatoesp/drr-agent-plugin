@@ -9,6 +9,7 @@ const http = require("http");
 const https = require("https");
 const fs = require("fs");
 const path = require("path");
+const { generateAlertsIndexHtml } = require("../lib/monitor");
 
 const PORT = parseInt(process.env.PORT || "3300", 10);
 const HOST = process.env.HOST || "127.0.0.1";
@@ -221,6 +222,29 @@ const server = http.createServer((req, res) => {
 		);
 	}
 
+	// 2b. Alerts Dashboard Index Route: /alerts -> /alerts/ -> live-refreshed alerts/index.html
+	if (pathname === "/alerts") {
+		res.writeHead(302, { Location: "/alerts/", ...SECURITY_HEADERS });
+		return res.end();
+	}
+	if (pathname === "/alerts/" || pathname === "/alerts/index.html") {
+		try {
+			const alertsDir = path.join(ROOT_DIR, "alerts");
+			const { indexPath } = generateAlertsIndexHtml(alertsDir);
+			const html = fs.readFileSync(indexPath, "utf8");
+			res.writeHead(200, {
+				"Content-Type": "text/html; charset=UTF-8",
+				"Content-Length": Buffer.byteLength(html, "utf8"),
+				"Cache-Control": "no-store",
+				...SECURITY_HEADERS,
+			});
+			return res.end(html);
+		} catch (err) {
+			res.writeHead(500, { "Content-Type": "text/plain; charset=UTF-8", ...SECURITY_HEADERS });
+			return res.end(`500 Internal Server Error: ${err.message}`);
+		}
+	}
+
 	// 3. Static File Serving
 	let safePath = path.normalize(pathname).replace(/^(\.\.[\/\\])+/, "");
 	if (safePath === "/" || safePath === "") {
@@ -279,6 +303,7 @@ if (require.main === module) {
 		console.log("\x1b[1m\x1b[36m==================================================\x1b[0m");
 		console.log("\x1b[1m\x1b[32m 🚀 DRR Agent Plugin Presentation & Tile Server \x1b[0m");
 		console.log("\x1b[1m\x1b[36m==================================================\x1b[0m");
+		console.log(`  \x1b[1mAlerts Index:\x1b[0m  http://localhost:${PORT}/alerts/`);
 		console.log(`  \x1b[1mLocal URL:\x1b[0m     http://localhost:${PORT}/docs/presentation/gis-map-presentation.html`);
 		console.log(`  \x1b[1mSlide Deck:\x1b[0m    http://localhost:${PORT}/docs/presentation/slides.html`);
 		console.log(`  \x1b[1mSitRep HTML:\x1b[0m   http://localhost:${PORT}/examples/earthquake-hazus-scenario/situation-report.html`);

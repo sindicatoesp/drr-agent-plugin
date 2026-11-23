@@ -43,6 +43,7 @@ A template configuration is provided in [`drr-agent-plugin/.env.example`](../.en
 | **`OSM_OVERPASS_URL`** | `https://overpass-api.de/api/interpreter` | Overpass API interpreter endpoint for interim OpenStreetMap critical infrastructure fallback (`drr_osm_critical_infra_fetch`; SSRF-guarded). |
 | **`HDX_HAPI_URL`** | `https://hapi.humdata.org/api/v2` | Base URL for OCHA HDX Humanitarian API (HAPI v2) indicator queries (SSRF-guarded). |
 | **`HAPI_APP_IDENTIFIER`** | *None (empty)* | Registered OCHA HAPI `app_identifier` query parameter required for live requests to `hapi.humdata.org`. |
+| **`HDX_CKAN_URL`** | `https://data.humdata.org/api/3/action/package_search` | Public OCHA HDX CKAN Action API v3 endpoint (no API key required) used by `drr_hdx_catalog_search` and monitor enrichment to discover COD-AB, COD-PS, WorldPop, Kontur, and HOTOSM datasets. |
 | **`DELTA_API_URL`** | `http://localhost:3000/en/api/mcp` | Target endpoint for connecting to DELTA Resilience core application MCP server. |
 | **`DELTA_MCP_API_KEY`** | *None (empty)* | Secret API token passed in `X-Auth` header to authenticate against DELTA's database. |
 | **`TARGET_COUNTRIES`** | `*` (all) | Comma-separated list of target country names or ISO-2/3 codes (e.g. `Indonesia,ID,IDN`). Foreign events are excluded from DELTA push. |
@@ -223,6 +224,8 @@ Run continuous feed polling against custom threshold rules:
 | `make config-check` | Validates environment variables, active API URLs, and JSON rules syntax. |
 | `make config-show` | Displays current active configuration while masking confidential secrets. |
 | `make alerts-validate` | Verifies declarative threshold rule count and structure. |
+| `make infra-build-global` | Downloads & builds a single static Global Major Infrastructure GeoJSON (`WRI` + `OurAirports`) into `data/`. |
+| `make infra-build-regional PRESET=thailand` | Builds a tiled Regional OSM Critical Infrastructure GeoJSON (`southeast-asia`, `philippines`, `indonesia`, `thailand`, `nepal`, `caribbean`, `pacific-islands`) into `data/`. |
 | `make clean-alerts` | Removes temporary generated CAP XMLs and alert artifacts from `alerts/`. |
 
 ---
@@ -273,6 +276,37 @@ When an event from outside the target country is evaluated, the plugin logs:
 [DELTA Country Filter] Skipped pushing event "Offshore Maule, Chile":
 Country "Chile" does not match national DELTA instance ["Indonesia", "ID", "IDN"].
 ```
+
+---
+
+## 5b. Report Tiering (`reportPolicy`) & Automatic Enrichment (`enrichment`)
+
+In `alerts-config.json`, you can control alert report verbosity and automatic open-source enrichment for qualifying `YELLOW`, `ORANGE`, and `RED` events:
+
+```json
+{
+  "reportPolicy": {
+    "minReportAlertLevel": "Yellow",
+    "writeFullPackageOnYellow": false,
+    "maxEventAgeHours": 72
+  },
+  "enrichment": {
+    "autoOsmInterimInfra": true,
+    "osmMaxElements": 250,
+    "osmTimeoutSec": 15,
+    "autoHdxPolygonPop": true,
+    "autoHdxCatalogDiscovery": true,
+    "codBoundaryFile": null
+  }
+}
+```
+
+* **`reportPolicy.minReportAlertLevel`**: Minimum alert level (`Green`, `Yellow`, `Orange`, `Red`) that generates files in `alerts/`. Events below this level (e.g., routine `GREEN` quakes) are suppressed to `ledger_only` and do not trigger enrichment calls.
+* **`reportPolicy.writeFullPackageOnYellow`**: When `false` (default), `YELLOW` events write a concise 2-file advisory (`.brief.md` + `.assessment.json`), while `ORANGE`/`RED`/tsunami events write the full 4-file emergency package (`.cap.xml`, `.brief.md`, `.sitrep.html`, `.assessment.json`).
+* **`reportPolicy.maxEventAgeHours`**: Maximum event age (default `72` hours for live runs) to avoid backfilling historical catalog events.
+* **`enrichment.autoOsmInterimInfra`**: When `true` (default) and no local exposure layer covers the hazard footprint (`no_exposure_layer` or `outside_exposure_coverage`), automatically queries OpenStreetMap Overpass API (`drr_osm_critical_infra_fetch`) for interim critical infrastructure across 9 Sendai Target D sectors (`external_unverified`, `ODbL-1.0`). Disabled automatically in `DRR_OFFLINE_MODE=true` or mock runs.
+* **`enrichment.autoHdxPolygonPop`** & **`enrichment.codBoundaryFile`**: When `codBoundaryFile` points to a local OCHA COD-AB admin boundary GeoJSON file (and `HAPI_APP_IDENTIFIER` is configured in `.env`), automatically estimates area-weighted exposed population via OCHA HDX HAPI v2 (`drr_hdx_polygon_population_estimate`, `screening_only`, distinct from Sendai B-1).
+* **`enrichment.autoHdxCatalogDiscovery`**: When `true` (default) and no local `codBoundaryFile` is configured, automatically queries the public OCHA HDX CKAN Action API v3 (`drr_hdx_catalog_search`, no API key required) to surface downloadable COD-AB, COD-PS, WorldPop, and Kontur dataset links for the affected region directly in `.brief.md` and `.assessment.json`.
 
 ---
 

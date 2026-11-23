@@ -135,3 +135,28 @@ node bin/cli.js osm-infra \
 * **`water` & `protective_infrastructure`:** GRanD & GOODD Global Dam Databases
 
 > **Governance Guardrail:** Interim OSM outputs are automatically tagged `interimFallback: true`, `verificationStatus: "external_unverified"`, `reportingEligibility: "screening_only"`, and `license: "ODbL-1.0"` (`© OpenStreetMap contributors`). Crowdsourced completeness varies by region (unmapped ≠ zero) and does not include operational lifeline `dependsOn` topology; replace with authoritative national layers as soon as available.
+
+---
+
+## Pre-Building Static Global & Regional Infrastructure Packs
+
+Instead of querying Overpass live per event, you can pre-build a single local GeoJSON file once using [`scripts/build-static-infra.js`](../scripts/build-static-infra.js) and point `defaultExposureFile` in `alerts-config.json` to it:
+
+```bash
+# 1. Global Major Infrastructure (WRI Power Plants + OurAirports + optional --extra-geojson)
+make infra-build-global
+# or: node scripts/build-static-infra.js --mode global --extra-geojson ./my-healthsites.geojson
+
+# 2. Regional / Multi-Country Static Extract (auto-tiled <= 4° Overpass queries)
+make infra-build-regional PRESET=southeast-asia
+# or custom bbox: node scripts/build-static-infra.js --mode regional --bbox 97.3,5.6,105.7,20.5
+```
+
+Then configure `alerts-config.json`:
+```json
+{
+  "defaultExposureFile": "./data/static-critical-infra-global.geojson"
+}
+```
+
+See **[CREDITS.md](../CREDITS.md)** for full license and attribution requirements (`ODbL-1.0`, `CC-BY-4.0`, `Public Domain`).

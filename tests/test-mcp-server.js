@@ -56,7 +56,7 @@ async function run() {
 	send({ jsonrpc: "2.0", id: 2, method: "tools/list", params: {} });
 	const listRes = await waitForResponse(2);
 	assert(listRes, "Expected tools/list response");
-	assert.strictEqual(listRes.result.tools.length, 39);
+	assert.strictEqual(listRes.result.tools.length, 40);
 
 	// 3. tools/call: drr_fragility_eval
 	send({
@@ -461,6 +461,17 @@ async function run() {
 	assert.strictEqual(benchRes.allPassed, true);
 	assert(benchRes.totalScenarios >= 6);
 
+	const ckanFixture = JSON.parse(
+		fs.readFileSync(path.join(__dirname, "../examples/hdx-hapi-cod/sample-ckan-search.json"), "utf8"),
+	);
+	const ckanRes = await callTool(37, "drr_hdx_catalog_search", {
+		query: "population",
+		countryIso3: "THA",
+		samplePayload: ckanFixture,
+	});
+	assert.strictEqual(ckanRes.summary.returnedDatasets, 3);
+	assert.strictEqual(ckanRes.provenance.requiresApiKey, false);
+
 	// 10. Error propagation verification for invalid input
 	send({
 		jsonrpc: "2.0",
@@ -476,7 +487,7 @@ async function run() {
 
 	fs.rmSync(path.join(__dirname, "../alerts"), { recursive: true, force: true });
 	child.kill();
-	console.log("✅ MCP Server Stdio tests passed (39 tools + error handling verified)!");
+	console.log("✅ MCP Server Stdio tests passed (40 tools + error handling verified)!");
 }
 
 run().catch((err) => {
