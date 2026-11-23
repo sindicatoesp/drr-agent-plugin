@@ -238,6 +238,18 @@ Each skill in `skills/*/SKILL.md` encodes DRR scientific guardrails, tool orches
 
 ---
 
+## Digital Public Goods (DPG) Standard & UN SDG Alignment
+
+`drr-agent-plugin` is engineered to align with all **9 indicators** of the [Digital Public Goods Standard](https://www.digitalpublicgoods.net/standard) (including the **September 2025 DPGA Privacy & Data Security Framework**):
+
+* **UN Sustainable Development Goals (Indicator 1)**: Directly advances **SDG 11** (Targets `11.5`, `11.b`), **SDG 13** (Targets `13.1`, `13.3`), **SDG 1** (`1.5`), **SDG 9** (`9.1`), and **SDG 17** (`17.6`, `17.18`).
+* **Open Licensing & Clear Ownership (Indicators 2–3)**: Full OSI **[Apache-2.0](LICENSE)** for software, **CC-BY-4.0** for documentation/skills/reference data ([NOTICE](NOTICE)), and transparent stewardship ([GOVERNANCE.md](GOVERNANCE.md)).
+* **Platform Independence & Data Portability (Indicators 4 & 6)**: `0` external npm dependencies, offline/air-gap mode (`DRR_OFFLINE_MODE=true`), and non-proprietary state extraction (`npm run data:export` in JSON, GeoJSON, and CSV).
+* **Privacy, Security & Do No Harm (Indicators 7 & 9A–9C)**: Zero individual PII collected by design ([PRIVACY.md](PRIVACY.md)), built-in retention/erasure (`npm run data:purge`), vulnerability disclosure & hardening ([SECURITY.md](SECURITY.md)), [CODE_OF_CONDUCT.md](CODE_OF_CONDUCT.md), and [CONTRIBUTING.md](CONTRIBUTING.md).
+* **Full Compliance Matrix & Automated Audit**: See **[docs/dpg-compliance.md](docs/dpg-compliance.md)**, **[dpg-assessment.json](dpg-assessment.json)**, and run `npm run dpg:audit`.
+
+---
+
 ## Credits, Data Sources & Static Infrastructure Packs
 
 * **[CREDITS.md](CREDITS.md)** — Full attribution and license references for all upstream data sources (USGS, GDACS, Open-Meteo, OpenStreetMap/Overpass, OCHA HDX HAPI & COD-AB, WRI Global Power Plant Database, OurAirports, Healthsites.io), open standards (OASIS CAP, OGC, STAC, FDSN), and scientific methodologies (HAZUS-MH, GEM, JRC, JIAF/INFORM).

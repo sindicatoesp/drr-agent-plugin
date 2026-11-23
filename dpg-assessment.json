@@ -1,0 +1,125 @@
+{
+	"schemaVersion": "1.0.0",
+	"dpgStandardVersion": "DPG Standard (including Sept 2025 Privacy & Data Security Framework)",
+	"project": {
+		"name": "DRR Agent Plugin",
+		"repository": "https://github.com/sindicatoesp/drr-agent-plugin",
+		"homepage": "https://sindicatoesp.github.io/drr-agent-plugin/",
+		"assetTypes": ["open-source-software", "open-content", "open-data"],
+		"steward": "DRR Agent Plugin Maintainers (sindicatoesp)"
+	},
+	"indicators": {
+		"1_sdg_relevance": {
+			"status": "aligned",
+			"sdgs": [
+				{ "goal": 1, "targets": ["1.5"], "focus": "Resilience of poor and vulnerable populations to climate/disaster shocks" },
+				{ "goal": 9, "targets": ["9.1"], "focus": "Resilient critical infrastructure across 9 Sendai Target D sectors" },
+				{ "goal": 11, "targets": ["11.5", "11.b"], "focus": "Reduce disaster losses and implement Sendai Framework DRR" },
+				{ "goal": 13, "targets": ["13.1", "13.3"], "focus": "Climate hazard resilience and multi-hazard early warning" },
+				{ "goal": 17, "targets": ["17.6", "17.18"], "focus": "Open-source technology sharing and disaggregated statistical capacity" }
+			],
+			"evidence": ["docs/dpg-compliance.md", "README.md", "docs/methodology.md"]
+		},
+		"2_open_licensing": {
+			"status": "aligned",
+			"softwareLicense": "Apache-2.0",
+			"contentLicense": "CC-BY-4.0",
+			"dataLicense": "CC-BY-4.0",
+			"osiApproved": true,
+			"evidence": ["LICENSE", "NOTICE", "CREDITS.md", "package.json", "plugin.json"]
+		},
+		"3_clear_ownership": {
+			"status": "aligned",
+			"copyrightHolder": "DRR Agent Plugin Contributors (sindicatoesp/drr-agent-plugin)",
+			"institutionalAffiliationDisclaimer": true,
+			"evidence": ["GOVERNANCE.md", "LICENSE", "NOTICE"]
+		},
+		"4_platform_independence": {
+			"status": "aligned",
+			"externalRuntimeDependencies": 0,
+			"offlineAirGapSupported": true,
+			"crossPlatform": ["linux", "macos", "windows", "docker-alpine"],
+			"evidence": ["package.json", "scripts/lint.js", "Dockerfile", "Makefile", "make.bat"]
+		},
+		"5_documentation": {
+			"status": "aligned",
+			"evidence": [
+				"README.md",
+				"docs/api-reference.md",
+				"docs/methodology.md",
+				"docs/operational-playbook.md",
+				"docs/skills-guide.md",
+				"docs/configuration.md",
+				"docs/tool-inventory.md",
+				"CONTRIBUTING.md"
+			]
+		},
+		"6_mechanism_for_extracting_data": {
+			"status": "aligned",
+			"supportedOpenFormats": ["json", "geojson", "csv", "xml", "markdown"],
+			"cliUtility": "scripts/dpg-data-portability.js",
+			"npmScripts": ["data:export", "data:purge"],
+			"programmaticApi": ["exportLedgerState", "purgeLedgerState"],
+			"evidence": ["lib/state-store.js", "scripts/dpg-data-portability.js"]
+		},
+		"7_privacy_and_applicable_laws": {
+			"status": "aligned",
+			"collectsIndividualPii": false,
+			"telemetryOrTracking": false,
+			"sept2025MandatoryPrivacyRequirements": {
+				"dataMinimisation": "Zero individual PII collected or required; aggregated demographics and physical assets only.",
+				"userConsentMechanisms": "No end-user PII collected; all external feed calls are operator-initiated and disableable via DRR_OFFLINE_MODE=true.",
+				"dataUsageTransparency": "Complete component-level Data Flow Map documented in PRIVACY.md.",
+				"privacyByDesignAndDeletion": "Automatic retention pruning + on-demand purgeLedgerState / npm run data:purge + detectAndRedactPii.",
+				"dataRetentionTransparency": "Explicit APPROVED_RETENTION_POLICIES (minimal-7d, standard-30d, audit-90d) in lib/state-store.js.",
+				"dataGovernanceAndAccessControls": "Tenant isolation, public-audience restricted facility redaction, HMAC approval tokens, local-first sovereignty."
+			},
+			"evidence": ["PRIVACY.md", "lib/security.js", "lib/state-store.js", "lib/infra-overlay.js"]
+		},
+		"8_standards_and_best_practices": {
+			"status": "aligned",
+			"openStandards": [
+				"OASIS CAP v1.2 / ITU-T X.1303",
+				"GeoJSON (RFC 7946)",
+				"OGC SensorThings API v1.1",
+				"OGC API - Features",
+				"STAC v1.0.0",
+				"FDSN-WS",
+				"UNDRR-ISC HIPs (2020/2025)",
+				"UN Sendai Framework Monitor",
+				"Agent Plugins v1.0.0",
+				"Model Context Protocol (MCP) JSON-RPC 2.0",
+				"ISO-8601 / ISO-4217 / ISO-3166"
+			],
+			"principlesForDigitalDevelopment": true,
+			"evidence": ["docs/dpg-compliance.md", ".github/workflows/ci.yml", "docs/methodology.md"]
+		},
+		"9a_data_privacy_and_security": {
+			"status": "aligned",
+			"securityControls": [
+				"XXE blocking (validateXmlSafety)",
+				"SSRF guard (validateDestination)",
+				"XSS escaping (generateVisualSitRepHtml)",
+				"Prompt-injection sanitization (sanitizeUntrustedFeedText)",
+				"Secret & PII redaction (redactSensitiveObject, detectAndRedactPii)",
+				"HMAC-SHA256 approval tokens (issueApprovalToken, verifyApprovalToken)",
+				"Multi-tenant & country isolation (enforceTenantIsolation)",
+				"Public-audience sensitive facility redaction (lib/infra-overlay.js)"
+			],
+			"evidence": ["SECURITY.md", "PRIVACY.md", "lib/security.js", "tests/test-security-cap.js"]
+		},
+		"9b_inappropriate_and_illegal_content": {
+			"status": "aligned",
+			"publicUgcHosting": false,
+			"failClosedCapDraftDefault": true,
+			"untrustedFeedSanitization": true,
+			"evidence": ["SECURITY.md", "lib/cap.js", "lib/security.js", "CODE_OF_CONDUCT.md"]
+		},
+		"9c_protection_from_harassment": {
+			"status": "aligned",
+			"codeOfConductStandard": "Contributor Covenant v2.1",
+			"privateReportingChannel": true,
+			"evidence": ["CODE_OF_CONDUCT.md", "GOVERNANCE.md"]
+		}
+	}
+}
