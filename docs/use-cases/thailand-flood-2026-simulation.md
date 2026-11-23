@@ -171,26 +171,26 @@ drr-tool delta-push \
 
 ### UN Sendai Framework Priority Scorecard
 
-| Sendai Indicator | Quantified Metric | Operational Consequence |
+| Sendai Indicator | Quantified Metric *(Modelled Benchmark)* | Decision-Support Interpretation |
 | :--- | :--- | :--- |
-| **Sendai Target B**<br>*(Affected Population)* | **18,610 Exposed Persons**<br>• **16,749 Est. Displaced (90%)** | Immediate mobilization of designated high-ground municipal shelters in Hat Yai and Mueang Yala; distribution of clean water purification units. |
-| **Sendai Target C**<br>*(Direct Economic Loss)* | **\$127,025,600 USD**<br>*(~4.45 Billion THB)* | Aggregate loss ratio of **63.04%** across exposed structural and contents portfolios. Rapid funding release via national contingency reserves. |
-| **Sendai Target D**<br>*(Critical Infrastructure)* | **7 Essential Facilities Damaged** | Inundation of regional tertiary hospitals, provincial power substations, transit bridges, and municipal railway depots. |
+| **Sendai Target B**<br>*(Modelled Exposure & Displacement)* | **18,610 Exposed Persons**<br>• **16,749 Est. Displaced (90%)** | Screening indicator to support municipal shelter readiness planning in Hat Yai and Mueang Yala; kept distinct from official `B-1` directly affected counts pending field verification. |
+| **Sendai Target C**<br>*(Modelled Direct Economic Loss)* | **\$127,025,600 USD**<br>*(~4.45 Billion THB)* | Aggregate illustrative loss ratio of **63.04%** across exposed structural and contents portfolios; draft input for Post-Disaster Needs Assessment (PDNA) validation. |
+| **Sendai Target D**<br>*(Modelled Critical Infrastructure)* | **7 Essential Facilities Exposed / Damaged** | Screening shortlist of potentially impacted regional hospitals, substations, bridges, and railway depots for field engineering verification. |
 
 ---
 
 ### Facility-by-Facility Structural Damage Audit
 
-| Facility Name | Province | Category | Taxonomy | Asset Value (USD) | Mean Damage Ratio (MDR) | Estimated Loss (USD) | Population | Priority Action Directive |
+| Facility Name | Province | Category | Taxonomy | Asset Value (USD) | Mean Damage Ratio (MDR) | Estimated Loss (USD) | Population | Illustrative Screening Note |
 | :--- | :--- | :--- | :--- | :---: | :---: | :---: | :---: | :--- |
-| **Mueang Yala Sateng Riverfront Community** *(ชุมชนสะเตง)* | Yala | Residential | `URM` | \$52,000,000 | **63.04%** | **\$32,780,800** | 11,800 | Worst flood in 20 yrs; immediate boat evacuation for 10,620 low-lying residents. |
-| **Yala Regional Hospital** *(ศูนย์ รพ.ยะลา, MOPH 10672)* | Yala | Healthcare | `C1_PRE_CODE` | \$38,000,000 | **63.04%** | **\$23,955,200** | 1,450 | Ground emergency floor flooded; deploy flood baffles and backup ICU generators. |
-| **Pattani Hospital** *(รพ.ปัตตานี, MOPH 10673)* | Pattani | Healthcare | `C1_MODERATE_CODE` | \$29,000,000 | **63.04%** | **\$18,281,600** | 920 | Pattani River backwater surge; activate secondary generator and flood barriers. |
-| **Narathiwat Ratchanakharin Hospital** *(รพ.นราธิวาสฯ, MOPH 10674)* | Narathiwat | Healthcare | `C1_MODERATE_CODE` | \$26,000,000 | **63.04%** | **\$16,390,400** | 850 | Low-lying emergency ambulance bay vulnerable; sandbag perimeter and secure medical gases. |
-| **PEA Yala 1 115kV Substation** *(กฟภ. ยะลา 1)* | Yala | Power | `C2` | \$19,500,000 | **63.04%** | **\$12,292,800** | 40 | High-voltage yard submerged; isolate feeder lines to avoid flashover explosions. |
-| **Hwy 418 Pattani River Transit Bridge** *(DOH-418-BR04)* | Pattani | Transit | `S1` | \$16,500,000 | **63.04%** | **\$10,401,600** | 0 | River debris scour; restrict traffic to emergency military relief vehicles only. |
-| **Yala Railway Station & SRT Southern Depot** *(SRT 4232)* | Yala | Transit | `S1` | \$11,000,000 | **63.04%** | **\$6,934,400** | 350 | Track ballast washed out; suspend rail passenger operations south of Hat Yai. |
-| **Hat Yai Evacuation & Relief Center** *(DDPM-SKL-001)* | Songkhla | Education | `C2` | \$9,500,000 | **63.04%** | **\$5,988,800** | 3,200 | Facility plinths elevated; serving as primary reception hub for 3,200 evacuees. |
+| **Mueang Yala Sateng Riverfront Community** *(ชุมชนสะเตง)* | Yala | Residential | `URM` | \$52,000,000 | **63.04%** | **\$32,780,800** | 11,800 | High modelled exposure (~10,620 est. displaced); priority area for local authority evacuation verification. |
+| **Yala Regional Hospital** *(ศูนย์ รพ.ยะลา, MOPH 10672)* | Yala | Healthcare | `C1_PRE_CODE` | \$38,000,000 | **63.04%** | **\$23,955,200** | 1,450 | Ground-floor inundation risk; candidate for flood barrier & backup ICU generator check. |
+| **Pattani Hospital** *(รพ.ปัตตานี, MOPH 10673)* | Pattani | Healthcare | `C1_MODERATE_CODE` | \$29,000,000 | **63.04%** | **\$18,281,600** | 920 | Pattani River backwater exposure; verify secondary generator and flood barrier status. |
+| **Narathiwat Ratchanakharin Hospital** *(รพ.นราธิวาสฯ, MOPH 10674)* | Narathiwat | Healthcare | `C1_MODERATE_CODE` | \$26,000,000 | **63.04%** | **\$16,390,400** | 850 | Low-lying ambulance bay exposure; verify perimeter protection and medical gas security. |
+| **PEA Yala 1 115kV Substation** *(กฟภ. ยะลา 1)* | Yala | Power | `C2` | \$19,500,000 | **63.04%** | **\$12,292,800** | 40 | High-voltage yard exposure; flag for utility operator feeder isolation assessment. |
+| **Hwy 418 Pattani River Transit Bridge** *(DOH-418-BR04)* | Pattani | Transit | `S1` | \$16,500,000 | **63.04%** | **\$10,401,600** | 0 | River scour exposure; flag for Department of Highways structural inspection. |
+| **Yala Railway Station & SRT Southern Depot** *(SRT 4232)* | Yala | Transit | `S1` | \$11,000,000 | **63.04%** | **\$6,934,400** | 350 | Track ballast exposure; flag for SRT rail operations safety verification. |
+| **Hat Yai Evacuation & Relief Center** *(DDPM-SKL-001)* | Songkhla | Education | `C2` | \$9,500,000 | **63.04%** | **\$5,988,800** | 3,200 | Elevated plinths; candidate reception hub subject to local DDPM site check. |
 | **TOTAL** | — | — | — | **\$201,500,000** | **63.04%** | **\$127,025,600** | **18,610** | — |
 
 ---
@@ -205,15 +205,15 @@ drr-tool delta-push \
   * 4-step EOC watchstander checklist for civil defense commanders.
   * Single-click **Print / Save as PDF** styling for field distribution.
 
-### 2. OASIS CAP v1.2 XML Alert
+### 2. OASIS CAP v1.2 Candidate XML Alert
 * **File Location:** [output-cap-alert.xml](file:///data/docker/drr-agent-plugin/examples/thailand-flood-scenario/output-cap-alert.xml)
 * **Standard:** ITU-T X.1303 / OASIS CAP v1.2
 * **Schema Validation:** `100% Valid (0 errors, 0 warnings)`
-* **Readiness:** Can be directly fed into cell broadcast sirens, police radio channels, and CAP-enabled CAP-C/CAP-AU emergency gateways.
+* **Governance Readiness:** Generated as a validated **candidate CAP v1.2 Draft alert** for review, authorization, and dissemination through the responsible national warning authority's certified gateways.
 
 ### 3. Executive Markdown Brief
 * **File Location:** [emergency-brief.md](file:///data/docker/drr-agent-plugin/examples/thailand-flood-scenario/emergency-brief.md)
-* **Readiness:** Clean Markdown for embedding in disaster dispatch emails, Slack/Teams emergency channels, or GitHub disaster repositories.
+* **Readiness:** Clean Markdown for embedding in internal EOC briefs, Slack/Teams coordination channels, or disaster documentation repositories.
 
 ### 4. Interactive GIS Mapping Console
 * **File Location:** [gis-map-presentation.html](file:///data/docker/drr-agent-plugin/docs/presentation/gis-map-presentation.html)
@@ -221,13 +221,13 @@ drr-tool delta-push \
 
 ---
 
-## 7. Value Proposition for Disaster Management Agencies
+## 7. Decision-Support Value for Disaster Management Agencies
 
-| Agency / Stakeholder | Traditional Pain Point | DRR Agent Plugin Transformation |
+| Agency / Stakeholder | Traditional Pain Point | DRR Agent Plugin Decision-Support Role |
 | :--- | :--- | :--- |
-| **Thailand DDPM** *(Dept. of Disaster Prevention & Mitigation)* | 48- to 72-hour delay in receiving verified damage numbers from inundated provincial offices. | **Instant 3-second estimation** of displaced population and damaged facilities based on depth sensors. |
-| **Provincial Emergency Responders** *(Yala / Pattani / Songkhla / Narathiwat)* | Fragmented reporting via phone calls and paper forms leading to overlapping rescue efforts. | **Single source of truth:** Standardized CAP XML and Visual SitRep showing exactly which facilities lost critical utility power. |
-| **ASEAN AHA Centre** *(Regional Humanitarian Assistance)* | Incompatible alert formats across Southeast Asian member states. | Standardized **ITU-T X.1303 CAP v1.2** and **UN Sendai Framework Targets** for immediate cross-border relief mobilization. |
+| **Thailand DDPM** *(Dept. of Disaster Prevention & Mitigation)* | 48- to 72-hour delay in receiving initial damage estimates from inundated provincial offices. | **Rapid first-order screening** of potentially exposed population and facilities from validated depth grids to guide field verification. |
+| **Provincial Emergency Responders** *(Yala / Pattani / Songkhla / Narathiwat)* | Fragmented reporting via phone calls and paper forms leading to overlapping assessment efforts. | **Shared draft picture:** Standardized candidate CAP XML and Visual SitRep highlighting potentially exposed facilities for ground-truthing. |
+| **ASEAN AHA Centre** *(Regional Humanitarian Assistance)* | Incompatible alert formats across Southeast Asian member states. | Standardized **ITU-T X.1303 CAP v1.2** candidate drafts and **UN Sendai Framework** draft indicators to support cross-border coordination. |
 | **UNDRR Sendai Monitor** | Months of post-event data reconciliation before draft records enter national disaster databases. | **Idempotent one-click DELTA draft record generation** mapped directly to UNDRR/ISC HIP taxonomy (`MH0007`). |
 
 ---

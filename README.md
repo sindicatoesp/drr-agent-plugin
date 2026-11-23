@@ -25,7 +25,7 @@ This plugin equips AI coding assistants and autonomous agents with sourced domai
 * **End-User Skills & Prompting Guide**: See **[docs/skills-guide.md](docs/skills-guide.md)** (ready-to-use prompt examples & specific DRR use cases for all **19 domain skills**, plus multi-skill chains).
 * **Machine-Readable Skills Manifest**: See **[skills-manifest.json](skills-manifest.json)** (auto-generated skill catalog with safety tiers and validated MCP tool bindings).
 * **Programmatic Inventory**: See **[docs/tool-inventory.md](docs/tool-inventory.md)** (generated directly from executable registration sources via `npm run generate:inventory`).
-* **MCP & CLI Specification**: See **[docs/api-reference.md](docs/api-reference.md)** (39 MCP tools and 39 CLI commands).
+* **MCP & CLI Specification**: See **[docs/api-reference.md](docs/api-reference.md)** (40 MCP tools and 40 CLI commands).
 * **Scientific Methodology & Boundaries**: See **[docs/methodology.md](docs/methodology.md)**.
 * **Operational Playbook**: See **[docs/operational-playbook.md](docs/operational-playbook.md)**.
 
@@ -46,8 +46,8 @@ drr-agent-plugin/
 ├── README.md                   # Master documentation
 ├── LICENSE                     # Apache 2.0
 ├── bin/
-│   ├── mcp-server.js           # Zero-dependency Node.js MCP server (39 active tools)
-│   ├── cli.js                  # Direct CLI for shell & CI/CD (39 subcommands)
+│   ├── mcp-server.js           # Zero-dependency Node.js MCP server (40 active tools)
+│   ├── cli.js                  # Direct CLI for shell & CI/CD (40 subcommands)
 │   └── serve.js                # Local static preview server
 ├── lib/                        # Pure stdlib computational & governance modules (32 JS modules + HIP data)
 │   ├── contracts.js            # Input contracts, unit conversions, C-03 provenance manifests (R-02/R-03)
@@ -216,9 +216,25 @@ Each skill in `skills/*/SKILL.md` encodes DRR scientific guardrails, tool orches
 
 * **Package Standard**: [Agent Plugins v1.0.0](https://agent-plugins.org/) (`plugin.json`, `mcp.json`, `skills/`).
 * **Tool Protocol**: [Model Context Protocol (MCP)](https://modelcontextprotocol.io/) JSON-RPC 2.0 stdio transport (`2024-11-05`).
-* **Alerting Standard**: OASIS Common Alerting Protocol v1.2 / ITU-T Recommendation X.1303.
+* **Alerting Standard**: OASIS Common Alerting Protocol v1.2 / ITU-T Recommendation X.1303 (generates and validates candidate `Draft` alerts for review and authorization by the responsible warning authority).
 * **Hazard Taxonomy**: UNDRR-ISC Hazard Information Profiles (HIP 2020 + 2025 revision flags).
-* **Disaster Loss Reporting**: UN Sendai Framework for Disaster Risk Reduction (2015–2030) Targets A, B, C, and D.
+* **Disaster Loss Reporting**: UN Sendai Framework for Disaster Risk Reduction (2015–2030) Targets A, B, C, and D (generates draft calculations for validation and subsequent reporting through national processes).
+
+---
+
+## Validation Maturity & Evidence Status (L0–L6)
+
+`drr-agent-plugin` is a **deterministic DRR analytics and decision-support toolkit**—not an autonomously authorized emergency broadcast or official reporting system. Evidence status is tracked explicitly against a seven-level validation ladder (see **[docs/methodology.md](docs/methodology.md#7-validation-maturity-ladder-l0l6--scope-boundaries)**):
+
+| Level | Tier | Status | Evidence |
+| :--- | :--- | :--- | :--- |
+| **L0** | Software Verified | ✅ Verified in CI | Zero-dep lint, unit/integration tests, MCP stdio contract tests (`npm run check`). |
+| **L1** | Standards Verified | ✅ Verified in CI | CAP v1.2 structural/XXE/scope checks, UNDRR-ISC HIP crosswalk, Sendai `C-01`..`C-03` semantics, DELTA schema checks. |
+| **L2** | Reference Model Verified | ✅ Verified in CI | Golden numerical checks against published Wald (1999) GMICE, lognormal fragility/MDR, trapezoidal AEP EAL, and OASIS CAP v1.2 reference payloads (`node bin/cli.js replay-validate --suite reference_model`). |
+| **L3** | Historical Hindcast Validated | 🟡 Multi-Event Suite in CI | Multi-event historical hindcast fixtures paired with observed outcome bands, uncertainty coverage, and FbF trigger skill metrics (`node bin/cli.js replay-validate --suite hindcast_benchmark`). |
+| **L4** | Independent Domain Review | ⏳ External / Planned | Independent peer review by seismologists, hydrologists, and DRR specialists. |
+| **L5** | Operational Pilot (Shadow Mode) | ⏳ Institutional / Planned | Multi-month EOC shadow-mode trial (`--read-only true`) across live hazard events. |
+| **L6** | Operational Decision Support | ⏳ Institutional Only | Requires L4 + L5, locally calibrated registries, and explicit human-in-the-loop authority. |
 
 ---
 

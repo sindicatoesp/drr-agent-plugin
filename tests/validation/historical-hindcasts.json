@@ -1,0 +1,363 @@
+{
+	"schemaVersion": "1.0.0",
+	"description": "Frozen multi-event historical hindcast validation fixtures (L3) paired with published observed outcome bands for accuracy, uncertainty interval coverage, and anticipatory-action trigger skill verification.",
+	"methodologyNote": "Observed bands reflect published post-event reconnaissance and authoritative archives (USGS ShakeMap/PAGER, EM-DAT, GDACS, DDPM, NDRRMC, IFRC). These fixtures measure first-order screening accuracy and regression stability against illustrative baseline curves; they do not substitute for country-specific engineering calibration (L4-L6).",
+	"impactEvents": [
+		{
+			"id": "hist_eq_haiti_2010",
+			"eventName": "2010 Haiti Earthquake (Mw 7.0, Port-au-Prince)",
+			"year": 2010,
+			"country": "Haiti",
+			"iso3": "HTI",
+			"hazardType": "earthquake",
+			"authoritativeSources": [
+				"USGS ShakeMap / PAGER (usp000h60h)",
+				"PDNA Haiti 2010 (Government of Haiti / World Bank / UN)",
+				"EM-DAT"
+			],
+			"inputs": {
+				"observedMmi": 8.0,
+				"intensityPgaG": 0.48,
+				"taxonomy": "URM",
+				"exposedValueUsd": 100000000,
+				"intensityBounds": { "min": 0.35, "max": 0.65, "sourced": true }
+			},
+			"observedOutcome": {
+				"pgaBandG": [0.35, 0.65],
+				"expectedExtrapolated": false,
+				"mdrBand": [0.40, 0.85],
+				"mdrMidpoint": 0.60,
+				"severityNote": "Severe URM and non-ductile concrete collapse across Port-au-Prince metropolitan zone."
+			}
+		},
+		{
+			"id": "hist_eq_nepal_2015",
+			"eventName": "2015 Gorkha Nepal Earthquake (Mw 7.8, Kathmandu Valley)",
+			"year": 2015,
+			"country": "Nepal",
+			"iso3": "NPL",
+			"hazardType": "earthquake",
+			"authoritativeSources": [
+				"USGS ShakeMap / KATNP Strong-Motion Station (us20002926)",
+				"NPC Nepal PDNA 2015",
+				"EM-DAT"
+			],
+			"inputs": {
+				"observedMmi": 7.0,
+				"intensityPgaG": 0.24,
+				"taxonomy": "URM",
+				"exposedValueUsd": 100000000,
+				"intensityBounds": { "min": 0.16, "max": 0.32, "sourced": true }
+			},
+			"observedOutcome": {
+				"pgaBandG": [0.16, 0.32],
+				"expectedExtrapolated": false,
+				"mdrBand": [0.20, 0.55],
+				"mdrMidpoint": 0.35,
+				"severityNote": "Moderate-to-extensive damage to URM masonry; lower high-frequency PGA in Kathmandu basin than Mw 7.8 alone suggested."
+			}
+		},
+		{
+			"id": "hist_eq_palu_2018",
+			"eventName": "2018 Palu-Donggala Earthquake (Mw 7.5, Central Sulawesi)",
+			"year": 2018,
+			"country": "Indonesia",
+			"iso3": "IDN",
+			"hazardType": "earthquake",
+			"authoritativeSources": [
+				"USGS ShakeMap (us1000h3p4)",
+				"BNPB Indonesia Situation Reports",
+				"GDACS Red Alert"
+			],
+			"inputs": {
+				"observedMmi": 8.0,
+				"intensityPgaG": 0.44,
+				"taxonomy": "C1_PRE_CODE",
+				"exposedValueUsd": 100000000,
+				"intensityBounds": { "min": 0.33, "max": 0.56, "sourced": true }
+			},
+			"observedOutcome": {
+				"pgaBandG": [0.33, 0.56],
+				"expectedExtrapolated": false,
+				"mdrBand": [0.30, 0.65],
+				"mdrMidpoint": 0.45,
+				"severityNote": "Substantial structural damage to non-ductile concrete frames (excluding secondary liquefaction/tsunami losses)."
+			}
+		},
+		{
+			"id": "hist_eq_turkiye_2023",
+			"eventName": "2023 Kahramanmaras Earthquake (Mw 7.8, Southern Turkiye)",
+			"year": 2023,
+			"country": "Turkiye",
+			"iso3": "TUR",
+			"hazardType": "earthquake",
+			"authoritativeSources": [
+				"USGS ShakeMap (us6000jllz)",
+				"AFAD Strong-Motion Network",
+				"TERR / World Bank Rapid Damage Assessment 2023"
+			],
+			"inputs": {
+				"observedMmi": 9.0,
+				"intensityPgaG": 0.65,
+				"taxonomy": "C1_PRE_CODE",
+				"comparisonTaxonomy": "C1_MODERATE_CODE",
+				"exposedValueUsd": 100000000,
+				"intensityBounds": { "min": 0.50, "max": 0.85, "sourced": true }
+			},
+			"observedOutcome": {
+				"pgaBandG": [0.50, 1.00],
+				"expectedExtrapolated": true,
+				"mdrBand": [0.45, 0.80],
+				"mdrMidpoint": 0.60,
+				"expectedCodeDifferentialMin": 0.15,
+				"severityNote": "MMI IX exceeds Wald99 MMI V-VIII calibration band (extrapolated flag expected); pre-code RC frames suffered substantially higher MDR than moderate-code buildings."
+			}
+		},
+		{
+			"id": "hist_flood_thailand_2017",
+			"eventName": "2017 Southern Thailand Monsoon Floods (Yala / Pattani / Songkhla)",
+			"year": 2017,
+			"country": "Thailand",
+			"iso3": "THA",
+			"hazardType": "flood",
+			"authoritativeSources": [
+				"Thailand DDPM Provincial Situation Reports",
+				"RID Hydrological Water-Level Gauges",
+				"EM-DAT"
+			],
+			"inputs": {
+				"intensityDepthM": 2.2,
+				"occupancy": "residential_1story",
+				"exposedValueUsd": 100000000,
+				"intensityBounds": { "min": 1.6, "max": 2.8, "sourced": true }
+			},
+			"observedOutcome": {
+				"mdrBand": [0.45, 0.78],
+				"mdrMidpoint": 0.62,
+				"severityNote": "Severe riverfront inundation (1.8-2.5m) causing heavy ground-floor structural and contents loss."
+			}
+		},
+		{
+			"id": "hist_flood_pakistan_2022",
+			"eventName": "2022 Pakistan Monsoon Floods (Sindh / Balochistan)",
+			"year": 2022,
+			"country": "Pakistan",
+			"iso3": "PAK",
+			"hazardType": "flood",
+			"authoritativeSources": [
+				"UNOSAT / Copernicus EMS Satellite Inundation Footprints",
+				"Pakistan PDNA 2022 (Ministry of Planning / UNDP / World Bank)",
+				"JRC Global Flood Depth-Damage Functions"
+			],
+			"inputs": {
+				"intensityDepthM": 1.8,
+				"occupancy": "residential_1story",
+				"exposedValueUsd": 100000000,
+				"intensityBounds": { "min": 1.2, "max": 2.4, "sourced": true }
+			},
+			"observedOutcome": {
+				"mdrBand": [0.40, 0.75],
+				"mdrMidpoint": 0.56,
+				"severityNote": "Widespread 1.5-2.0m standing inundation across rural and peri-urban single-story housing."
+			}
+		},
+		{
+			"id": "hist_cyclone_haiyan_2013",
+			"eventName": "2013 Super Typhoon Haiyan / Yolanda (Tacloban, Leyte)",
+			"year": 2013,
+			"country": "Philippines",
+			"iso3": "PHL",
+			"hazardType": "cyclone",
+			"authoritativeSources": [
+				"PAGASA / JTWC Best Track Advisory",
+				"NDRRMC Final Report on Typhoon Yolanda",
+				"GDACS Red Alert"
+			],
+			"inputs": {
+				"intensityWindKmh": 250,
+				"exposedValueUsd": 100000000,
+				"intensityBounds": { "min": 220, "max": 280, "sourced": true }
+			},
+			"observedOutcome": {
+				"mdrBand": [0.65, 1.00],
+				"mdrMidpoint": 0.85,
+				"severityNote": "Catastrophic Category 5 wind gusts causing near-total roof and envelope failure on non-engineered structures."
+			}
+		},
+		{
+			"id": "hist_cyclone_idai_2019",
+			"eventName": "2019 Tropical Cyclone Idai (Beira, Sofala)",
+			"year": 2019,
+			"country": "Mozambique",
+			"iso3": "MOZ",
+			"hazardType": "cyclone",
+			"authoritativeSources": [
+				"MFR / JTWC Tropical Cyclone Track",
+				"Mozambique PDNA 2019 (INGC / World Bank / UN)",
+				"GDACS Red Alert"
+			],
+			"inputs": {
+				"intensityWindKmh": 185,
+				"exposedValueUsd": 100000000,
+				"intensityBounds": { "min": 165, "max": 205, "sourced": true }
+			},
+			"observedOutcome": {
+				"mdrBand": [0.25, 0.70],
+				"mdrMidpoint": 0.45,
+				"severityNote": "Sustained Category 3 winds damaging ~70-90% of informal roofs and causing moderate-to-extensive damage across mixed urban building stock."
+			}
+		}
+	],
+	"fbfTriggerCases": [
+		{
+			"id": "fbf_bangladesh_2020_monsoon",
+			"eventName": "2020 Bangladesh Brahmaputra Monsoon Peak (FbF Activation)",
+			"country": "Bangladesh",
+			"iso3": "BGD",
+			"authoritativeSources": ["IFRC / BDRCS Early Action Protocol", "FFWC Bangladesh"],
+			"weatherData": {
+				"daily": {
+					"time": ["2020-07-11", "2020-07-12", "2020-07-13"],
+					"precipitation_sum": [95, 115, 85],
+					"wind_speed_10m_max": [32, 38, 30]
+				},
+				"forecastMetadata": {
+					"issueTime": "2020-07-09T00:00:00Z",
+					"modelRun": "2020-07-09T00Z"
+				}
+			},
+			"options": {
+				"triggerPolicy": {
+					"policyId": "EAP-BGD-FLOOD-2020",
+					"approved": true,
+					"redTotalPrecipMm": 200,
+					"redDailyPrecipMm": 100,
+					"orangeTotalPrecipMm": 120,
+					"orangeDailyPrecipMm": 60,
+					"requirePersistence": true,
+					"requiredConsecutiveRuns": 2
+				},
+				"previousRuns": [
+					{
+						"issueTime": "2020-07-08T12:00:00Z",
+						"modelRun": "2020-07-08T12Z",
+						"exceedance": true,
+						"metricValue": 270
+					}
+				]
+			},
+			"expectedTriggerActivated": true
+		},
+		{
+			"id": "fbf_mozambique_2019_idai_rain",
+			"eventName": "2019 Mozambique Cyclone Idai Landfall Heavy Rainfall",
+			"country": "Mozambique",
+			"iso3": "MOZ",
+			"authoritativeSources": ["INAM Mozambique", "WFP / IFRC"],
+			"weatherData": {
+				"daily": {
+					"time": ["2019-03-14", "2019-03-15", "2019-03-16"],
+					"precipitation_sum": [140, 180, 90],
+					"wind_speed_10m_max": [165, 185, 95]
+				},
+				"forecastMetadata": {
+					"issueTime": "2019-03-12T00:00:00Z",
+					"modelRun": "2019-03-12T00Z"
+				}
+			},
+			"options": {
+				"triggerPolicy": {
+					"policyId": "EAP-MOZ-CYCLONE-2019",
+					"approved": true,
+					"redTotalPrecipMm": 200,
+					"redDailyPrecipMm": 100,
+					"requirePersistence": true,
+					"requiredConsecutiveRuns": 2
+				},
+				"previousRuns": [
+					{
+						"issueTime": "2019-03-11T12:00:00Z",
+						"modelRun": "2019-03-11T12Z",
+						"exceedance": true,
+						"metricValue": 390
+					}
+				]
+			},
+			"expectedTriggerActivated": true
+		},
+		{
+			"id": "fbf_non_persistent_spike_negative",
+			"eventName": "Single-Run Forecast Spike Rejected by Persistence Gate",
+			"country": "Philippines",
+			"iso3": "PHL",
+			"authoritativeSources": ["Synthetic FbF False-Alarm Guard Case"],
+			"weatherData": {
+				"daily": {
+					"time": ["2024-09-01", "2024-09-02", "2024-09-03"],
+					"precipitation_sum": [110, 60, 45],
+					"wind_speed_10m_max": [40, 35, 25]
+				},
+				"forecastMetadata": {
+					"issueTime": "2024-08-30T00:00:00Z",
+					"modelRun": "2024-08-30T00Z"
+				}
+			},
+			"options": {
+				"triggerPolicy": {
+					"policyId": "EAP-PHL-FLOOD-TEST",
+					"approved": true,
+					"redTotalPrecipMm": 200,
+					"redDailyPrecipMm": 100,
+					"requirePersistence": true,
+					"requiredConsecutiveRuns": 2
+				},
+				"previousRuns": [
+					{
+						"issueTime": "2024-08-29T12:00:00Z",
+						"modelRun": "2024-08-29T12Z",
+						"exceedance": false,
+						"metricValue": 45
+					}
+				]
+			},
+			"expectedTriggerActivated": false
+		},
+		{
+			"id": "fbf_kenya_dry_season_negative",
+			"eventName": "Sub-Threshold Seasonal Rainfall (Correct Negative)",
+			"country": "Kenya",
+			"iso3": "KEN",
+			"authoritativeSources": ["Kenya Meteorological Department Baseline"],
+			"weatherData": {
+				"daily": {
+					"time": ["2023-08-10", "2023-08-11", "2023-08-12"],
+					"precipitation_sum": [5, 8, 2],
+					"wind_speed_10m_max": [20, 18, 22]
+				},
+				"forecastMetadata": {
+					"issueTime": "2023-08-08T00:00:00Z",
+					"modelRun": "2023-08-08T00Z"
+				}
+			},
+			"options": {
+				"triggerPolicy": {
+					"policyId": "EAP-KEN-FLOOD-2023",
+					"approved": true,
+					"redTotalPrecipMm": 150,
+					"redDailyPrecipMm": 75,
+					"requirePersistence": true,
+					"requiredConsecutiveRuns": 2
+				},
+				"previousRuns": [
+					{
+						"issueTime": "2023-08-07T12:00:00Z",
+						"modelRun": "2023-08-07T12Z",
+						"exceedance": false,
+						"metricValue": 12
+					}
+				]
+			},
+			"expectedTriggerActivated": false
+		}
+	]
+}

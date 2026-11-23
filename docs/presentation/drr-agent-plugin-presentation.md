@@ -142,14 +142,14 @@ The plugin addresses the complete disaster lifecycle across specialized operatio
 
 | Operational Phase | Timeline | Primary Actors | Key Plugin Workflows |
 | :--- | :--- | :--- | :--- |
-| **Pre-Disaster** | T -72h to -24h | Anticipatory Action Leads (Red Cross, WFP) | Open-Meteo multi-model precipitation triggers, flood shelter exposure join |
-| **Co-Disaster (Instant)** | T +5m to +2h | National EOC Watchstanders (FEMA, BNPB) | USGS seismic telemetry, Wald PGA estimation, OASIS CAP v1.2 broadcast sirens |
-| **Co-Disaster (Tactical)** | T +6h to +48h | UN Humanitarian Officers (OCHA, UNDAC) | GDACS cyclone swaths, critical infrastructure audit, 24h Situation Briefs |
-| **Post-Disaster** | T +2w to +3m | National Loss Focal Points (UNDRR DELTA) | Sendai Framework Target B, C, & D loss accounting for UN General Assembly |
+| **Pre-Disaster** | T -72h to -24h | Anticipatory Action Leads (Red Cross, WFP) | Open-Meteo multi-model precipitation threshold screening, flood shelter exposure join |
+| **Co-Disaster (Instant)** | T +5m to +2h | National EOC Watchstanders (FEMA, BNPB) | USGS seismic telemetry, Wald99 GMICE screening, candidate OASIS CAP v1.2 Draft alerts |
+| **Co-Disaster (Tactical)** | T +6h to +48h | UN Humanitarian Officers (OCHA, UNDAC) | GDACS cyclone swaths, critical infrastructure screening, 24h Situation Brief drafts |
+| **Post-Disaster** | T +2w to +3m | National Loss Focal Points (UNDRR DELTA) | Draft Sendai Framework Target B, C, & D loss calculations for national validation |
 
 <!--
 Speaker Notes:
-Notice how the plugin adapts seamlessly: from releasing pre-allocated forecast-based financing 3 days before a flood peaks, to cell broadcasts within 5 minutes of an earthquake, all the way to year-end UN Sendai loss reporting.
+Notice how the plugin supports decision-makers across the lifecycle: from evaluating forecast conditions against configurable anticipatory-action thresholds 3 days before a flood peaks, to generating validated Draft CAP v1.2 candidate alerts for Duty Officer review within minutes of an earthquake, all the way to preparing draft Sendai loss calculations for national validation.
 -->
 
 ---
@@ -359,11 +359,12 @@ Strict compliance with **ITU-T Recommendation X.1303** & **OASIS CAP v1.2**:
 </div>
 
 <div class="card">
-<h3 style="color:#38bdf8;">Broadcast & Multi-Channel Reach</h3>
+<h3 style="color:#38bdf8;">Candidate CAP v1.2 Draft Format</h3>
 
 ```xml
 <alert xmlns="urn:oasis:names:tc:emergency:cap:1.2">
   <identifier>DELTA-CAP-1731118400</identifier>
+  <status>Draft</status>
   <info>
     <category>Geo</category>
     <event>Major Earthquake Warning</event>
@@ -381,7 +382,7 @@ Strict compliance with **ITU-T Recommendation X.1303** & **OASIS CAP v1.2**:
 
 <!--
 Speaker Notes:
-CAP is the global standard for cellular broadcasts, outdoor sirens, and television emergency crawlers. The plugin generates and validates this XML with zero external libraries.
+CAP is the global standard for emergency warning interoperability. The plugin generates and validates Draft candidate CAP v1.2 XML with zero external libraries for review and authorization by the responsible warning authority.
 -->
 
 ---
@@ -398,14 +399,14 @@ Continuous background vigilance with automated impact modeling and universal web
 2. **Rule Evaluation**: Compares events against declarative rules in `alerts-config.json` (magnitude, PGA, rain).
 3. **Automated Impact Modeling**: Auto-executes spatial exposure joins and fragility calculations.
 4. **Tri-Output Dispatch**:
-   * Saves CAP v1.2 XML to `alerts/`
+   * Saves Draft CAP v1.2 XML to `alerts/`
    * Writes executive Situation Brief (`.brief.md`)
    * Pushes Draft Record to DELTA Resilience
    * Fires Slack / Teams / Discord Webhooks
 </div>
 
 <div class="card">
-<h3 style="color:#4ade80;">Instant Operational Commands</h3>
+<h3 style="color:#4ade80;">Shadow &amp; Scheduled Monitoring Commands</h3>
 
 ```bash
 # 1. Native background process
@@ -415,7 +416,7 @@ make monitor INTERVAL=60
 make docker-up
 make docker-logs
 
-# 3. Direct CLI execution
+# 3. Direct CLI execution (read-only shadow mode by default)
 drr-tool monitor --once --mock
 ```
 
@@ -427,7 +428,7 @@ drr-tool monitor --once --mock
 
 <!--
 Speaker Notes:
-The daemon can run locally or in our hardened 130MB Alpine Docker image. It monitors feeds 24/7 without needing human intervention until an actionable threshold is breached.
+The daemon can run locally or in our hardened 130MB Alpine Docker image. It supports read-only shadow mode by default and monitors feeds continuously until an actionable threshold is breached for human review.
 -->
 
 ---
@@ -444,8 +445,8 @@ Three end-to-end executable testbeds included out-of-the-box:
   <li>PGA: 0.38g shaking</li>
   <li>Taxonomy: URM & C1</li>
   <li>18,400 exposed population</li>
-  <li>3 hospitals compromised</li>
-  <li>Instant OASIS CAP siren</li>
+  <li>3 hospitals flagged for inspection</li>
+  <li>Draft OASIS CAP v1.2 candidate</li>
 </ul>
 <code>make scenario-earthquake</code>
 </div>
@@ -455,10 +456,10 @@ Three end-to-end executable testbeds included out-of-the-box:
 <p><strong>GDACS Atmospheric River</strong></p>
 <ul>
   <li>240mm 72h rainfall</li>
-  <li>1.8m inundation depth</li>
-  <li>Anticipatory action trigger</li>
-  <li>3 critical shelters secured</li>
-  <li>Pre-flood evacuation notice</li>
+  <li>1.8m calibrated depth scenario</li>
+  <li>Configurable FbF threshold check</li>
+  <li>3 critical shelters screened</li>
+  <li>Draft pre-flood advisory</li>
 </ul>
 <code>make scenario-flood</code>
 </div>

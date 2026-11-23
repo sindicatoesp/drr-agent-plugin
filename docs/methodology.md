@@ -71,7 +71,23 @@ The plugin enforces strict UNDRR Sendai Framework Monitor (SFM) semantic boundar
 
 ---
 
-## 7. Authoritative References & Standards
+## 7. Validation Maturity Ladder (L0–L6) & Scope Boundaries
+
+Deterministic computation does not by itself establish operational reliability—uncertainty accumulates across hazard telemetry, ground-motion or depth estimation, fragility curves, and exposure inventories. `drr-agent-plugin` tracks its evidence status explicitly against a seven-tier validation ladder:
+
+| Level | Tier | Current Status | Verification Basis & Scope |
+| :--- | :--- | :--- | :--- |
+| **L0** | **Software Verified** | ✅ Verified in CI | Pure-stdlib AST lint, zero-dependency enforcement, unit & integration tests, MCP stdio contract tests, and deterministic replay invariants (`npm run check`). |
+| **L1** | **Standards Verified** | ✅ Verified in CI | OASIS CAP v1.2 structural/XXE/reference/scope rules, UNDRR-ISC HIP 2020/2025 taxonomy crosswalk, Sendai Target B/C/D semantic separation (`C-01`..`C-03`), and DELTA schema validation. |
+| **L2** | **Reference Model Verified** | ✅ Verified in CI | Golden numerical checks against published analytical reference values (Wald et al. 1999 GMICE table points, lognormal fragility/MDR closed-form & HAZUS-style reference points, AEP trapezoidal EAL analytical integrals, and OASIS CAP v1.2 canonical example alerts). |
+| **L3** | **Historical Hindcast Validated** | 🟡 Multi-Event Suite in CI *(expanding)* | Frozen multi-event historical hindcast fixtures paired with observed outcome bands (USGS PAGER/ShakeMap, GDACS, EM-DAT/DDPM, and FbF trigger skill metrics: POD, FAR, CSI, uncertainty interval coverage). Not a substitute for country-specific calibration. |
+| **L4** | **Independent Domain Review** | ⏳ External / Planned | Formal peer review of hazard, vulnerability, and exposure methodologies by independent seismologists, hydrologists, and DRR specialists. |
+| **L5** | **Operational Pilot (Shadow Mode)** | ⏳ Institutional / Planned | Multi-month EOC or DRR agency shadow-mode trial (`--read-only true`) across live hazard events without affecting public decisions. |
+| **L6** | **Operational Decision Support** | ⏳ Institutional Only | Requires L4 + L5 completion, locally calibrated exposure/fragility registries, and explicit **human-in-the-loop authority** for CAP publication, FbF release, and official Sendai reporting. |
+
+---
+
+## 8. Authoritative References & Standards
 * **UNDRR Sendai Framework Monitor**: *Technical Guidance for Monitoring and Reporting on Progress in Achieving the Global Targets of the Sendai Framework (2015–2030)*. [S1]
 * **UNDRR / ISC (2020 & 2025)**: *Hazard Information Profiles (HIPs)* — 2025 revision covering 281 hazards across 8 types. [S2]
 * **Wald et al. (1999)**: *Relationships between Peak Ground Acceleration, Peak Ground Velocity, and Modified Mercalli Intensity in California* (Earthquake Spectra / USGS ShakeMap `wald99`). [S3, S4]
