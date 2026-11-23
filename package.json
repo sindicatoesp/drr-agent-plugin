@@ -19,6 +19,9 @@
     "lint": "node scripts/lint.js",
     "check": "node scripts/lint.js && bash tests/run-all-tests.sh",
     "test": "bash tests/run-all-tests.sh",
+    "dpg:audit": "node scripts/dpg-audit.js",
+    "data:export": "node scripts/dpg-data-portability.js export",
+    "data:purge": "node scripts/dpg-data-portability.js purge",
     "generate:inventory": "node scripts/generate-inventory.js",
     "infra:global": "node scripts/build-static-infra.js --mode global",
     "infra:regional": "node scripts/build-static-infra.js --mode regional",
@@ -31,12 +34,16 @@
     "drr",
     "undrr",
     "disaster-risk-reduction",
+    "digital-public-good",
+    "dpg",
+    "sdg-11",
+    "sdg-13",
     "hazus",
     "gem",
     "sendai-framework",
     "cap"
   ],
-  "author": "UNDRR DELTA Resilience",
+  "author": "DRR Agent Plugin Contributors (sindicatoesp)",
   "license": "Apache-2.0",
   "engines": {
     "node": ">=18.0.0"
