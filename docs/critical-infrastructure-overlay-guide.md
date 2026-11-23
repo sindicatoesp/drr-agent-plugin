@@ -107,3 +107,31 @@ Group results by the 9 Sendai Target D sectors, report physical exposure (D-2..D
 separately from cascading lifeline disruption risk (D-6..D-8), and then re-run with
 audience: "public" to confirm restricted energy/telecom assets are redacted.
 ```
+
+---
+
+## Interim Open-Source Fallback (When No Authoritative National Source Exists)
+
+When a country or municipality does not yet expose an authoritative national GIS / OGC API – Features or UNDRR DELTA layer, use **`drr_osm_critical_infra_fetch`** (CLI: `drr-tool osm-infra`, registered method `exposure.osm.interim_critical_infra_v1`) to retrieve an interim **OpenStreetMap (Overpass API)** baseline mapped directly to the 9 Sendai Target D sectors:
+
+```bash
+# Offline sample fixture
+node bin/cli.js osm-infra \
+  --file examples/critical-infra-overlay/sample-osm-overpass.json
+
+# Live Overpass API query (WGS84 bbox max 5° x 5°, SSRF-guarded) with immediate hazard overlay
+node bin/cli.js osm-infra \
+  --bbox 100.40,6.95,100.55,7.08 \
+  --sectors health,energy,water,protective_infrastructure \
+  --hazard examples/thailand-flood-scenario/input-hazard.json
+```
+
+**Complementary global open interim registries** (GeoJSON can be passed directly into `drr_critical_infra_overlay`):
+* **All sectors (pre-clipped by country):** HOTOSM / HDX Country Exports (`data.humdata.org`, ODbL-1.0)
+* **`health`:** Healthsites.io & WHO/HDX Health Facilities
+* **`education`:** UNICEF Giga & HOTOSM/HDX Education Facilities
+* **`energy`:** WRI Global Power Plant Database (CC-BY-4.0) & Open Infrastructure Map
+* **`transportation`:** OurAirports (Public Domain) & World Port Index / HDX Ports
+* **`water` & `protective_infrastructure`:** GRanD & GOODD Global Dam Databases
+
+> **Governance Guardrail:** Interim OSM outputs are automatically tagged `interimFallback: true`, `verificationStatus: "external_unverified"`, `reportingEligibility: "screening_only"`, and `license: "ODbL-1.0"` (`© OpenStreetMap contributors`). Crowdsourced completeness varies by region (unmapped ≠ zero) and does not include operational lifeline `dependsOn` topology; replace with authoritative national layers as soon as available.

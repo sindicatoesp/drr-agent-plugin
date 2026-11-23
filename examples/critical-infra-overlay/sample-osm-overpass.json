@@ -1,0 +1,56 @@
+{
+  "version": 0.6,
+  "generator": "Overpass API sample fixture",
+  "elements": [
+    {
+      "type": "node",
+      "id": 1001,
+      "lat": 7.008,
+      "lon": 100.474,
+      "tags": {
+        "name": "Hat Yai Regional Hospital",
+        "amenity": "hospital",
+        "operator": "Ministry of Public Health"
+      }
+    },
+    {
+      "type": "way",
+      "id": 2002,
+      "center": { "lat": 7.015, "lon": 100.482 },
+      "tags": {
+        "name": "Songkhla Substation North",
+        "power": "substation",
+        "operator": "PEA"
+      }
+    },
+    {
+      "type": "node",
+      "id": 3003,
+      "lat": 6.995,
+      "lon": 100.461,
+      "tags": {
+        "name": "Hat Yai Wittayalai School",
+        "amenity": "school"
+      }
+    },
+    {
+      "type": "way",
+      "id": 4004,
+      "center": { "lat": 7.022, "lon": 100.455 },
+      "tags": {
+        "name": "Khlong U-Taphao Flood Levee",
+        "man_made": "levee"
+      }
+    },
+    {
+      "type": "node",
+      "id": 5005,
+      "lat": 7.001,
+      "lon": 100.490,
+      "tags": {
+        "name": "Municipal Water Treatment Plant",
+        "man_made": "water_works"
+      }
+    }
+  ]
+}
