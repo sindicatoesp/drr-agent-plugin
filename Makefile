@@ -21,10 +21,12 @@ LAT          ?= 23.8
 LON          ?= 90.4
 DAYS         ?= 5
 DOCKER_IMAGE ?= undrr/drr-agent-plugin:latest
+PRESET       ?= thailand
 
 .PHONY: help info version \
         config-init config-check config-show alerts-validate \
         test check lint inventory monitor monitor-once mcp usgs forecast \
+        infra-build-global infra-build-regional \
         scenario-earthquake scenario-flood scenario-cyclone scenarios \
         presentation gis-map serve run sitrep-sample clean-alerts \
         docker-build docker-up docker-down docker-restart docker-status \
@@ -154,6 +156,12 @@ usgs: ## Fetch real-time USGS earthquakes (MIN_MAG=5.0)
 
 forecast: ## Fetch Open-Meteo flood anticipatory forecast (LAT=23.8 LON=90.4 DAYS=5)
 	node bin/cli.js forecast --lat $(LAT) --lon $(LON) --days $(DAYS)
+
+infra-build-global: ## Download & build single static Global Major Infrastructure GeoJSON (WRI + OurAirports)
+	node scripts/build-static-infra.js --mode global
+
+infra-build-regional: ## Build tiled Regional OSM Critical Infrastructure GeoJSON (PRESET=thailand|philippines|indonesia|southeast-asia|nepal|caribbean|pacific-islands)
+	node scripts/build-static-infra.js --mode regional --preset $(PRESET)
 
 scenario-earthquake: ## Run full HAZUS MMI-to-PGA + CAP XML earthquake pipeline
 	@bash examples/earthquake-hazus-scenario/run.sh
