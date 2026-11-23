@@ -1,0 +1,46 @@
+DRR Agent Plugin (sindicatoesp/drr-agent-plugin)
+Copyright 2026 DRR Agent Plugin Contributors
+
+This product is an open-source Disaster Risk Reduction (DRR) analytics toolkit
+and AI Agent Plugin aligned with the Digital Public Goods (DPG) Standard.
+
+================================================================================
+MULTI-ASSET OPEN LICENSING (DPG STANDARD INDICATOR 2)
+================================================================================
+
+1. Software Source Code (bin/, lib/, scripts/, tests/, Dockerfile, Makefile):
+   Licensed under the Apache License, Version 2.0 (SPDX: Apache-2.0), an
+   OSI-approved open-source software license. See LICENSE for full terms.
+
+2. Open Content & Documentation (README.md, docs/, skills/*/SKILL.md, index.html):
+   Licensed under Creative Commons Attribution 4.0 International
+   (SPDX: CC-BY-4.0, https://creativecommons.org/licenses/by/4.0/) as well as
+   Apache-2.0 when distributed as part of the software package.
+
+3. Bundled Reference & Benchmark Datasets (lib/hips-data.json, examples/,
+   tests/validation/historical-hindcasts.json, tests/benchmarks/):
+   Licensed under Creative Commons Attribution 4.0 International (SPDX: CC-BY-4.0),
+   except where individual fixtures carry upstream open-data attributions listed
+   below and in CREDITS.md.
+
+================================================================================
+UPSTREAM OPEN DATA & STANDARDS ATTRIBUTIONS
+================================================================================
+
+* UNDRR-ISC Hazard Information Profiles (HIPs): Reference hazard codes and
+  classifications derived from UNDRR & International Science Council (2020/2025).
+* OpenStreetMap / Overpass API interim infrastructure samples:
+  © OpenStreetMap contributors, available under the Open Database License
+  (ODbL-1.0, https://www.openstreetmap.org/copyright).
+* OCHA Humanitarian Data Exchange (HDX HAPI / COD-AB) samples:
+  CC BY-IGO / CC BY 4.0 (per-dataset attribution preserved in provenance).
+* Open-Meteo weather forecast API integration: CC BY 4.0 (non-commercial) /
+  Commercial API terms at https://open-meteo.com/.
+* USGS Earthquake Hazards Program & NGA World Port Index: Public Domain (US Gov).
+* WRI Global Power Plant Database: CC BY 4.0 (World Resources Institute).
+* OurAirports: Public Domain.
+* OASIS Common Alerting Protocol (CAP) v1.2 / ITU-T Recommendation X.1303,
+  OGC SensorThings API v1.1, OGC API - Features, STAC v1.0.0, FDSN-WS, and
+  Agent Plugins v1.0.0 / MCP: Open technical specifications.
+
+See CREDITS.md for complete upstream references and attribution guidance.

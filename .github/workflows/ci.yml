@@ -2,10 +2,10 @@ name: DRR Agent Plugin CI
 
 on:
   push:
-    branches: [ main ]
+    branches: [ main, dev ]
     tags: [ 'v*' ]
   pull_request:
-    branches: [ main ]
+    branches: [ main, dev ]
 
 jobs:
   test:
@@ -27,7 +27,10 @@ jobs:
       - name: Run Static Lint & Syntax Check
         run: node scripts/lint.js
 
-      - name: Run All 19 Unit & MCP Test Suites
+      - name: Run Digital Public Goods (DPG) Standard Audit
+        run: node scripts/dpg-audit.js
+
+      - name: Run All Unit, Validation & MCP Test Suites
         run: bash tests/run-all-tests.sh
 
       - name: Run Southern Thailand Flood 2026 Benchmark
