@@ -8,11 +8,11 @@ This playbook outlines real-world operational scenarios, emergency management ti
 
 | Persona / Role | Organization / Setting | Primary Purpose for Using the Plugin |
 | :--- | :--- | :--- |
-| **EOC Duty Officer & Watchstander** | National Disaster Management Agencies (e.g. FEMA, BNPB Indonesia, NDRRMC Philippines, Civil Defense) | Rapid situational awareness, triggering public OASIS CAP sirens/broadcasts, and tactical search-and-rescue prioritization within the first 2 hours of a shock. |
-| **Anticipatory Action Lead** | Red Cross / Red Crescent Climate Centre, WFP, Start Network | Verifying forecast-based financing (FbF) triggers 48–72h before a flood or cyclone peaks to release pre-allocated contingency funds. |
-| **UN Humanitarian Affairs Officer** | UN OCHA (Office for the Coordination of Humanitarian Affairs) | Synthesizing standardized Situation Reports (SitReps), cluster briefings, and Flash Appeals within the first 6–24 hours of an emergency. |
-| **National Disaster Loss Focal Point** | Ministry of Environment / Civil Defense reporting to UNDRR DELTA | Auditing and mapping post-event losses to UN Sendai Framework Targets (Target B: displacement, C: direct economic loss, D: critical infrastructure damage). |
-| **Municipal Structural & Resilience Engineer** | City Urban Planning Department / Public Works | Running tabletop earthquake or flood scenarios against the local building stock (GEM/HAZUS taxonomy) to prioritize retrofitting investments. |
+| **EOC Duty Officer & Watchstander** | National Disaster Management Agencies (e.g. FEMA, BNPB Indonesia, NDRRMC Philippines, Civil Defense) | Rapid situational awareness, generating and validating candidate OASIS CAP v1.2 Draft alerts for authority review, and producing exposure-based prioritisation indicators within the first 2 hours of a shock. |
+| **Anticipatory Action Lead** | Red Cross / Red Crescent Climate Centre, WFP, Start Network | Evaluating forecast conditions against configurable, organization-approved forecast-based financing (FbF) thresholds 48–72h before a flood or cyclone peaks to support trigger verification. |
+| **UN Humanitarian Affairs Officer** | UN OCHA (Office for the Coordination of Humanitarian Affairs) | Synthesizing standardized Situation Reports (SitReps), cluster briefings, and Flash Appeal drafts within the first 6–24 hours of an emergency. |
+| **National Disaster Loss Focal Point** | Ministry of Environment / Civil Defense reporting to UNDRR DELTA | Generating and auditing draft UN Sendai Framework Target B, C, and D loss calculations for national validation and subsequent reporting through official processes. |
+| **Municipal Structural & Resilience Engineer** | City Urban Planning Department / Public Works | Running tabletop earthquake or flood scenarios against the local building stock (GEM/HAZUS taxonomy) to support retrofitting options appraisal. |
 
 ---
 
@@ -61,7 +61,7 @@ flowchart LR
   1. **Forecast & Discharge Screening**: The operator prompts the agent to run `drr_openmeteo_forecast` (and optionally `drr_basin_rainfall_aggregate` / `drr_river_discharge_screen` for GloFAS $\text{m}^3/\text{s}$ screening) for the vulnerable river basin coordinates.
   2. **Policy & Persistence Gate (C-05)**: The plugin evaluates meteorological thresholds against an explicitly approved `triggerPolicy` and multi-run `previousRuns` persistence. It **never fabricates flood inundation depth from rainfall totals alone** (`depthStatus: "depth_unavailable"`). If depth-based fragility is required, a separately calibrated hydraulic inundation grid is ingested.
   3. **Spatial Intersection**: The agent calls `drr_spatial_exposure_join` with local community flood shelters, water purification plants, and access roads.
-  4. **Anticipatory Action**: Once the approved trigger policy and persistence check pass, coordinators release pre-allocated contingency funds and draft `status: "Draft"` public advisories for Duty Officer sign-off.
+  4. **Anticipatory Action Support**: Once the organization-approved trigger policy and persistence check pass, the plugin produces a structured trigger verification brief and `status: "Draft"` candidate advisories to support coordinator sign-off under national FbF protocols.
 
 ### Scenario 2: Sudden-Onset M7+ Earthquake (T plus 5 min to 2 hours)
 * **Trigger Event**: A major earthquake strikes with ground shaking felt across multiple provinces.
@@ -74,7 +74,7 @@ flowchart LR
   3. **Illustrative Structural Fragility Assessment (C-06)**: The agent executes `drr_fragility_eval` in `exploratory` mode against local building taxonomies (e.g. non-ductile concrete frame `C1_PRE_CODE` and unreinforced masonry `URM`). Production publication requires locally calibrated curves.
   4. **Draft Warning & Controlled Broadcast (C-07)**: The agent generates a schema-validated **OASIS CAP v1.2 XML** (`drr_cap_alert_generate_validate`, defaulting to `status: "Draft"`) and a command situation brief. Live broadcast requires an authorized Duty Officer cryptographic `approvalToken` via `drr_cap_publish` (with `DRR_ENABLE_PRODUCTION_PUBLISH=true`).
 
-### Scenario 3: Tropical Cyclone Landfall & Immediate Search & Rescue (T plus 6h to 48h)
+### Scenario 3: Tropical Cyclone Landfall & Impact Screening (T plus 6h to 48h)
 * **Trigger Event**: A Category 4 tropical cyclone crosses coastlines or island chains.
 * **Primary Operator**: UN Disaster Assessment and Coordination (UNDAC) and Civil Defense.
 * **Relevant Skills**: `gdacs-feed-ingestion`, `hazard-exposure-modeling`, `vulnerability-matrix`
@@ -82,7 +82,7 @@ flowchart LR
   1. **Sanitized Footprint Extraction**: The analyst ingests the GDACS cyclone alert (`drr_gdacs_fetch`, checking `promptInjectionFlagged`) and feeds the wind swath into `drr_spatial_exposure_join`.
   2. **Critical Infrastructure Audit**: The tool intersects the footprint with provincial hospitals, power substations, and bridge coordinates.
   3. **Vulnerability Evaluation**: `drr_vulnerability_matrix_calc` calculates facilities with high physical damage probabilities ($\text{MDR} \ge 60\%$), preserving unknown values as `null` and separating physical damage (`D-2`..`D-4`) from service disruption (`D-6`..`D-8`).
-  4. **Tactical Deployment**: The agent outputs an operational brief detailing compromised hospitals, directing mobile surgical teams and tactical satellite communications to the most damaged facilities.
+  4. **Decision-Support Prioritisation**: The agent outputs a structured screening brief highlighting potentially compromised hospitals and lifelines so field commanders can prioritize rapid ground verification and response planning.
 
 ### Scenario 4: Annual Sendai Framework Loss Reporting to the UN (Peace Time / Recovery)
 * **Trigger Event**: End-of-year national disaster accounting or Post-Disaster Needs Assessment (PDNA).
@@ -127,7 +127,7 @@ flowchart LR
 
 ## 3. Quick Operator Prompt Cheatsheet
 
-> For complete, per-skill prompt examples across all **13 DRR skills** and multi-skill prompt chains, see **[docs/skills-guide.md](./skills-guide.md)**.
+> For complete, per-skill prompt examples across all **19 DRR skills** and multi-skill prompt chains, see **[docs/skills-guide.md](./skills-guide.md)**.
 
 ### For EOC Watchstanders (USGS Earthquake & Draft CAP Alert)
 * **Agent Prompt**:

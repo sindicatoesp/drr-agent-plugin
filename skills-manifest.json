@@ -1,7 +1,7 @@
 {
   "schemaVersion": "1.0.0",
   "pluginName": "drr-analytics",
-  "pluginVersion": "1.7.1",
+  "pluginVersion": "1.8.0",
   "mcpServer": "drr-analytics-mcp",
   "mcpProtocolVersion": "2024-11-05",
   "registeredToolCount": 40,
