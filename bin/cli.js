@@ -32,12 +32,15 @@ const { ingestSensorThings, toSensorGeoJSON } = require("../lib/sensorthings");
 const { ingestStacHazardCatalog, toStacFootprintGeoJSON } = require("../lib/stac");
 const { ingestFdsnShakeMap, toShakeMapGeoJSON } = require("../lib/shakemap");
 const { ingestCriticalInfraOverlay } = require("../lib/infra-overlay");
+const { ingestHdxHapiData, validateCodBoundaries } = require("../lib/hdx");
+const { evaluateHumanitarianSeverity } = require("../lib/severity");
+const { runBenchmarkSuite } = require("../lib/benchmarks");
 const pkg = require("../package.json");
 
 function printHelp() {
 	console.log(`
 DRR Analytics & Agent Plugin CLI v${pkg.version}
-Disaster Risk Reduction Tools: GDACS, USGS, FDSN-WS/ShakeMap, Open-Meteo, OGC SensorThings, STAC EO Grids, Sendai Infra Overlay, Hydro, Spatial/CRS/Raster, Fragility, CAP Alerts, Sendai, DELTA, Uncertainty, Appraisal & Replay
+Disaster Risk Reduction Tools: GDACS, USGS, FDSN-WS/ShakeMap, Open-Meteo, OGC SensorThings, STAC EO Grids, Sendai Infra Overlay, HDX/HAPI & COD-AB, Humanitarian Severity, Benchmarks, Hydro, Spatial/CRS/Raster, Fragility, CAP Alerts, Sendai, DELTA, Uncertainty, Appraisal & Replay
 
 Usage:
   drr-tool <command> [options]
@@ -50,6 +53,10 @@ Commands:
   sensorthings         Ingest custom government/private OGC SensorThings API v1.1 gauges
   stac-hazard          Ingest STAC v1.0.0 EO catalogs & validated flood depth grids (C-05)
   infra-overlay        Group & overlay Sendai Target D 9-sector critical infrastructure (OGC API - Features / GeoJSON)
+  hdx-hapi             Query or parse OCHA HDX Humanitarian API (HAPI v2) indicators with freshness & license checks
+  cod-validate         Validate OCHA COD-AB administrative boundaries, P-code hierarchy & DELTA reconciliation
+  severity-assess      Evaluate JIAF/INFORM multi-factor humanitarian rapid impact & severity (phases 1-5)
+  benchmark            Run curated GeoDisaster-inspired multi-step DRR agent benchmark suite
   basin-rainfall       Aggregate rainfall forecasts (mm) across catchment polygon/points
   river-discharge      Screen GloFAS / Open-Meteo river discharge (m^3/s)
   fragility            Evaluate GEM/HAZUS structural fragility curves (requires --intensity)
@@ -684,6 +691,83 @@ async function main() {
 				});
 				const output = options["as-geojson"] ? report.overlayGeoJSON : report;
 				console.log(JSON.stringify(output, null, 2));
+				break;
+			}
+
+			case "hdx-hapi": {
+				const samplePayload = options.file
+					? JSON.parse(fs.readFileSync(options.file, "utf8"))
+					: undefined;
+				const report = await ingestHdxHapiData({
+					endpointUrl: options.url,
+					resource: options.resource,
+					locationCode: options.iso3 || options.country,
+					admin1Code: options.admin1,
+					admin2Code: options.admin2,
+					adminLevel: options["admin-level"] !== undefined ? parseInt(options["admin-level"], 10) : undefined,
+					appIdentifier: options["app-id"],
+					maxAgeDays: options["max-age-days"] !== undefined ? parseInt(options["max-age-days"], 10) : undefined,
+					limit: options.limit ? parseInt(options.limit, 10) : undefined,
+					samplePayload,
+				});
+				console.log(JSON.stringify(report, null, 2));
+				break;
+			}
+
+			case "cod-validate": {
+				const filePath = options.file || options._file;
+				if (!filePath) throw new Error("cod-validate requires --file <path-to-cod-ab.geojson>");
+				const payload = JSON.parse(fs.readFileSync(filePath, "utf8"));
+				const deltaDivisions = options["delta-file"]
+					? JSON.parse(fs.readFileSync(options["delta-file"], "utf8"))
+					: undefined;
+				const isGeo = payload && (payload.type === "FeatureCollection" || payload.type === "Feature");
+				const report = validateCodBoundaries({
+					boundaryGeoJSON: isGeo ? payload : undefined,
+					records: Array.isArray(payload) ? payload : undefined,
+					expectedIso3: options.iso3,
+					expectedAdminLevel: options["admin-level"] !== undefined ? parseInt(options["admin-level"], 10) : undefined,
+					maxAgeDays: options["max-age-days"] !== undefined ? parseInt(options["max-age-days"], 10) : undefined,
+					boundarySource: options.source,
+					deltaDivisions,
+				});
+				console.log(JSON.stringify(report, null, 2));
+				break;
+			}
+
+			case "severity-assess": {
+				let input = {};
+				if (options.file || options._file) {
+					input = JSON.parse(fs.readFileSync(options.file || options._file, "utf8"));
+				} else {
+					input = {
+						pcode: options.pcode,
+						unitName: options.name,
+						hazardType: options.hazard,
+						hazardIntensity: options["hazard-intensity"] !== undefined ? parseFloat(options["hazard-intensity"]) : undefined,
+						exposure: options.exposure !== undefined ? parseFloat(options.exposure) : undefined,
+						vulnerability: options.vulnerability !== undefined ? parseFloat(options.vulnerability) : undefined,
+						copingCapacityDeficit: options["coping-deficit"] !== undefined ? parseFloat(options["coping-deficit"]) : undefined,
+						affectedPopulation: options["affected-pop"] !== undefined ? parseInt(options["affected-pop"], 10) : undefined,
+						totalPopulation: options["total-pop"] !== undefined ? parseInt(options["total-pop"], 10) : undefined,
+					};
+				}
+				const report = evaluateHumanitarianSeverity(input);
+				console.log(JSON.stringify(report, null, 2));
+				break;
+			}
+
+			case "benchmark": {
+				const trajectories = options.trajectories
+					? JSON.parse(fs.readFileSync(options.trajectories, "utf8"))
+					: undefined;
+				const report = await runBenchmarkSuite({
+					category: options.category,
+					scenarioId: options.scenario,
+					trajectories,
+				});
+				console.log(JSON.stringify(report, null, 2));
+				if (!report.allPassed) process.exit(1);
 				break;
 			}
 

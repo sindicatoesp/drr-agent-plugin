@@ -1,0 +1,325 @@
+{
+  "suiteId": "drr-geodisaster-agent-eval-v1",
+  "version": "1.0.0",
+  "description": "Curated GeoDisaster-inspired multi-step agent evaluation scenarios testing DRR tool selection, numerical accuracy, non-goal compliance, evidence/provenance coverage, and schema validity.",
+  "scenarios": [
+    {
+      "id": "geo-01-flood-fba-non-fabrication",
+      "category": "anticipatory_action_hydrology",
+      "prompt": "Evaluate a 3-day monsoon rainfall forecast and GloFAS discharge series for a 180 km2 headwater catchment on a 5 km grid. Confirm trigger status without fabricating flood inundation depth.",
+      "expectedTools": [
+        "drr_openmeteo_forecast",
+        "drr_river_discharge_screen"
+      ],
+      "forbiddenTools": [
+        "drr_cap_publish",
+        "drr_delta_push_draft_record"
+      ],
+      "inputs": {
+        "openmeteo": {
+          "samplePayload": {
+            "daily": {
+              "time": ["2026-09-01", "2026-09-02", "2026-09-03"],
+              "precipitation_sum": [95, 110, 80]
+            }
+          },
+          "triggerPolicy": {
+            "policyId": "bgd-monsoon-2026",
+            "approved": true,
+            "redThresholdMm": 200,
+            "requirePersistence": false
+          }
+        },
+        "riverDischarge": {
+          "dailyDischargeM3s": [420, 980, 1360],
+          "dates": ["2026-09-01", "2026-09-02", "2026-09-03"],
+          "returnPeriodThresholds": { "q2": 600, "q5": 1000, "q10": 1250 },
+          "gridResolutionKm": 5,
+          "upstreamDrainageAreaSqKm": 180,
+          "isRiverCell": true
+        }
+      },
+      "assertions": {
+        "requiredKeys": ["forecast", "discharge", "depthStatus", "provenance"],
+        "exactValues": {
+          "depthStatus": "depth_unavailable"
+        },
+        "numericChecks": [
+          { "path": "forecast.totalForecastPrecipitationMm", "expected": 285, "tolerance": 0.01 },
+          { "path": "discharge.peakDischargeM3s", "expected": 1360, "tolerance": 0.01 }
+        ],
+        "nonGoalRules": [
+          "no_fabricated_flood_depth"
+        ]
+      }
+    },
+    {
+      "id": "geo-02-eq-rapid-exposure-sendai",
+      "category": "seismic_exposure_and_sendai",
+      "prompt": "Intersect exposed buildings with the earthquake shaking footprint, compute vulnerability/loss at 0.35 g PGA, and validate Sendai semantics keeping modelled displacement separate from B-1.",
+      "expectedTools": [
+        "drr_spatial_exposure_join",
+        "drr_vulnerability_matrix_calc",
+        "drr_sendai_validate"
+      ],
+      "forbiddenTools": [
+        "drr_cap_publish"
+      ],
+      "inputs": {
+        "hazardGeoJSON": {
+          "type": "Polygon",
+          "coordinates": [[[100.0, 13.0], [101.0, 13.0], [101.0, 14.0], [100.0, 14.0], [100.0, 13.0]]]
+        },
+        "exposureGeoJSON": {
+          "type": "FeatureCollection",
+          "features": [
+            {
+              "type": "Feature",
+              "properties": {
+                "id": "bldg-01",
+                "name": "District Clinic",
+                "taxonomy": "URM",
+                "population": 400,
+                "valueUsd": 2000000
+              },
+              "geometry": { "type": "Point", "coordinates": [100.5, 13.5] }
+            }
+          ]
+        },
+        "hazardType": "earthquake",
+        "intensity": 0.35
+      },
+      "assertions": {
+        "requiredKeys": ["spatialReport", "vulnerabilityReport", "sendaiValidation", "provenance"],
+        "exactValues": {
+          "spatialReport.summary.totalExposedAssets": 1
+        },
+        "numericChecks": [
+          { "path": "vulnerabilityReport.sendaiFrameworkMetrics.targetC_DirectEconomicLoss.estimatedDirectEconomicLossUsd", "min": 100000, "max": 2000000 }
+        ],
+        "nonGoalRules": [
+          "separate_displacement_from_b1"
+        ]
+      }
+    },
+    {
+      "id": "geo-03-cap-draft-governance",
+      "category": "alert_governance",
+      "prompt": "Generate an OASIS CAP v1.2 flood warning draft and verify that attempting to publish a Draft CAP alert to a production channel is rejected.",
+      "expectedTools": [
+        "drr_cap_alert_generate_validate",
+        "drr_cap_publish"
+      ],
+      "forbiddenTools": [
+        "drr_delta_push_draft_record"
+      ],
+      "inputs": {
+        "alertParams": {
+          "event": "River Flood",
+          "headline": "Draft Flood Warning for Basin North",
+          "severity": "Severe",
+          "urgency": "Expected",
+          "certainty": "Likely",
+          "areaDesc": "Basin North"
+        },
+        "publishAttempt": {
+          "channelType": "production",
+          "destination": "https://alerts.example.org/cap"
+        }
+      },
+      "assertions": {
+        "requiredKeys": ["capResult", "publishGate", "provenance"],
+        "exactValues": {
+          "capResult.isValid": true,
+          "publishGate.published": false
+        },
+        "numericChecks": [],
+        "nonGoalRules": [
+          "block_draft_on_production"
+        ]
+      }
+    },
+    {
+      "id": "geo-04-hdx-cod-severity",
+      "category": "humanitarian_severity_and_cod",
+      "prompt": "Validate OCHA COD-AB ADM2 boundaries, ingest HDX HAPI population baseline, and compute a multi-factor JIAF/INFORM humanitarian severity assessment without reducing severity to hazard magnitude alone.",
+      "expectedTools": [
+        "drr_cod_boundary_validate",
+        "drr_hdx_hapi_fetch",
+        "drr_humanitarian_severity_assess"
+      ],
+      "forbiddenTools": [
+        "drr_cap_publish"
+      ],
+      "inputs": {
+        "codGeoJSON": {
+          "type": "FeatureCollection",
+          "features": [
+            {
+              "type": "Feature",
+              "properties": {
+                "ADM0_PCODE": "THA",
+                "ADM1_PCODE": "TH90",
+                "ADM2_PCODE": "TH9001",
+                "ADM2_EN": "Hat Yai",
+                "date": "2025-10-01",
+                "source": "OCHA ROAP COD-AB"
+              },
+              "geometry": {
+                "type": "Polygon",
+                "coordinates": [[[100.3, 6.9], [100.6, 6.9], [100.6, 7.1], [100.3, 7.1], [100.3, 6.9]]]
+              }
+            }
+          ]
+        },
+        "hapiSample": {
+          "data": [
+            {
+              "location_code": "THA",
+              "admin1_code": "TH90",
+              "admin2_code": "TH9001",
+              "admin2_name": "Hat Yai",
+              "population": 160000,
+              "reference_period_start": "2026-01-01",
+              "reference_period_end": "2026-06-01",
+              "license": "cc-by-igo",
+              "org_name": "OCHA"
+            }
+          ]
+        },
+        "severityInput": {
+          "pcode": "TH9001",
+          "unitName": "Hat Yai",
+          "hazardType": "flood",
+          "hazardIntensity": 7.5,
+          "affectedPopulation": 42000,
+          "totalPopulation": 160000,
+          "vulnerability": 6.2,
+          "copingCapacityDeficit": 5.8
+        }
+      },
+      "assertions": {
+        "requiredKeys": ["codValidation", "hapiData", "severityAssessment", "provenance"],
+        "exactValues": {
+          "codValidation.valid": true,
+          "severityAssessment.hazardOnlyBlocked": false,
+          "severityAssessment.dataConfidence": "high"
+        },
+        "numericChecks": [
+          { "path": "severityAssessment.severityPhase", "min": 3, "max": 5 },
+          { "path": "hapiData.summary.totalIndicatorValue", "expected": 160000, "tolerance": 0.01 }
+        ],
+        "nonGoalRules": [
+          "no_hazard_only_severity"
+        ]
+      }
+    },
+    {
+      "id": "geo-05-cip-cascade-redaction",
+      "category": "critical_infrastructure_and_cip",
+      "prompt": "Overlay critical infrastructure onto a flood polygon for a public SitRep audience, ensuring restricted CIP facilities are redacted while tracking lifeline cascades separately from physical exposure.",
+      "expectedTools": [
+        "drr_critical_infra_overlay"
+      ],
+      "forbiddenTools": [
+        "drr_cap_publish"
+      ],
+      "inputs": {
+        "hazardGeoJSON": {
+          "type": "Polygon",
+          "coordinates": [[[100.3, 6.9], [100.6, 6.9], [100.6, 7.1], [100.3, 7.1], [100.3, 6.9]]]
+        },
+        "infraGeoJSON": {
+          "type": "FeatureCollection",
+          "features": [
+            {
+              "type": "Feature",
+              "properties": {
+                "id": "substation-01",
+                "name": "South Grid Substation",
+                "sector": "energy",
+                "sensitivity": "restricted",
+                "redistributionAllowed": false
+              },
+              "geometry": { "type": "Point", "coordinates": [100.45, 7.0] }
+            },
+            {
+              "type": "Feature",
+              "properties": {
+                "id": "hosp-01",
+                "name": "Central General Hospital",
+                "sector": "health",
+                "dependsOn": ["substation-01"]
+              },
+              "geometry": { "type": "Point", "coordinates": [100.8, 7.2] }
+            }
+          ]
+        },
+        "audience": "public"
+      },
+      "assertions": {
+        "requiredKeys": ["infraOverlay", "provenance"],
+        "exactValues": {
+          "infraOverlay.summary.redactedForPublicCount": 1
+        },
+        "numericChecks": [
+          { "path": "infraOverlay.summary.redactedForPublicCount", "min": 1, "max": 2 }
+        ],
+        "nonGoalRules": [
+          "cip_public_redaction_enforced"
+        ]
+      }
+    },
+    {
+      "id": "geo-06-stac-depth-vs-extent",
+      "category": "earth_observation_stac",
+      "prompt": "Ingest a STAC flood item catalog containing both extent-only and depth-grid assets, ensuring flood extent is separated from validated flood depth.",
+      "expectedTools": [
+        "drr_stac_hazard_fetch"
+      ],
+      "forbiddenTools": [
+        "drr_cap_publish"
+      ],
+      "inputs": {
+        "stacSample": {
+          "type": "FeatureCollection",
+          "features": [
+            {
+              "type": "Feature",
+              "stac_version": "1.0.0",
+              "id": "copernicus-emsr-flood-extent-01",
+              "bbox": [100.3, 6.9, 100.6, 7.1],
+              "geometry": {
+                "type": "Polygon",
+                "coordinates": [[[100.3, 6.9], [100.6, 6.9], [100.6, 7.1], [100.3, 7.1], [100.3, 6.9]]]
+              },
+              "properties": {
+                "datetime": "2026-08-15T06:00:00Z",
+                "eo:cloud_cover": 8,
+                "license": "copernicus-open"
+              },
+              "assets": {
+                "flood_extent": {
+                  "href": "https://example.org/emsr/flood_extent.geojson",
+                  "type": "application/geo+json",
+                  "roles": ["data", "flood-extent"]
+                }
+              }
+            }
+          ]
+        }
+      },
+      "assertions": {
+        "requiredKeys": ["stacResult", "provenance"],
+        "exactValues": {
+          "stacResult.summary.itemCount": 1,
+          "stacResult.summary.validatedDepthGridCount": 0
+        },
+        "numericChecks": [],
+        "nonGoalRules": [
+          "separate_extent_from_depth"
+        ]
+      }
+    }
+  ]
+}
