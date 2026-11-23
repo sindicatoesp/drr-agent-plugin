@@ -6,7 +6,7 @@ Complete technical specification of all **33 MCP tools** provided by `bin/mcp-se
 
 ---
 
-# Part 1: Model Context Protocol (MCP) Tools (37 Tools)
+# Part 1: Model Context Protocol (MCP) Tools (38 Tools)
 
 ## 1. `drr_gdacs_fetch`
 Ingests and filters active GDACS alerts by severity, hazard type (`EQ`, `TC`, `FL`, `VO`, `DR`), or country, with untrusted feed sanitization (`promptInjectionFlagged`), `sourceIssuedAt`, `retrievedAt`, and `payloadHash`.
@@ -486,15 +486,31 @@ Runs the curated GeoDisaster-inspired multi-step DRR agent benchmark suite (`tes
 }
 ```
 
+## 38. `drr_hdx_polygon_population_estimate`
+Estimates exposed population inside an arbitrary hazard polygon (or `epicenter` + `bufferKm`) by intersecting it with **OCHA COD-AB** administrative boundaries and joining **OCHA HDX HAPI v2** population counts by P-code via deterministic areal interpolation (`exposure.hdx.polygon_population_v1`). Reports both area-weighted and full-unit totals, preserves missing HAPI counts as `null` (`R-02`), separates modelled exposure from Sendai `B-1` (`C-01`), and flags uniform-density caveats.
+
+```json
+{
+  "hazardGeoJSON": {},
+  "epicenter": [100.45, 7.0],
+  "bufferKm": 15,
+  "codBoundaryGeoJSON": {},
+  "hapiSamplePayload": {},
+  "expectedIso3": "THA",
+  "expectedAdminLevel": 2,
+  "gridResolution": 25
+}
+```
+
 ---
 
-# Part 2: Command-Line Interface (CLI) Reference (37 Subcommands)
+# Part 2: Command-Line Interface (CLI) Reference (38 Subcommands)
 
 Run `node bin/cli.js --help` (or `drr-tool --help`) for usage.
 
 * **Telemetry & Hydro**: `gdacs`, `usgs`, `fdsn-shakemap`, `forecast`, `sensorthings`, `stac-hazard`, `hdx-hapi`, `basin-rainfall`, `river-discharge`, `monitor`
 * **Contracts, Registry, Replay & Benchmarks**: `validate-input`, `registry`, `replay-validate`, `benchmark`
-* **Spatial, COD-AB, Overlay & Raster**: `spatial-join`, `infra-overlay`, `cod-validate`, `geojson-validate`, `geometry-repair`, `crs-transform`, `raster-zonal-stats`
+* **Spatial, COD-AB, Overlay & Raster**: `spatial-join`, `infra-overlay`, `cod-validate`, `hdx-polygon-pop`, `geojson-validate`, `geometry-repair`, `crs-transform`, `raster-zonal-stats`
 * **Fragility, Vulnerability, Severity & Sendai**: `fragility` *(requires `--intensity`)*, `vulnerability` *(requires `--spatial` and `--intensity`)*, `severity-assess`, `sendai-validate`
 * **Taxonomy & Event Identity**: `hazard-crosswalk`, `event-dedup`
 * **Uncertainty & Appraisal**: `uncertainty`, `eal`, `cba`

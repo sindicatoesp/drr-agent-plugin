@@ -56,7 +56,7 @@ async function run() {
 	send({ jsonrpc: "2.0", id: 2, method: "tools/list", params: {} });
 	const listRes = await waitForResponse(2);
 	assert(listRes, "Expected tools/list response");
-	assert.strictEqual(listRes.result.tools.length, 37);
+	assert.strictEqual(listRes.result.tools.length, 38);
 
 	// 3. tools/call: drr_fragility_eval
 	send({
@@ -424,6 +424,17 @@ async function run() {
 	assert.strictEqual(codRes.valid, true);
 	assert.strictEqual(codRes.deltaReconciliation.reconciled, true);
 
+	const polyPopRes = await callTool(35, "drr_hdx_polygon_population_estimate", {
+		codBoundaryGeoJSON: codSample,
+		hapiSamplePayload: hapiSample,
+		epicenter: [100.45, 7.0],
+		bufferKm: 15,
+		expectedIso3: "THA",
+		gridResolution: 20,
+	});
+	assert(polyPopRes.summary.overlappingAdminUnits >= 1);
+	assert(polyPopRes.summary.totalAreaWeightedExposedPopulation > 0);
+
 	const sevRes = await callTool(33, "drr_humanitarian_severity_assess", {
 		pcode: "TH9001",
 		hazardType: "flood",
@@ -455,7 +466,7 @@ async function run() {
 
 	fs.rmSync(path.join(__dirname, "../alerts"), { recursive: true, force: true });
 	child.kill();
-	console.log("✅ MCP Server Stdio tests passed (37 tools + error handling verified)!");
+	console.log("✅ MCP Server Stdio tests passed (38 tools + error handling verified)!");
 }
 
 run().catch((err) => {

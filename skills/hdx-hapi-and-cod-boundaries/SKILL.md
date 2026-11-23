@@ -26,6 +26,7 @@ description: Discovers and validates OCHA HDX Humanitarian API (HAPI v2) baselin
 ## Allowed Executable Tools
 * `drr_hdx_hapi_fetch`
 * `drr_cod_boundary_validate`
+* `drr_hdx_polygon_population_estimate`
 * `drr_geojson_validate`
 * `drr_geometry_repair`
 * `drr_delta_fetch_exposure`
@@ -40,8 +41,9 @@ description: Discovers and validates OCHA HDX Humanitarian API (HAPI v2) baselin
   Using the hdx-hapi-and-cod-boundaries skill, validate examples/hdx-hapi-cod/sample-cod-ab.geojson
   for expectedIso3 "THA" at expectedAdminLevel 2 and reconcile against DELTA divisions ["TH9001", "TH9002"].
   ```
-* **Use Case — Ingest HDX HAPI Population Baseline with Freshness & License Audit**:
+* **Use Case — Estimate Exposed Population Inside a Hazard Polygon via COD-AB + HDX HAPI**:
   ```text
-  Ingest examples/hdx-hapi-cod/sample-hapi-population.json via drr_hdx_hapi_fetch for ISO3 "THA"
-  with maxAgeDays 365 and report total indicator value, stale records, and redistribution eligibility.
+  Use drr_hdx_polygon_population_estimate with codBoundaryGeoJSON examples/hdx-hapi-cod/sample-cod-ab.geojson,
+  hapiSamplePayload examples/hdx-hapi-cod/sample-hapi-population.json, and a flood polygon covering
+  the northern half of Hat Yai. Report area-weighted vs. full-unit totals and uniform-density caveats.
   ```
