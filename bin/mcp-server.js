@@ -29,6 +29,9 @@ const { ingestSensorThings, toSensorGeoJSON } = require("../lib/sensorthings");
 const { ingestStacHazardCatalog, toStacFootprintGeoJSON } = require("../lib/stac");
 const { ingestFdsnShakeMap, toShakeMapGeoJSON } = require("../lib/shakemap");
 const { ingestCriticalInfraOverlay } = require("../lib/infra-overlay");
+const { ingestHdxHapiData, validateCodBoundaries } = require("../lib/hdx");
+const { evaluateHumanitarianSeverity } = require("../lib/severity");
+const { runBenchmarkSuite } = require("../lib/benchmarks");
 
 const pkg = require("../package.json");
 
@@ -866,10 +869,190 @@ const TOOLS = [
 			},
 		},
 	},
+	{
+		name: "drr_hdx_hapi_fetch",
+		description:
+			"Query and normalize OCHA HDX Humanitarian API (HAPI v2) indicators (population, humanitarian needs, IDPs, refugees, operational presence, metadata) with ISO3/P-code validation, freshness screening, license/redistribution checks, SSRF protection, and SHA-256 provenance.",
+		inputSchema: {
+			type: "object",
+			properties: {
+				endpointUrl: {
+					type: "string",
+					description: "Optional custom HAPI v2 base URL (defaults to https://hapi.humdata.org/api/v2; SSRF-guarded)",
+				},
+				resource: {
+					type: "string",
+					description: "HAPI resource path (e.g. 'population-social/population', 'affected-people/humanitarian-needs', 'affected-people/idps', 'metadata/admin2')",
+				},
+				locationCode: {
+					type: "string",
+					description: "Optional ISO3 country filter (e.g. 'THA', 'PHL', 'BGD')",
+				},
+				admin1Code: {
+					type: "string",
+					description: "Optional ADM1 P-code filter",
+				},
+				admin2Code: {
+					type: "string",
+					description: "Optional ADM2 P-code filter",
+				},
+				adminLevel: {
+					type: "number",
+					description: "Optional administrative level filter (0, 1, 2)",
+				},
+				appIdentifier: {
+					type: "string",
+					description: "Optional HAPI registered app_identifier (falls back to HAPI_APP_IDENTIFIER env var)",
+				},
+				maxAgeDays: {
+					type: "number",
+					description: "Freshness threshold in days before flagging records as stale (default: 365)",
+				},
+				limit: {
+					type: "number",
+					description: "Maximum rows to fetch (default: 100, max: 10000)",
+				},
+				samplePayload: {
+					type: "object",
+					description: "Optional offline/test HAPI JSON payload `{ data: [...] }` to parse instead of live network fetch",
+				},
+			},
+		},
+	},
+	{
+		name: "drr_cod_boundary_validate",
+		description:
+			"Validate OCHA Common Operational Datasets - Administrative Boundaries (COD-AB) GeoJSON or metadata records for ISO3 codes, P-code syntax/uniqueness, parent-child hierarchy, release freshness, RFC 7946 geometry validity, and optional reconciliation against UNDRR DELTA divisions.",
+		inputSchema: {
+			type: "object",
+			properties: {
+				boundaryGeoJSON: {
+					type: "object",
+					description: "COD-AB GeoJSON FeatureCollection or Feature to validate",
+				},
+				records: {
+					type: "array",
+					items: { type: "object" },
+					description: "Optional non-spatial COD-AB metadata records array (when validating tabular P-codes without geometries)",
+				},
+				expectedIso3: {
+					type: "string",
+					description: "Optional expected ISO3 country code (e.g. 'THA')",
+				},
+				expectedAdminLevel: {
+					type: "number",
+					description: "Optional expected administrative level (0..4)",
+				},
+				maxAgeDays: {
+					type: "number",
+					description: "Maximum acceptable boundary release age in days before warning (default: 1095)",
+				},
+				boundarySource: {
+					type: "string",
+					description: "Optional COD-AB source attribution string (e.g. 'OCHA ROAP COD-AB')",
+				},
+				deltaDivisions: {
+					type: "array",
+					description: "Optional list of UNDRR DELTA division objects or P-code strings to reconcile against COD-AB",
+				},
+			},
+		},
+	},
+	{
+		name: "drr_humanitarian_severity_assess",
+		description:
+			"Evaluate a JIAF 2.0 / INFORM-aligned multi-factor humanitarian rapid impact and severity assessment (phases 1-5), explicitly separating hazard intensity, exposure, vulnerability, coping capacity deficit, and data confidence without reducing severity to hazard magnitude alone or coercing missing dimensions to 0.",
+		inputSchema: {
+			type: "object",
+			properties: {
+				pcode: { type: "string", description: "Optional OCHA P-code of the assessed area" },
+				unitName: { type: "string", description: "Optional area or admin unit name" },
+				hazardType: { type: "string", description: "Hazard type (e.g. 'flood', 'earthquake', 'cyclone')" },
+				hazardIntensity: { type: "number", description: "Normalized hazard intensity score (0-10)" },
+				exposure: { type: "number", description: "Explicit normalized exposure score (0-10); optional if derived from population/facilities/spatialReport" },
+				vulnerability: { type: "number", description: "Explicit baseline vulnerability score (0-10); optional if derived from vulnerabilityReport" },
+				copingCapacityDeficit: { type: "number", description: "Lack of coping capacity score (0-10); optional if derived from copingCapacity or infraOverlay" },
+				copingCapacity: { type: "number", description: "Optional coping capacity score (0-10, inverted internally to copingCapacityDeficit)" },
+				affectedPopulation: { type: "number", description: "Optional estimated affected/exposed population count" },
+				totalPopulation: { type: "number", description: "Optional baseline total population count for share calculation" },
+				exposedFacilities: { type: "number", description: "Optional count of exposed facilities" },
+				spatialReport: { type: "object", description: "Optional output from drr_spatial_exposure_join" },
+				vulnerabilityReport: { type: "object", description: "Optional output from drr_vulnerability_matrix_calc" },
+				infraOverlay: { type: "object", description: "Optional output from drr_critical_infra_overlay" },
+				weights: { type: "object", description: "Optional custom pillar weights { hazardIntensity, exposure, vulnerability, copingCapacityDeficit }" },
+				units: {
+					type: "array",
+					items: { type: "object" },
+					description: "Optional array of admin-unit assessment inputs for multi-unit priority ranking",
+				},
+			},
+		},
+	},
+	{
+		name: "drr_benchmark_run",
+		description:
+			"Run the curated GeoDisaster-inspired multi-step DRR agent benchmark suite to score tool selection, numerical accuracy, non-goal compliance, provenance coverage, and schema validity across deterministic reference or external agent trajectories.",
+		inputSchema: {
+			type: "object",
+			properties: {
+				category: {
+					type: "string",
+					description: "Optional benchmark category filter (e.g. 'anticipatory_action_hydrology', 'humanitarian_severity_and_cod')",
+				},
+				scenarioId: {
+					type: "string",
+					description: "Optional single scenario ID to execute (e.g. 'geo-01-flood-fba-non-fabrication')",
+				},
+				trajectories: {
+					type: "object",
+					description: "Optional map of { [scenarioId]: { toolsCalled: string[], output: object } } for evaluating an external LLM agent",
+				},
+			},
+		},
+	},
 ];
 
 async function handleToolCall(name, args) {
 	switch (name) {
+		case "drr_hdx_hapi_fetch": {
+			return ingestHdxHapiData({
+				endpointUrl: args.endpointUrl,
+				resource: args.resource,
+				locationCode: args.locationCode,
+				admin1Code: args.admin1Code,
+				admin2Code: args.admin2Code,
+				adminLevel: args.adminLevel,
+				appIdentifier: args.appIdentifier,
+				maxAgeDays: args.maxAgeDays,
+				limit: args.limit,
+				samplePayload: args.samplePayload,
+			});
+		}
+
+		case "drr_cod_boundary_validate": {
+			return validateCodBoundaries({
+				boundaryGeoJSON: args.boundaryGeoJSON,
+				records: args.records,
+				expectedIso3: args.expectedIso3,
+				expectedAdminLevel: args.expectedAdminLevel,
+				maxAgeDays: args.maxAgeDays,
+				boundarySource: args.boundarySource,
+				deltaDivisions: args.deltaDivisions,
+			});
+		}
+
+		case "drr_humanitarian_severity_assess": {
+			return evaluateHumanitarianSeverity(args);
+		}
+
+		case "drr_benchmark_run": {
+			return runBenchmarkSuite({
+				category: args.category,
+				scenarioId: args.scenarioId,
+				trajectories: args.trajectories,
+			});
+		}
+
 		case "drr_critical_infra_overlay": {
 			return ingestCriticalInfraOverlay({
 				endpointUrl: args.endpointUrl,

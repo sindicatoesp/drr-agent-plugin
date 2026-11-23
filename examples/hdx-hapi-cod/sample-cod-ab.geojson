@@ -1,0 +1,53 @@
+{
+  "type": "FeatureCollection",
+  "features": [
+    {
+      "type": "Feature",
+      "properties": {
+        "ADM0_PCODE": "THA",
+        "ADM1_PCODE": "TH90",
+        "ADM1_EN": "Songkhla",
+        "ADM2_PCODE": "TH9001",
+        "ADM2_EN": "Hat Yai",
+        "date": "2025-10-01",
+        "source": "OCHA ROAP COD-AB"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [100.3, 6.9],
+            [100.6, 6.9],
+            [100.6, 7.1],
+            [100.3, 7.1],
+            [100.3, 6.9]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "ADM0_PCODE": "THA",
+        "ADM1_PCODE": "TH90",
+        "ADM1_EN": "Songkhla",
+        "ADM2_PCODE": "TH9002",
+        "ADM2_EN": "Sadao",
+        "date": "2025-10-01",
+        "source": "OCHA ROAP COD-AB"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [100.3, 6.6],
+            [100.6, 6.6],
+            [100.6, 6.9],
+            [100.3, 6.9],
+            [100.3, 6.6]
+          ]
+        ]
+      }
+    }
+  ]
+}

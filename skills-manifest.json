@@ -1,0 +1,304 @@
+{
+  "schemaVersion": "1.0.0",
+  "pluginName": "drr-analytics",
+  "pluginVersion": "1.5.0",
+  "mcpServer": "drr-analytics-mcp",
+  "mcpProtocolVersion": "2024-11-05",
+  "registeredToolCount": 37,
+  "skillCount": 19,
+  "safetyTiers": {
+    "read_only_analytics": "Pure local deterministic computation, spatial validation, or benchmark verification.",
+    "external_network_read": "Reads external hazard/humanitarian APIs with SSRF guards and prompt-injection sanitization.",
+    "governance_write_gated": "Includes state-mutating or publication tools gated by Draft-default, approval tokens, or explicit production flags."
+  },
+  "valid": true,
+  "validationErrors": [],
+  "skills": [
+    {
+      "name": "cap-governance-and-approval",
+      "description": "Enforces C-07 CAP state separation, signed cryptographic approval tokens bound to exact payload hash and destination, production channel isolation, destination allowlists, idempotency, and audit logging.",
+      "path": "skills/cap-governance-and-approval/SKILL.md",
+      "safetyTier": "governance_write_gated",
+      "allowedTools": [
+        "drr_cap_alert_generate_validate",
+        "drr_cap_publish"
+      ],
+      "nonGoalCount": 3,
+      "triggerCount": 2,
+      "escalationCount": 1
+    },
+    {
+      "name": "critical-infrastructure-overlay",
+      "description": "Groups critical infrastructure assets by the 9 UNDRR Sendai Framework Target D sectors, ingests layers via OGC API - Features (OGC 17-069r4) or GeoJSON, overlays them onto hazard footprints, evaluates lifeline dependency cascades (D-6..D-8 separate from D-2..D-4), and enforces CIP sensitivity redaction.",
+      "path": "skills/critical-infrastructure-overlay/SKILL.md",
+      "safetyTier": "external_network_read",
+      "allowedTools": [
+        "drr_critical_infra_overlay",
+        "drr_spatial_exposure_join",
+        "drr_delta_fetch_exposure",
+        "drr_sendai_validate"
+      ],
+      "nonGoalCount": 4,
+      "triggerCount": 2,
+      "escalationCount": 3
+    },
+    {
+      "name": "delta-disaster-recording",
+      "description": "Schema-validated, tenant-isolated, draft-only interoperability with UNDRR DELTA Resilience retaining C-03 governance metadata, HIP triad completeness, and idempotency keys.",
+      "path": "skills/delta-disaster-recording/SKILL.md",
+      "safetyTier": "governance_write_gated",
+      "allowedTools": [
+        "drr_delta_docs",
+        "drr_delta_fetch_exposure",
+        "drr_delta_schema_validate",
+        "drr_delta_push_draft_record"
+      ],
+      "nonGoalCount": 3,
+      "triggerCount": 1,
+      "escalationCount": 2
+    },
+    {
+      "name": "drr-data-quality-and-provenance",
+      "description": "Validates input contracts, explicit intensity units, lat/lon ordering, temporal bounds, secret-sanitized SHA-256 provenance manifests, model registry applicability, and frozen-input replay verification.",
+      "path": "skills/drr-data-quality-and-provenance/SKILL.md",
+      "safetyTier": "read_only_analytics",
+      "allowedTools": [
+        "drr_input_contract_validate",
+        "drr_source_provenance_manifest",
+        "drr_model_registry_list",
+        "drr_assessment_replay_validate",
+        "drr_uncertainty_propagate"
+      ],
+      "nonGoalCount": 3,
+      "triggerCount": 2,
+      "escalationCount": 1
+    },
+    {
+      "name": "early-warning-telemetry",
+      "description": "Multi-source disaster telemetry ingestion and rainfall/seismic screening across GDACS, USGS Earthquake Hazards, and Open-Meteo. Never fabricates flood depths or equates MMI-to-PGA GMICE with source-distance GMPEs.",
+      "path": "skills/early-warning-telemetry/SKILL.md",
+      "safetyTier": "external_network_read",
+      "allowedTools": [
+        "drr_usgs_earthquake_fetch",
+        "drr_gdacs_fetch",
+        "drr_openmeteo_forecast",
+        "drr_river_discharge_screen",
+        "drr_event_match_deduplicate"
+      ],
+      "nonGoalCount": 4,
+      "triggerCount": 2,
+      "escalationCount": 3
+    },
+    {
+      "name": "event-identity-and-linkage",
+      "description": "Multi-source disaster event deduplication, revision tracking, and reversible event-linkage classification avoiding automatic causal inference from spatial-temporal co-occurrence.",
+      "path": "skills/event-identity-and-linkage/SKILL.md",
+      "safetyTier": "external_network_read",
+      "allowedTools": [
+        "drr_event_match_deduplicate",
+        "drr_monitor_check"
+      ],
+      "nonGoalCount": 3,
+      "triggerCount": 2,
+      "escalationCount": 1
+    },
+    {
+      "name": "fdsn-shakemap-seismic",
+      "description": "Ingests custom national FDSN-WS seismic event feeds (BMKG, PHIVOLCS, JMA, EMSC, GeoNet, USGS) and ShakeMap v4 PGA/PGV/Vs30 contours, instrumented station lists, and gridded PGA rasters to upgrade C-04 beyond Wald99 GMICE approximations.",
+      "path": "skills/fdsn-shakemap-seismic/SKILL.md",
+      "safetyTier": "external_network_read",
+      "allowedTools": [
+        "drr_fdsn_shakemap_fetch",
+        "drr_spatial_exposure_join",
+        "drr_raster_zonal_stats",
+        "drr_fragility_eval",
+        "drr_vulnerability_matrix_calc"
+      ],
+      "nonGoalCount": 4,
+      "triggerCount": 2,
+      "escalationCount": 2
+    },
+    {
+      "name": "forecast-based-action-trigger-design",
+      "description": "Hydro-meteorological Anticipatory Action trigger evaluation across Open-Meteo rainfall screening, basin rainfall aggregation, and GloFAS river discharge screening with approved triggerPolicy and persistence gates.",
+      "path": "skills/forecast-based-action-trigger-design/SKILL.md",
+      "safetyTier": "external_network_read",
+      "allowedTools": [
+        "drr_openmeteo_forecast",
+        "drr_basin_rainfall_aggregate",
+        "drr_river_discharge_screen",
+        "drr_spatial_exposure_join"
+      ],
+      "nonGoalCount": 3,
+      "triggerCount": 1,
+      "escalationCount": 1
+    },
+    {
+      "name": "gdacs-feed-ingestion",
+      "description": "Ingest, sanitize, and interpret GDACS active hazard alerts for earthquakes, tropical cyclones, floods, droughts, and volcanoes while enforcing feed-text untrusted-data boundaries and cross-source event deduplication.",
+      "path": "skills/gdacs-feed-ingestion/SKILL.md",
+      "safetyTier": "external_network_read",
+      "allowedTools": [
+        "drr_gdacs_fetch",
+        "drr_hazard_crosswalk",
+        "drr_event_match_deduplicate",
+        "drr_spatial_exposure_join"
+      ],
+      "nonGoalCount": 3,
+      "triggerCount": 2,
+      "escalationCount": 2
+    },
+    {
+      "name": "hazard-exposure-modeling",
+      "description": "Execute deterministic spatial joins (antimeridian, hole, CRS, raster-aware) and registered illustrative GEM/HAZUS physical fragility curves with explicit unit conversions and production gates.",
+      "path": "skills/hazard-exposure-modeling/SKILL.md",
+      "safetyTier": "read_only_analytics",
+      "allowedTools": [
+        "drr_geojson_validate",
+        "drr_geometry_repair",
+        "drr_crs_transform",
+        "drr_raster_zonal_stats",
+        "drr_spatial_exposure_join",
+        "drr_model_registry_list",
+        "drr_fragility_eval"
+      ],
+      "nonGoalCount": 4,
+      "triggerCount": 2,
+      "escalationCount": 2
+    },
+    {
+      "name": "hdx-hapi-and-cod-boundaries",
+      "description": "Discovers and validates OCHA HDX Humanitarian API (HAPI v2) baseline indicators (population, humanitarian needs, IDPs, refugees, operational presence) and OCHA COD-AB administrative boundary P-code hierarchies with DELTA Resilience division reconciliation.",
+      "path": "skills/hdx-hapi-and-cod-boundaries/SKILL.md",
+      "safetyTier": "external_network_read",
+      "allowedTools": [
+        "drr_hdx_hapi_fetch",
+        "drr_cod_boundary_validate",
+        "drr_geojson_validate",
+        "drr_geometry_repair",
+        "drr_delta_fetch_exposure"
+      ],
+      "nonGoalCount": 4,
+      "triggerCount": 2,
+      "escalationCount": 2
+    },
+    {
+      "name": "humanitarian-rapid-impact-severity",
+      "description": "Conducts JIAF 2.0 / INFORM-aligned multi-factor humanitarian rapid impact and severity assessments (phases 1-5), explicitly separating hazard intensity, exposure, vulnerability, coping capacity deficit, and data confidence, and verifying agent trajectories via curated DRR benchmarks.",
+      "path": "skills/humanitarian-rapid-impact-severity/SKILL.md",
+      "safetyTier": "external_network_read",
+      "allowedTools": [
+        "drr_humanitarian_severity_assess",
+        "drr_spatial_exposure_join",
+        "drr_critical_infra_overlay",
+        "drr_vulnerability_matrix_calc",
+        "drr_hdx_hapi_fetch",
+        "drr_cod_boundary_validate",
+        "drr_benchmark_run"
+      ],
+      "nonGoalCount": 3,
+      "triggerCount": 3,
+      "escalationCount": 1
+    },
+    {
+      "name": "oasis-cap-alerting",
+      "description": "Generates XXE-hardened OASIS CAP v1.2 / ITU-T X.1303 XML emergency messages (defaulting to Draft status), verifies schema/profile/reference/scope rules, and routes publication through authorized approval tokens.",
+      "path": "skills/oasis-cap-alerting/SKILL.md",
+      "safetyTier": "governance_write_gated",
+      "allowedTools": [
+        "drr_cap_alert_generate_validate",
+        "drr_cap_publish"
+      ],
+      "nonGoalCount": 3,
+      "triggerCount": 1,
+      "escalationCount": 2
+    },
+    {
+      "name": "ogc-sensorthings-telemetry",
+      "description": "Ingests and normalizes custom government and private in-situ sensor observations via OGC SensorThings API v1.1 (OGC 18-088) with unit normalization, WMO/QARTOD QC filtering, staleness checks, SSRF/prompt-injection guards, and private redistribution licensing controls.",
+      "path": "skills/ogc-sensorthings-telemetry/SKILL.md",
+      "safetyTier": "external_network_read",
+      "allowedTools": [
+        "drr_sensorthings_fetch",
+        "drr_spatial_exposure_join",
+        "drr_input_contract_validate",
+        "drr_source_provenance_manifest"
+      ],
+      "nonGoalCount": 4,
+      "triggerCount": 2,
+      "escalationCount": 2
+    },
+    {
+      "name": "risk-reduction-options-appraisal",
+      "description": "Expected Annual Loss (EAL) trapezoidal AEP integration and mitigation Cost-Benefit Analysis (NPV, BCR, residual risk, sensitivity matrix) distinguishing quantitative economics from policy judgement.",
+      "path": "skills/risk-reduction-options-appraisal/SKILL.md",
+      "safetyTier": "read_only_analytics",
+      "allowedTools": [
+        "drr_expected_annual_loss",
+        "drr_mitigation_cost_benefit",
+        "drr_uncertainty_propagate"
+      ],
+      "nonGoalCount": 3,
+      "triggerCount": 2,
+      "escalationCount": 1
+    },
+    {
+      "name": "sendai-indicator-accounting",
+      "description": "Enforces UNDRR Sendai Framework Monitor (SFM) indicator definitions across Target B (B-1 vs displacement & deduplication), Target D (D-2..D-4 physical damage vs D-6..D-8 disruption), per-100,000 denominators, and C-03 official reporting eligibility.",
+      "path": "skills/sendai-indicator-accounting/SKILL.md",
+      "safetyTier": "read_only_analytics",
+      "allowedTools": [
+        "drr_sendai_validate",
+        "drr_vulnerability_matrix_calc",
+        "drr_delta_schema_validate"
+      ],
+      "nonGoalCount": 5,
+      "triggerCount": 1,
+      "escalationCount": 1
+    },
+    {
+      "name": "stac-eo-hazard-grids",
+      "description": "Ingests STAC v1.0.0 Earth Observation catalogs (Copernicus EMS, Sentinel-1 SAR, ICEYE, Floodbase) and validates flood inundation depth grids via ingestValidatedInundationGrid (C-05 / R-12), separating flood extent from depth and enforcing commercial licensing, cloud cover, and SSRF guards.",
+      "path": "skills/stac-eo-hazard-grids/SKILL.md",
+      "safetyTier": "external_network_read",
+      "allowedTools": [
+        "drr_stac_hazard_fetch",
+        "drr_raster_zonal_stats",
+        "drr_spatial_exposure_join",
+        "drr_fragility_eval",
+        "drr_vulnerability_matrix_calc"
+      ],
+      "nonGoalCount": 4,
+      "triggerCount": 2,
+      "escalationCount": 2
+    },
+    {
+      "name": "undrr-hip-hazard-classification",
+      "description": "Versioned crosswalk of hazard codes, external telemetry taxonomies, and free-text labels to UNDRR-ISC Hazard Information Profiles (HIP 2020 + 2025 revision flags), distinguishing exact matches from candidate suggestions.",
+      "path": "skills/undrr-hip-hazard-classification/SKILL.md",
+      "safetyTier": "external_network_read",
+      "allowedTools": [
+        "drr_hazard_crosswalk",
+        "drr_delta_fetch_exposure"
+      ],
+      "nonGoalCount": 3,
+      "triggerCount": 2,
+      "escalationCount": 1
+    },
+    {
+      "name": "vulnerability-matrix",
+      "description": "Evaluates composite disaster vulnerability matrices while strictly preserving unknown population/asset values as null, separating modelled displacement from Sendai B-1, and separating physical damage from service disruption.",
+      "path": "skills/vulnerability-matrix/SKILL.md",
+      "safetyTier": "read_only_analytics",
+      "allowedTools": [
+        "drr_input_contract_validate",
+        "drr_vulnerability_matrix_calc",
+        "drr_sendai_validate",
+        "drr_uncertainty_propagate"
+      ],
+      "nonGoalCount": 4,
+      "triggerCount": 1,
+      "escalationCount": 2
+    }
+  ]
+}

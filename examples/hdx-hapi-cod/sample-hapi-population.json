@@ -1,0 +1,36 @@
+{
+  "data": [
+    {
+      "location_code": "THA",
+      "location_name": "Thailand",
+      "admin1_code": "TH90",
+      "admin1_name": "Songkhla",
+      "admin2_code": "TH9001",
+      "admin2_name": "Hat Yai",
+      "admin_level": 2,
+      "population": 160000,
+      "population_group": "ALL",
+      "reference_period_start": "2026-01-01",
+      "reference_period_end": "2026-09-01",
+      "license": "cc-by-igo",
+      "org_name": "OCHA ROAP",
+      "dataset_hdx_id": "tha-cod-ps-2026"
+    },
+    {
+      "location_code": "THA",
+      "location_name": "Thailand",
+      "admin1_code": "TH90",
+      "admin1_name": "Songkhla",
+      "admin2_code": "TH9002",
+      "admin2_name": "Sadao",
+      "admin_level": 2,
+      "population": 122000,
+      "population_group": "ALL",
+      "reference_period_start": "2026-01-01",
+      "reference_period_end": "2026-09-01",
+      "license": "cc-by-igo",
+      "org_name": "OCHA ROAP",
+      "dataset_hdx_id": "tha-cod-ps-2026"
+    }
+  ]
+}
