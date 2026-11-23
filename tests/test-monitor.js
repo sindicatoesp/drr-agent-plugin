@@ -313,8 +313,17 @@ async function testTieredReportingAndExposureCoverage() {
 	assert(redCap.includes("<severity>Extreme</severity>"));
 	assert(redCap.includes("<urgency>Immediate</urgency>"));
 
+	// 4. Verify alerts/index.html dashboard was auto-generated with links to reports
+	const indexHtmlPath = path.join(tmpAlertsDir, "index.html");
+	assert(fs.existsSync(indexHtmlPath), "alerts/index.html must be auto-generated");
+	const indexHtml = fs.readFileSync(indexHtmlPath, "utf8");
+	assert(indexHtml.includes("usgs_yellow_china.brief.md"), "index.html must link to yellow brief.md");
+	assert(indexHtml.includes("usgs_red_tsunami.sitrep.html"), "index.html must link to red sitrep.html");
+	assert(indexHtml.includes("usgs_red_tsunami.cap.xml"), "index.html must link to red cap.xml");
+	assert(indexHtml.includes("usgs_red_tsunami.assessment.json"), "index.html must link to assessment.json");
+
 	fs.rmSync(tmpAlertsDir, { recursive: true, force: true });
-	console.log("✅ Tiered reporting policy & honest exposure coverage tests passed!");
+	console.log("✅ Tiered reporting policy, honest exposure coverage & alerts/index.html tests passed!");
 }
 
 async function run() {
