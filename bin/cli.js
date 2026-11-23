@@ -33,7 +33,7 @@ const { ingestStacHazardCatalog, toStacFootprintGeoJSON } = require("../lib/stac
 const { ingestFdsnShakeMap, toShakeMapGeoJSON } = require("../lib/shakemap");
 const { ingestCriticalInfraOverlay } = require("../lib/infra-overlay");
 const { ingestOsmInterimCriticalInfra } = require("../lib/osm-infra");
-const { ingestHdxHapiData, validateCodBoundaries, estimateHdxPolygonPopulation } = require("../lib/hdx");
+const { ingestHdxHapiData, searchHdxCkanCatalog, validateCodBoundaries, estimateHdxPolygonPopulation } = require("../lib/hdx");
 const { evaluateHumanitarianSeverity } = require("../lib/severity");
 const { runBenchmarkSuite } = require("../lib/benchmarks");
 const pkg = require("../package.json");
@@ -56,6 +56,7 @@ Commands:
   infra-overlay        Group & overlay Sendai Target D 9-sector critical infrastructure (OGC API - Features / GeoJSON)
   osm-infra            Interim open-source critical infrastructure fallback via OpenStreetMap (Overpass API)
   hdx-hapi             Query or parse OCHA HDX Humanitarian API (HAPI v2) indicators with freshness & license checks
+  hdx-search           Search public OCHA HDX CKAN v3 catalog (no API key) for COD-AB, COD-PS, WorldPop, Kontur & HOTOSM datasets
   cod-validate         Validate OCHA COD-AB administrative boundaries, P-code hierarchy & DELTA reconciliation
   hdx-polygon-pop      Estimate exposed population inside a hazard polygon via COD-AB overlap & HDX HAPI areal interpolation
   severity-assess      Evaluate JIAF/INFORM multi-factor humanitarian rapid impact & severity (phases 1-5)
@@ -766,6 +767,25 @@ async function main() {
 					maxAgeDays: options["max-age-days"] !== undefined ? parseInt(options["max-age-days"], 10) : undefined,
 					boundarySource: options.source,
 					deltaDivisions,
+				});
+				console.log(JSON.stringify(report, null, 2));
+				break;
+			}
+
+			case "hdx-search": {
+				const samplePayload = options.file
+					? JSON.parse(fs.readFileSync(options.file, "utf8"))
+					: undefined;
+				const report = await searchHdxCkanCatalog({
+					query: options.query || options.q || "population",
+					countryIso3: options.iso3 || options.country,
+					codLevel: options["cod-level"],
+					format: options.format,
+					geodataOnly: options["geodata-only"] === true || options["geodata-only"] === "true",
+					rows: options.rows ? parseInt(options.rows, 10) : undefined,
+					sort: options.sort,
+					endpointUrl: options.url,
+					samplePayload,
 				});
 				console.log(JSON.stringify(report, null, 2));
 				break;

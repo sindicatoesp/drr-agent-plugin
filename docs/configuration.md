@@ -43,6 +43,7 @@ A template configuration is provided in [`drr-agent-plugin/.env.example`](../.en
 | **`OSM_OVERPASS_URL`** | `https://overpass-api.de/api/interpreter` | Overpass API interpreter endpoint for interim OpenStreetMap critical infrastructure fallback (`drr_osm_critical_infra_fetch`; SSRF-guarded). |
 | **`HDX_HAPI_URL`** | `https://hapi.humdata.org/api/v2` | Base URL for OCHA HDX Humanitarian API (HAPI v2) indicator queries (SSRF-guarded). |
 | **`HAPI_APP_IDENTIFIER`** | *None (empty)* | Registered OCHA HAPI `app_identifier` query parameter required for live requests to `hapi.humdata.org`. |
+| **`HDX_CKAN_URL`** | `https://data.humdata.org/api/3/action/package_search` | Public OCHA HDX CKAN Action API v3 endpoint (no API key required) used by `drr_hdx_catalog_search` and monitor enrichment to discover COD-AB, COD-PS, WorldPop, Kontur, and HOTOSM datasets. |
 | **`DELTA_API_URL`** | `http://localhost:3000/en/api/mcp` | Target endpoint for connecting to DELTA Resilience core application MCP server. |
 | **`DELTA_MCP_API_KEY`** | *None (empty)* | Secret API token passed in `X-Auth` header to authenticate against DELTA's database. |
 | **`TARGET_COUNTRIES`** | `*` (all) | Comma-separated list of target country names or ISO-2/3 codes (e.g. `Indonesia,ID,IDN`). Foreign events are excluded from DELTA push. |
@@ -294,6 +295,7 @@ In `alerts-config.json`, you can control alert report verbosity and automatic op
     "osmMaxElements": 250,
     "osmTimeoutSec": 15,
     "autoHdxPolygonPop": true,
+    "autoHdxCatalogDiscovery": true,
     "codBoundaryFile": null
   }
 }
@@ -304,6 +306,7 @@ In `alerts-config.json`, you can control alert report verbosity and automatic op
 * **`reportPolicy.maxEventAgeHours`**: Maximum event age (default `72` hours for live runs) to avoid backfilling historical catalog events.
 * **`enrichment.autoOsmInterimInfra`**: When `true` (default) and no local exposure layer covers the hazard footprint (`no_exposure_layer` or `outside_exposure_coverage`), automatically queries OpenStreetMap Overpass API (`drr_osm_critical_infra_fetch`) for interim critical infrastructure across 9 Sendai Target D sectors (`external_unverified`, `ODbL-1.0`). Disabled automatically in `DRR_OFFLINE_MODE=true` or mock runs.
 * **`enrichment.autoHdxPolygonPop`** & **`enrichment.codBoundaryFile`**: When `codBoundaryFile` points to a local OCHA COD-AB admin boundary GeoJSON file (and `HAPI_APP_IDENTIFIER` is configured in `.env`), automatically estimates area-weighted exposed population via OCHA HDX HAPI v2 (`drr_hdx_polygon_population_estimate`, `screening_only`, distinct from Sendai B-1).
+* **`enrichment.autoHdxCatalogDiscovery`**: When `true` (default) and no local `codBoundaryFile` is configured, automatically queries the public OCHA HDX CKAN Action API v3 (`drr_hdx_catalog_search`, no API key required) to surface downloadable COD-AB, COD-PS, WorldPop, and Kontur dataset links for the affected region directly in `.brief.md` and `.assessment.json`.
 
 ---
 

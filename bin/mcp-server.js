@@ -30,7 +30,7 @@ const { ingestStacHazardCatalog, toStacFootprintGeoJSON } = require("../lib/stac
 const { ingestFdsnShakeMap, toShakeMapGeoJSON } = require("../lib/shakemap");
 const { ingestCriticalInfraOverlay } = require("../lib/infra-overlay");
 const { ingestOsmInterimCriticalInfra } = require("../lib/osm-infra");
-const { ingestHdxHapiData, validateCodBoundaries, estimateHdxPolygonPopulation } = require("../lib/hdx");
+const { ingestHdxHapiData, searchHdxCkanCatalog, validateCodBoundaries, estimateHdxPolygonPopulation } = require("../lib/hdx");
 const { evaluateHumanitarianSeverity } = require("../lib/severity");
 const { runBenchmarkSuite } = require("../lib/benchmarks");
 
@@ -1014,6 +1014,52 @@ const TOOLS = [
 		},
 	},
 	{
+		name: "drr_hdx_catalog_search",
+		description:
+			"Search the public OCHA HDX CKAN Action API v3 catalog (data.humdata.org/api/3/action/package_search — no API key required) to discover downloadable COD-AB administrative boundaries, COD-PS subnational population CSVs, WorldPop/Kontur population grids, and HOTOSM geodata with license, freshness, and SHA/MD5 resource metadata.",
+		inputSchema: {
+			type: "object",
+			properties: {
+				query: {
+					type: "string",
+					description: "Free-text search query (default: 'population', e.g. 'health facilities', 'flood')",
+				},
+				countryIso3: {
+					type: "string",
+					description: "Optional 3-letter ISO3 country code filter (e.g. 'THA', 'PHL', 'IDN')",
+				},
+				codLevel: {
+					type: "string",
+					description: "Optional OCHA COD level filter (e.g. 'cod-ab' for boundaries, 'cod-ps' for population statistics)",
+				},
+				format: {
+					type: "string",
+					description: "Optional resource format filter (e.g. 'GeoJSON', 'CSV', 'GeoTIFF', 'Geopackage')",
+				},
+				geodataOnly: {
+					type: "boolean",
+					description: "If true, restrict results to geospatial datasets (has_geodata:true)",
+				},
+				rows: {
+					type: "number",
+					description: "Maximum datasets to return (1..50, default: 10)",
+				},
+				sort: {
+					type: "string",
+					description: "Optional CKAN sort order (default: 'metadata_modified desc')",
+				},
+				endpointUrl: {
+					type: "string",
+					description: "Optional custom HDX CKAN package_search URL (SSRF-guarded)",
+				},
+				samplePayload: {
+					type: "object",
+					description: "Optional offline CKAN package_search JSON payload",
+				},
+			},
+		},
+	},
+	{
 		name: "drr_hdx_polygon_population_estimate",
 		description:
 			"Estimate population exposed inside an arbitrary hazard polygon (or epicenter + bufferKm) by intersecting it with OCHA COD-AB administrative boundaries and joining OCHA HDX HAPI population statistics by P-code via deterministic areal interpolation (reporting both area-weighted and full-unit totals, preserving null !== 0, and flagging uniform-density caveats).",
@@ -1161,6 +1207,20 @@ async function handleToolCall(name, args) {
 				maxAgeDays: args.maxAgeDays,
 				boundarySource: args.boundarySource,
 				deltaDivisions: args.deltaDivisions,
+			});
+		}
+
+		case "drr_hdx_catalog_search": {
+			return searchHdxCkanCatalog({
+				query: args.query,
+				countryIso3: args.countryIso3,
+				codLevel: args.codLevel,
+				format: args.format,
+				geodataOnly: args.geodataOnly,
+				rows: args.rows,
+				sort: args.sort,
+				endpointUrl: args.endpointUrl,
+				samplePayload: args.samplePayload,
 			});
 		}
 
