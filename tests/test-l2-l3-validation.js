@@ -31,7 +31,7 @@ assert.strictEqual(capCase.details.malformedRejectedCount, 3);
 // 2. L3 Historical Hindcast & FbF Trigger Skill Suite
 const l3 = runReplayValidation({ suite: "hindcast_benchmark" });
 assert.strictEqual(l3.valid, true, `L3 hindcast_benchmark suite failed: ${JSON.stringify(l3.cases.filter((c) => !c.passed))}`);
-assert.strictEqual(l3.totalCases, 3, "Expected 3 L3 hindcast_benchmark cases");
+assert.strictEqual(l3.totalCases, 4, "Expected 4 L3 hindcast_benchmark cases");
 assert(l3.cases.every((c) => c.classification === "hindcast_benchmark"));
 
 const corpusCase = l3.cases.find((c) => c.id === "hindcast_multi_event_historical_corpus");
@@ -53,12 +53,20 @@ assert.strictEqual(fbfCase.details.skillMetrics.far, 0);
 assert.strictEqual(fbfCase.details.skillMetrics.csi, 1);
 assert.strictEqual(fbfCase.details.skillMetrics.accuracy, 1);
 
+const e2eGeoCase = l3.cases.find((c) => c.id === "hindcast_geospatial_end_to_end_replays");
+assert(e2eGeoCase && e2eGeoCase.passed, "End-to-end geospatial historical event replay case must pass");
+assert.strictEqual(e2eGeoCase.details.eventsEvaluated, 2, "Expected 2 end-to-end geospatial historical replays");
+assert.strictEqual(e2eGeoCase.details.meanSpatialPrecision, 1);
+assert.strictEqual(e2eGeoCase.details.meanSpatialRecall, 1);
+assert.strictEqual(e2eGeoCase.details.allReproducible, true);
+assert(e2eGeoCase.details.meanPopulationApePct <= 5.0);
+
 // 3. Full Suite Maturity Summary
 const all = runReplayValidation({ suite: "all" });
 assert.strictEqual(all.valid, true);
-assert.strictEqual(all.totalCases, 13);
+assert.strictEqual(all.totalCases, 14);
 assert.strictEqual(all.maturitySummary.L0_L1_synthetic_reference.passed, 6);
 assert.strictEqual(all.maturitySummary.L2_reference_model.passed, 4);
-assert.strictEqual(all.maturitySummary.L3_hindcast_benchmark.passed, 3);
+assert.strictEqual(all.maturitySummary.L3_hindcast_benchmark.passed, 4);
 
 console.log("✅ L2 Reference Model & L3 Multi-Event Historical Hindcast Validation tests passed!");

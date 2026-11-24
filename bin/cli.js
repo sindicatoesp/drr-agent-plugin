@@ -36,12 +36,13 @@ const { ingestOsmInterimCriticalInfra } = require("../lib/osm-infra");
 const { ingestHdxHapiData, searchHdxCkanCatalog, validateCodBoundaries, estimateHdxPolygonPopulation } = require("../lib/hdx");
 const { evaluateHumanitarianSeverity } = require("../lib/severity");
 const { runBenchmarkSuite } = require("../lib/benchmarks");
+const { reconcileAndDiffSitRep } = require("../lib/reconcile");
 const pkg = require("../package.json");
 
 function printHelp() {
 	console.log(`
 DRR Analytics & Agent Plugin CLI v${pkg.version}
-Disaster Risk Reduction Tools: GDACS, USGS, FDSN-WS/ShakeMap, Open-Meteo, OGC SensorThings, STAC EO Grids, Sendai Infra Overlay, OSM Interim Infra, HDX/HAPI & COD-AB, Humanitarian Severity, Benchmarks, Hydro, Spatial/CRS/Raster, Fragility, CAP Alerts, Sendai, DELTA, Uncertainty, Appraisal & Replay
+Disaster Risk Reduction Tools: GDACS, USGS, FDSN-WS/ShakeMap, Open-Meteo, OGC SensorThings, STAC EO Grids, Sendai Infra Overlay, OSM Interim Infra, HDX/HAPI & COD-AB, Humanitarian Severity, SitRep Reconciliation & Diff, Benchmarks, Hydro, Spatial/CRS/Raster, Fragility, CAP Alerts, Sendai, DELTA, Uncertainty, Appraisal & Replay
 
 Usage:
   drr-tool <command> [options]
@@ -60,6 +61,7 @@ Commands:
   cod-validate         Validate OCHA COD-AB administrative boundaries, P-code hierarchy & DELTA reconciliation
   hdx-polygon-pop      Estimate exposed population inside a hazard polygon via COD-AB overlap & HDX HAPI areal interpolation
   severity-assess      Evaluate JIAF/INFORM multi-factor humanitarian rapid impact & severity (phases 1-5)
+  sitrep-reconcile     Reconcile multi-source impact claims (preserving conflicts) and/or diff two SitRep versions
   benchmark            Run curated GeoDisaster-inspired multi-step DRR agent benchmark suite
   basin-rainfall       Aggregate rainfall forecasts (mm) across catchment polygon/points
   river-discharge      Screen GloFAS / Open-Meteo river discharge (m^3/s)
@@ -856,6 +858,26 @@ async function main() {
 				});
 				console.log(JSON.stringify(report, null, 2));
 				if (!report.allPassed) process.exit(1);
+				break;
+			}
+
+			case "sitrep-reconcile": {
+				const claims = options.claims ? JSON.parse(fs.readFileSync(options.claims, "utf8")) : undefined;
+				const previousSitRep = options.previous ? JSON.parse(fs.readFileSync(options.previous, "utf8")) : undefined;
+				const currentSitRep = options.current ? JSON.parse(fs.readFileSync(options.current, "utf8")) : undefined;
+				const payload = options.file ? JSON.parse(fs.readFileSync(options.file, "utf8")) : {};
+				const report = reconcileAndDiffSitRep({
+					claims: claims || payload.claims,
+					previousSitRep: previousSitRep || payload.previousSitRep,
+					currentSitRep: currentSitRep || payload.currentSitRep,
+					options: {
+						eventId: options["event-id"] || (payload.options && payload.options.eventId),
+						conflictThresholdPct: options["conflict-threshold"]
+							? Number(options["conflict-threshold"])
+							: payload.options && payload.options.conflictThresholdPct,
+					},
+				});
+				console.log(JSON.stringify(report, null, 2));
 				break;
 			}
 

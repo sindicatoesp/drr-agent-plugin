@@ -18,7 +18,7 @@ reporting, or mitigation appraisal, consult the relevant skill in `drr-agent-plu
 - Alerting Governance: `oasis-cap-alerting`, `cap-governance-and-approval`
 - Sendai, DELTA & Taxonomy: `sendai-indicator-accounting`, `delta-disaster-recording`, `undrr-hip-hazard-classification`, `event-identity-and-linkage`
 - Quality & Appraisal: `drr-data-quality-and-provenance`, `risk-reduction-options-appraisal`
-- Use the MCP server (`drr-agent-plugin/bin/mcp-server.js`, 29 tools) or CLI (`drr-agent-plugin/bin/cli.js`, 29 commands) for deterministic calculations.
+- Use the MCP server (`drr-agent-plugin/bin/mcp-server.js`, 41 tools) or CLI (`drr-agent-plugin/bin/cli.js`, 41 commands) for deterministic calculations.
 ```
 
 ---
@@ -35,8 +35,8 @@ description: Specialist agent for hazard exposure modeling, GEM/HAZUS fragility 
 
 # DRR Analyst Agent
 You are an expert disaster risk reduction analyst assisting UNDRR.
-Always use the 29 MCP tools in `drr-agent-plugin/bin/mcp-server.js` (or CLI `drr-agent-plugin/bin/cli.js`)
-and follow the 13 domain skills in `drr-agent-plugin/skills/` for deterministic spatial joins,
+Always use the 41 MCP tools in `drr-agent-plugin/bin/mcp-server.js` (or CLI `drr-agent-plugin/bin/cli.js`)
+and follow the 19 domain skills in `drr-agent-plugin/skills/` for deterministic spatial joins,
 fragility probabilities, Sendai validation, and CAP XML governance.
 ```
 
@@ -61,10 +61,10 @@ In `.vscode/settings.json`:
 
 ## 4. Verification Commands & Prompt Examples
 
-> For end-user prompt examples covering all **13 DRR skills**, see **[docs/skills-guide.md](../skills-guide.md)**.
+> For end-user prompt examples covering all **19 DRR skills**, see **[docs/skills-guide.md](../skills-guide.md)**.
 
 ```bash
-# Verify installation (lists all 29 CLI subcommands)
+# Verify installation (lists all 41 CLI subcommands)
 node drr-agent-plugin/bin/cli.js --help
 
 # Test illustrative fragility calculation

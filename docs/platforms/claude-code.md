@@ -24,7 +24,7 @@ Add `drr-analytics` to the `mcpServers` object:
 }
 ```
 
-Restart Claude Desktop. The hammer icon (Tools) will show the **29 active DRR tools**.
+Restart Claude Desktop. The hammer icon (Tools) will show the **41 active DRR tools**.
 
 ---
 

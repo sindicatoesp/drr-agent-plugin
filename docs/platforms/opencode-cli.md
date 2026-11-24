@@ -120,5 +120,5 @@ node drr-agent-plugin/bin/cli.js sendai-validate --file examples/thailand-flood-
 node drr-agent-plugin/bin/cli.js monitor --once --read-only true --config alerts-config.example.json
 ```
 
-> For all **29 MCP tools** and **29 CLI subcommands**, see **[docs/api-reference.md](../api-reference.md)**.  
-> For end-user prompt examples covering all **13 DRR skills**, see **[docs/skills-guide.md](../skills-guide.md)**.
+> For all **41 MCP tools** and **41 CLI subcommands**, see **[docs/api-reference.md](../api-reference.md)**.  
+> For end-user prompt examples covering all **19 DRR skills**, see **[docs/skills-guide.md](../skills-guide.md)**.

@@ -18,8 +18,8 @@ cp -r /path/to/drr-agent-plugin .agents/plugins/drr-analytics
 
 Antigravity automatically detects:
 * `plugin.json` -> Registers plugin metadata
-* `mcp.json` -> Spawns the `drr-analytics` MCP server (**29 deterministic tools**)
-* `skills/*/SKILL.md` -> Registers all **13 DRR domain skills**
+* `mcp.json` -> Spawns the `drr-analytics` MCP server (**41 deterministic tools**)
+* `skills/*/SKILL.md` -> Registers all **19 DRR domain skills**
 
 ### Option B: Global Mounting
 To make DRR capabilities available across all Antigravity workspaces:
@@ -35,7 +35,7 @@ cp -r /path/to/drr-agent-plugin ~/.gemini/config/plugins/drr-analytics
 
 1. Open your Antigravity conversation.
 2. Check connected tools by clicking **Additional Options (...) > MCP Servers**.
-3. You should see `drr-analytics` with **29 active tools** across 7 categories:
+3. You should see `drr-analytics` with **41 active tools** across 7 categories (see [`docs/tool-inventory.md`](../tool-inventory.md) for the complete generated list):
    - **Telemetry & Hydrology (6)**: `drr_gdacs_fetch`, `drr_usgs_earthquake_fetch`, `drr_openmeteo_forecast`, `drr_basin_rainfall_aggregate`, `drr_river_discharge_screen`, `drr_monitor_check`
    - **Contracts, Governance & Replay (4)**: `drr_input_contract_validate`, `drr_source_provenance_manifest`, `drr_model_registry_list`, `drr_assessment_replay_validate`
    - **Spatial, CRS & Raster (5)**: `drr_spatial_exposure_join`, `drr_geojson_validate`, `drr_geometry_repair`, `drr_crs_transform`, `drr_raster_zonal_stats`

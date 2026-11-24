@@ -1,10 +1,10 @@
 {
   "schemaVersion": "1.0.0",
   "pluginName": "drr-analytics",
-  "pluginVersion": "1.9.0",
+  "pluginVersion": "1.10.0",
   "mcpServer": "drr-analytics-mcp",
   "mcpProtocolVersion": "2024-11-05",
-  "registeredToolCount": 40,
+  "registeredToolCount": 41,
   "skillCount": 19,
   "safetyTiers": {
     "read_only_analytics": "Pure local deterministic computation, spatial validation, or benchmark verification.",
@@ -80,6 +80,7 @@
       "path": "skills/early-warning-telemetry/SKILL.md",
       "safetyTier": "external_network_read",
       "allowedTools": [
+        "drr_fdsn_shakemap_fetch",
         "drr_usgs_earthquake_fetch",
         "drr_gdacs_fetch",
         "drr_openmeteo_forecast",

@@ -74,10 +74,12 @@ const TEST_MAPPING = {
 	drr_critical_infra_overlay: "tests/test-infra-overlay.js, tests/test-mcp-server.js",
 	drr_osm_critical_infra_fetch: "tests/test-osm-infra.js, tests/test-mcp-server.js",
 	drr_hdx_hapi_fetch: "tests/test-hdx-cod.js, tests/test-mcp-server.js",
+	drr_hdx_catalog_search: "tests/test-hdx-cod.js, tests/test-mcp-server.js",
 	drr_cod_boundary_validate: "tests/test-hdx-cod.js, tests/test-mcp-server.js",
 	drr_hdx_polygon_population_estimate: "tests/test-hdx-cod.js, tests/test-mcp-server.js",
 	drr_humanitarian_severity_assess: "tests/test-severity.js, tests/test-mcp-server.js",
-	drr_benchmark_run: "tests/test-benchmarks.js, tests/test-mcp-server.js",
+	drr_benchmark_run: "tests/test-benchmarks.js, tests/test-agent-eval-harness.js, tests/test-mcp-server.js",
+	drr_sitrep_reconcile: "tests/test-reconcile.js, tests/test-mcp-server.js",
 };
 
 const WRITE_GATED_TOOLS = new Set(["drr_cap_publish", "drr_delta_push_draft_record"]);
@@ -94,6 +96,7 @@ const NETWORK_READ_TOOLS = new Set([
 	"drr_critical_infra_overlay",
 	"drr_osm_critical_infra_fetch",
 	"drr_hdx_hapi_fetch",
+	"drr_hdx_catalog_search",
 	"drr_hdx_polygon_population_estimate",
 ]);
 
@@ -238,7 +241,7 @@ function generateInventoryMarkdown() {
 	lines.push(`- **Test Suites (\`tests/test-*.js\`)**: ${testFiles.length}`);
 	lines.push("");
 	lines.push("### Documentation Reconciliation Note");
-	lines.push("- **Historical 10-vs-11 discrepancy (`origin/dev`)**: `bin/mcp-server.js` registered 11 tools (including `drr_delta_docs`), whereas `docs/api-reference.md` documented 10 tools and omitted `drr_delta_docs`. Both `docs/api-reference.md` and `README.md` are now reconciled with the expanded registration baseline of **29 MCP tools**.");
+	lines.push(`- **Historical 10-vs-11 discrepancy (\`origin/dev\`)**: \`bin/mcp-server.js\` registered 11 tools (including \`drr_delta_docs\`), whereas \`docs/api-reference.md\` documented 10 tools and omitted \`drr_delta_docs\`. Both \`docs/api-reference.md\` and \`README.md\` are now reconciled with the expanded registration baseline of **${TOOLS.length} MCP tools**.`);
 	lines.push("");
 	lines.push(`## Registered MCP Tools (${TOOLS.length})`);
 	lines.push("");
