@@ -14,6 +14,7 @@ The **DRR Analytics Agent Plugin** builds on open humanitarian data, internation
 | **FDSN (International Federation of Digital Seismograph Networks)** | Custom national/regional FDSN-WS seismic catalogs & ShakeMap bundles (`lib/shakemap.js`) | Open Standard | [fdsn.org](https://www.fdsn.org/) |
 | **OGC SensorThings API v1.1** | In-situ hydro-met, tide, and river-gauge telemetry ingestion (`lib/sensorthings.js`) | OGC Open Standard | [ogc.org/standards/sensorthings](https://www.ogc.org/standards/sensorthings/) |
 | **STAC (SpatioTemporal Asset Catalog) v1.0.0** | Earth Observation flood-depth and hazard raster discovery (`lib/stac.js`) | Apache-2.0 / Open Spec | [stacspec.org](https://stacspec.org/) |
+| **Copernicus Climate Change Service (C3S) / ERA5** | Frozen L3 extreme-heat WBGT historical reanalysis validation (`tests/validation/era5-luzon-wbgt-2024-04.json`) | Copernicus C3S License (*Contains modified Copernicus C3S information*) | [cds.climate.copernicus.eu](https://cds.climate.copernicus.eu/) |
 
 ---
 
