@@ -37,11 +37,12 @@ assert(helpOut.includes("hdx-search"), "CLI --help must list hdx-search");
 assert(helpOut.includes("cod-validate"), "CLI --help must list cod-validate");
 assert(helpOut.includes("hdx-polygon-pop"), "CLI --help must list hdx-polygon-pop");
 assert(helpOut.includes("severity-assess"), "CLI --help must list severity-assess");
+assert(helpOut.includes("sitrep-reconcile"), "CLI --help must list sitrep-reconcile");
 assert(helpOut.includes("benchmark"), "CLI --help must list benchmark");
 
 const cliCmds = extractCliCommands();
-assert.strictEqual(TOOLS.length, 40, "MCP server must expose 40 tools");
-assert.strictEqual(cliCmds.length, 40, "CLI must register 40 subcommands");
+assert.strictEqual(TOOLS.length, 41, "MCP server must expose 41 tools");
+assert.strictEqual(cliCmds.length, 41, "CLI must register 41 subcommands");
 
 const invMd = generateInventoryMarkdown();
 for (const tool of TOOLS) {
@@ -54,10 +55,18 @@ for (const cmd of cliCmds) {
 const manifest = generateSkillsManifest();
 assert.strictEqual(manifest.valid, true, `Skills manifest invalid: ${manifest.validationErrors.join("; ")}`);
 assert.strictEqual(manifest.skillCount, 19, "Skills manifest must index 19 skills");
-assert.strictEqual(manifest.registeredToolCount, 40);
+assert.strictEqual(manifest.registeredToolCount, 41);
 const manifestOnDisk = JSON.parse(fs.readFileSync(path.join(ROOT, "skills-manifest.json"), "utf8"));
 assert.strictEqual(manifestOnDisk.skillCount, manifest.skillCount, "skills-manifest.json on disk must stay synced");
 assert.strictEqual(manifestOnDisk.valid, true);
+
+// Prevent documentation count drift between code and primary docs
+const readmeText = fs.readFileSync(path.join(ROOT, "README.md"), "utf8");
+const skillsGuideText = fs.readFileSync(path.join(ROOT, "docs", "skills-guide.md"), "utf8");
+const apiRefText = fs.readFileSync(path.join(ROOT, "docs", "api-reference.md"), "utf8");
+assert(readmeText.includes(`${TOOLS.length} MCP tools`), `README.md must reference ${TOOLS.length} MCP tools`);
+assert(skillsGuideText.includes(`${TOOLS.length}`), `docs/skills-guide.md must reference ${TOOLS.length} tools`);
+assert(apiRefText.includes(`${TOOLS.length} Tools`), `docs/api-reference.md must reference ${TOOLS.length} Tools`);
 
 // 2. CLI computational & validation commands
 const fragOut = JSON.parse(runCli(["fragility", "--hazard", "earthquake", "--intensity", "0.35", "--taxonomy", "URM"]));

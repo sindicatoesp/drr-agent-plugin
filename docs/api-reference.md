@@ -1,12 +1,12 @@
 # MCP Tools & CLI Technical Reference
 
-Complete technical specification of all **33 MCP tools** provided by `bin/mcp-server.js` and the **33 CLI commands** in `bin/cli.js`.
+Complete technical specification of all **41 MCP tools** provided by `bin/mcp-server.js` and the **41 CLI commands** in `bin/cli.js`.
 
-> **Inventory Note (R-01)**: Historically at baseline commit `1d7600ce5cc50dcdea7b438ccbd59d28282793dd` (`origin/dev`), `bin/mcp-server.js` registered 11 tools (including `drr_delta_docs`) while this reference listed 10. Both `docs/api-reference.md` and `docs/tool-inventory.md` are now reconciled with the full **33-tool** registration source.
+> **Inventory Note (R-01)**: Historically at baseline commit `1d7600ce5cc50dcdea7b438ccbd59d28282793dd` (`origin/dev`), `bin/mcp-server.js` registered 11 tools (including `drr_delta_docs`) while this reference listed 10. Both `docs/api-reference.md` and `docs/tool-inventory.md` are now reconciled with the full **41-tool** registration source.
 
 ---
 
-# Part 1: Model Context Protocol (MCP) Tools (39 Tools)
+# Part 1: Model Context Protocol (MCP) Tools (41 Tools)
 
 ## 1. `drr_gdacs_fetch`
 Ingests and filters active GDACS alerts by severity, hazard type (`EQ`, `TC`, `FL`, `VO`, `DR`), or country, with untrusted feed sanitization (`promptInjectionFlagged`), `sourceIssuedAt`, `retrievedAt`, and `payloadHash`.
@@ -514,17 +514,51 @@ Interim open-source critical infrastructure fallback via **OpenStreetMap (Overpa
 }
 ```
 
+## 40. `drr_hdx_catalog_search`
+Searches the public **OCHA HDX CKAN v3** dataset catalog (no API key required) for COD-AB administrative boundaries, COD-PS population statistics, WorldPop rasters, Kontur population grids, and HOTOSM critical infrastructure layers.
+
+```json
+{
+  "iso3": "THA",
+  "query": "population",
+  "limit": 10,
+  "samplePayload": {}
+}
+```
+
+## 41. `drr_sitrep_reconcile`
+Reconciles conflicting multi-source disaster impact claims (national official authorities, sub-national LGUs, humanitarian clusters, modelled estimates, and unverified media) without silently collapsing figures into a single unattributed number, and/or computes a deterministic version-to-version SitRep diff with SHA-256 provenance.
+
+```json
+{
+  "claims": [
+    {
+      "source": "NDRRMC Situational Report #4",
+      "authorityTier": "national_official",
+      "evidenceBasis": "confirmed",
+      "metric": "affected_population",
+      "value": 12000,
+      "pcode": "PH160200000",
+      "reportedAt": "2025-11-12T06:00:00Z"
+    }
+  ],
+  "previousSitRep": {},
+  "currentSitRep": {},
+  "options": { "conflictThresholdPct": 10, "eventId": "PHL-TY-2025-01" }
+}
+```
+
 ---
 
-# Part 2: Command-Line Interface (CLI) Reference (39 Subcommands)
+# Part 2: Command-Line Interface (CLI) Reference (41 Subcommands)
 
 Run `node bin/cli.js --help` (or `drr-tool --help`) for usage.
 
-* **Telemetry & Hydro**: `gdacs`, `usgs`, `fdsn-shakemap`, `forecast`, `sensorthings`, `stac-hazard`, `hdx-hapi`, `basin-rainfall`, `river-discharge`, `monitor`
+* **Telemetry & Hydro**: `gdacs`, `usgs`, `fdsn-shakemap`, `forecast`, `sensorthings`, `stac-hazard`, `hdx-hapi`, `hdx-search`, `basin-rainfall`, `river-discharge`, `monitor`
 * **Contracts, Registry, Replay & Benchmarks**: `validate-input`, `registry`, `replay-validate`, `benchmark`
 * **Spatial, COD-AB, Overlay & Raster**: `spatial-join`, `infra-overlay`, `osm-infra`, `cod-validate`, `hdx-polygon-pop`, `geojson-validate`, `geometry-repair`, `crs-transform`, `raster-zonal-stats`
 * **Fragility, Vulnerability, Severity & Sendai**: `fragility` *(requires `--intensity`)*, `vulnerability` *(requires `--spatial` and `--intensity`)*, `severity-assess`, `sendai-validate`
-* **Taxonomy & Event Identity**: `hazard-crosswalk`, `event-dedup`
+* **Taxonomy, Event Identity & SitRep Reconciliation**: `hazard-crosswalk`, `event-dedup`, `sitrep-reconcile`
 * **Uncertainty & Appraisal**: `uncertainty`, `eal`, `cba`
 * **CAP & SitRep**: `cap-generate` *(defaults to `--status Draft`)*, `cap-validate`, `sitrep`
 * **DELTA Interoperability**: `delta-validate`, `delta-push` *(requires `--file`)*, `delta-docs`, `delta-hazards`

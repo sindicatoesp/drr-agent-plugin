@@ -33,6 +33,7 @@ const { ingestOsmInterimCriticalInfra } = require("../lib/osm-infra");
 const { ingestHdxHapiData, searchHdxCkanCatalog, validateCodBoundaries, estimateHdxPolygonPopulation } = require("../lib/hdx");
 const { evaluateHumanitarianSeverity } = require("../lib/severity");
 const { runBenchmarkSuite } = require("../lib/benchmarks");
+const { reconcileAndDiffSitRep } = require("../lib/reconcile");
 
 const pkg = require("../package.json");
 
@@ -1179,6 +1180,34 @@ const TOOLS = [
 			},
 		},
 	},
+	{
+		name: "drr_sitrep_reconcile",
+		description:
+			"Reconcile conflicting multi-source disaster impact claims (national authority, LGU, humanitarian cluster, modelled estimates) without silently collapsing figures, and/or compute a deterministic version-to-version SitRep diff with SHA-256 provenance.",
+		inputSchema: {
+			type: "object",
+			properties: {
+				claims: {
+					type: "array",
+					description:
+						"Array of impact claim records ({ source, authorityTier, evidenceBasis, metric, value, unit, reportedAt, pcode, adminArea, geographicScope, notes })",
+					items: { type: "object" },
+				},
+				previousSitRep: {
+					type: "object",
+					description: "Previous SitRep snapshot ({ version, issuedAt, metrics, affectedAreas }) for version diffing",
+				},
+				currentSitRep: {
+					type: "object",
+					description: "Current SitRep snapshot ({ version, issuedAt, metrics, affectedAreas }) for version diffing",
+				},
+				options: {
+					type: "object",
+					description: "Optional settings ({ conflictThresholdPct?: number, eventId?: string })",
+				},
+			},
+		},
+	},
 ];
 
 async function handleToolCall(name, args) {
@@ -1252,6 +1281,15 @@ async function handleToolCall(name, args) {
 				category: args.category,
 				scenarioId: args.scenarioId,
 				trajectories: args.trajectories,
+			});
+		}
+
+		case "drr_sitrep_reconcile": {
+			return reconcileAndDiffSitRep({
+				claims: args.claims,
+				previousSitRep: args.previousSitRep,
+				currentSitRep: args.currentSitRep,
+				options: args.options,
 			});
 		}
 

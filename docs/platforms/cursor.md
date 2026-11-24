@@ -32,9 +32,9 @@ In the root of your project, create or edit `.cursor/mcp.json`:
 
 ---
 
-## 2. Mounting All 13 Domain Skills in Cursor
+## 2. Mounting All 19 Domain Skills in Cursor
 
-Once connected, Cursor exposes all **29 deterministic DRR MCP tools**. To enable Cursor's agent to follow the DRR methodologies and governance rules, add references to `.cursorrules` or `.cursor/rules/`:
+Once connected, Cursor exposes all **41 deterministic DRR MCP tools**. To enable Cursor's agent to follow the DRR methodologies and governance rules, add references to `.cursorrules` or `.cursor/rules/`:
 
 ```markdown
 # Disaster Risk Reduction Guidelines

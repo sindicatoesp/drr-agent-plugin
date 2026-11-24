@@ -1,0 +1,279 @@
+{
+	"schemaVersion": "1.0.0",
+	"description": "Frozen end-to-end geospatial historical event replay fixtures (L3+) exercising spatial exposure joins, Sendai 9-sector critical infrastructure overlays, fragility/vulnerability loss matrices, Sendai semantic validation, and explicit APE / precision / recall accuracy metrics against published reference outcomes.",
+	"methodologyNote": "Coordinates, hazard footprints, and reference outcome bands are derived from published post-disaster reconnaissance (USGS ShakeMap us6000jllz, World Bank TERR 2023, AFAD, PAGASA/JTWC Best Track, NDRRMC Final Reports, OCHA HNP). Exposure inventories are representative sub-national screening clusters for deterministic replay regression; they remain subject to L4-L6 local calibration gates.",
+	"replays": [
+		{
+			"id": "e2e_eq_turkiye_kahramanmaras_2023",
+			"eventName": "2023 Kahramanmaras Earthquake (Mw 7.8, Southern Turkiye)",
+			"year": 2023,
+			"country": "Turkiye",
+			"iso3": "TUR",
+			"hazardType": "earthquake",
+			"intensity": 0.65,
+			"intensityUnit": "g",
+			"intensitySource": "USGS ShakeMap us6000jllz / AFAD strong-motion corridor",
+			"authoritativeSources": [
+				"USGS ShakeMap / PAGER (us6000jllz)",
+				"AFAD Strong-Motion Network",
+				"Turkiye Earthquakes Recovery and Reconstruction Assessment (TERRA / World Bank 2023)"
+			],
+			"hazardGeoJSON": {
+				"type": "Feature",
+				"properties": {
+					"eventId": "us6000jllz",
+					"hazardType": "earthquake",
+					"mmiContour": 8.0,
+					"pgaG": 0.65
+				},
+				"geometry": {
+					"type": "Polygon",
+					"coordinates": [
+						[
+							[35.80, 36.05],
+							[38.30, 36.05],
+							[38.30, 37.90],
+							[35.80, 37.90],
+							[35.80, 36.05]
+						]
+					]
+				}
+			},
+			"exposureGeoJSON": {
+				"type": "FeatureCollection",
+				"features": [
+					{
+						"type": "Feature",
+						"properties": {
+							"id": "tur_pazarcik_urban",
+							"name": "Pazarcik Urban Residential Cluster",
+							"sector": "other_essential",
+							"taxonomy": "C1_PRE_CODE",
+							"population": 70000,
+							"valueUsd": 420000000
+						},
+						"geometry": { "type": "Point", "coordinates": [37.29, 37.49] }
+					},
+					{
+						"type": "Feature",
+						"properties": {
+							"id": "tur_kahramanmaras_hosp",
+							"name": "Kahramanmaras Regional Hospital",
+							"sector": "health",
+							"taxonomy": "C1_MODERATE_CODE",
+							"population": 120000,
+							"valueUsd": 180000000
+						},
+						"geometry": { "type": "Point", "coordinates": [36.93, 37.58] }
+					},
+					{
+						"type": "Feature",
+						"properties": {
+							"id": "tur_antakya_historic",
+							"name": "Antakya Central Masonry & RC Cluster",
+							"sector": "education",
+							"taxonomy": "URM",
+							"population": 210000,
+							"valueUsd": 650000000
+						},
+						"geometry": { "type": "Point", "coordinates": [36.16, 36.20] }
+					},
+					{
+						"type": "Feature",
+						"properties": {
+							"id": "tur_gaziantep_substation",
+							"name": "Gaziantep High-Voltage Substation",
+							"sector": "energy",
+							"taxonomy": "C1_MODERATE_CODE",
+							"population": 95000,
+							"valueUsd": 150000000
+						},
+						"geometry": { "type": "Point", "coordinates": [37.38, 37.06] }
+					},
+					{
+						"type": "Feature",
+						"properties": {
+							"id": "tur_iskenderun_port",
+							"name": "Iskenderun Port & Logistics Hub",
+							"sector": "transportation",
+							"taxonomy": "C1_PRE_CODE",
+							"population": 85000,
+							"valueUsd": 310000000
+						},
+						"geometry": { "type": "Point", "coordinates": [36.18, 36.59] }
+					},
+					{
+						"type": "Feature",
+						"properties": {
+							"id": "tur_ctrl_ankara",
+							"name": "Ankara Control Facility (Outside Footprint)",
+							"sector": "health",
+							"taxonomy": "C1_MODERATE_CODE",
+							"population": 500000,
+							"valueUsd": 900000000
+						},
+						"geometry": { "type": "Point", "coordinates": [32.85, 39.93] }
+					},
+					{
+						"type": "Feature",
+						"properties": {
+							"id": "tur_ctrl_konya",
+							"name": "Konya Control Substation (Outside Footprint)",
+							"sector": "energy",
+							"taxonomy": "C1_MODERATE_CODE",
+							"population": 250000,
+							"valueUsd": 300000000
+						},
+						"geometry": { "type": "Point", "coordinates": [32.48, 37.87] }
+					}
+				]
+			},
+			"referenceOutcome": {
+				"expectedExposedFeatureIds": [
+					"tur_pazarcik_urban",
+					"tur_kahramanmaras_hosp",
+					"tur_antakya_historic",
+					"tur_gaziantep_substation",
+					"tur_iskenderun_port"
+				],
+				"expectedExcludedFeatureIds": ["tur_ctrl_ankara", "tur_ctrl_konya"],
+				"referenceExposedPopulation": 580000,
+				"maxPopulationApePct": 5.0,
+				"expectedMdrBand": [0.40, 0.80],
+				"expectedSeverityPhaseMin": 4
+			}
+		},
+		{
+			"id": "e2e_tc_philippines_odette_2021",
+			"eventName": "2021 Super Typhoon Rai / Odette (Caraga & Central Visayas, Philippines)",
+			"year": 2021,
+			"country": "Philippines",
+			"iso3": "PHL",
+			"hazardType": "cyclone",
+			"intensity": 195,
+			"intensityUnit": "km/h",
+			"intensitySource": "PAGASA / JTWC Best Track Category 5 landfall swath",
+			"authoritativeSources": [
+				"PAGASA Tropical Cyclone Advisory / JTWC Best Track (2021)",
+				"NDRRMC Situational Report for Typhoon Odette",
+				"UN OCHA Philippines Humanitarian Needs and Priorities (Typhoon Rai)"
+			],
+			"hazardGeoJSON": {
+				"type": "Feature",
+				"properties": {
+					"eventId": "GDACS-TC-1000849-ODETTE",
+					"hazardType": "cyclone",
+					"peakWindKmh": 195
+				},
+				"geometry": {
+					"type": "Polygon",
+					"coordinates": [
+						[
+							[123.40, 9.35],
+							[126.35, 9.35],
+							[126.35, 10.65],
+							[123.40, 10.65],
+							[123.40, 9.35]
+						]
+					]
+				}
+			},
+			"exposureGeoJSON": {
+				"type": "FeatureCollection",
+				"features": [
+					{
+						"type": "Feature",
+						"properties": {
+							"id": "phl_siargao_hosp",
+							"name": "Siargao District Hospital (Dapa)",
+							"sector": "health",
+							"population": 115000,
+							"valueUsd": 45000000
+						},
+						"geometry": { "type": "Point", "coordinates": [126.05, 9.76] }
+					},
+					{
+						"type": "Feature",
+						"properties": {
+							"id": "phl_surigao_port",
+							"name": "Surigao City Port & Coastal Cluster",
+							"sector": "transportation",
+							"population": 171000,
+							"valueUsd": 120000000
+						},
+						"geometry": { "type": "Point", "coordinates": [125.49, 9.79] }
+					},
+					{
+						"type": "Feature",
+						"properties": {
+							"id": "phl_dinagat_power",
+							"name": "Dinagat Islands Power & Telecom Node",
+							"sector": "energy",
+							"population": 128000,
+							"valueUsd": 55000000
+						},
+						"geometry": { "type": "Point", "coordinates": [125.60, 10.12] }
+					},
+					{
+						"type": "Feature",
+						"properties": {
+							"id": "phl_bohol_water",
+							"name": "Tagbilaran Water & Sanitation Facility",
+							"sector": "water",
+							"population": 105000,
+							"valueUsd": 62000000
+						},
+						"geometry": { "type": "Point", "coordinates": [123.85, 9.65] }
+					},
+					{
+						"type": "Feature",
+						"properties": {
+							"id": "phl_cebu_schools",
+							"name": "Metro Cebu Evacuation Schools Cluster",
+							"sector": "education",
+							"population": 340000,
+							"valueUsd": 190000000
+						},
+						"geometry": { "type": "Point", "coordinates": [123.89, 10.32] }
+					},
+					{
+						"type": "Feature",
+						"properties": {
+							"id": "phl_ctrl_davao",
+							"name": "Davao City Control Hospital (Outside Swath)",
+							"sector": "health",
+							"population": 450000,
+							"valueUsd": 220000000
+						},
+						"geometry": { "type": "Point", "coordinates": [125.61, 7.07] }
+					},
+					{
+						"type": "Feature",
+						"properties": {
+							"id": "phl_ctrl_manila",
+							"name": "Metro Manila Control Grid (Outside Swath)",
+							"sector": "energy",
+							"population": 1200000,
+							"valueUsd": 950000000
+						},
+						"geometry": { "type": "Point", "coordinates": [120.98, 14.60] }
+					}
+				]
+			},
+			"referenceOutcome": {
+				"expectedExposedFeatureIds": [
+					"phl_siargao_hosp",
+					"phl_surigao_port",
+					"phl_dinagat_power",
+					"phl_bohol_water",
+					"phl_cebu_schools"
+				],
+				"expectedExcludedFeatureIds": ["phl_ctrl_davao", "phl_ctrl_manila"],
+				"referenceExposedPopulation": 859000,
+				"maxPopulationApePct": 5.0,
+				"expectedMdrBand": [0.30, 0.85],
+				"expectedSeverityPhaseMin": 4
+			}
+		}
+	]
+}
