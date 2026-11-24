@@ -28,6 +28,7 @@ This plugin equips AI coding assistants and autonomous agents with sourced domai
 * **MCP & CLI Specification**: See **[docs/api-reference.md](docs/api-reference.md)** (41 MCP tools and 41 CLI commands).
 * **Scientific Methodology & Boundaries**: See **[docs/methodology.md](docs/methodology.md)**.
 * **Operational Playbook**: See **[docs/operational-playbook.md](docs/operational-playbook.md)**.
+* **Offline Copernicus CDS / ERA5 → STAC Workflow**: See **[docs/offline-cds-stac-workflow.md](docs/offline-cds-stac-workflow.md)** (how to preprocess NetCDF/GRIB climate reanalyses into zero-dep `rasterGrid` JSON snapshots).
 
 ### Directory Structure & Layout
 
@@ -95,6 +96,7 @@ drr-agent-plugin/
 │   ├── tool-inventory.md       # Programmatically generated capability & test inventory
 │   ├── methodology.md          # Scientific equations, bounds & C-01..C-08 governance
 │   ├── operational-playbook.md # Personas, timelines & operational workflows
+│   ├── offline-cds-stac-workflow.md # Offline Copernicus CDS / ERA5 -> STAC & rasterGrid JSON handoff guide
 │   ├── configuration.md        # Environment variables, proxies, country scoping & shadow monitor
 │   └── platforms/              # Platform setup guides (Antigravity, Claude, Cursor, Copilot, OpenCode)
 ├── skills/                     # 19 Reusable AI Agent Skills (SKILL.md)
@@ -123,7 +125,8 @@ drr-agent-plugin/
     │   └── geodisaster-scenarios.json
     ├── validation/
     │   ├── historical-hindcasts.json
-    │   └── geospatial-event-replays.json
+    │   ├── geospatial-event-replays.json
+    │   └── era5-luzon-wbgt-2024-04.json
     └── run-all-tests.sh
 ```
 

@@ -31,7 +31,7 @@ assert.strictEqual(capCase.details.malformedRejectedCount, 3);
 // 2. L3 Historical Hindcast & FbF Trigger Skill Suite
 const l3 = runReplayValidation({ suite: "hindcast_benchmark" });
 assert.strictEqual(l3.valid, true, `L3 hindcast_benchmark suite failed: ${JSON.stringify(l3.cases.filter((c) => !c.passed))}`);
-assert.strictEqual(l3.totalCases, 4, "Expected 4 L3 hindcast_benchmark cases");
+assert.strictEqual(l3.totalCases, 5, "Expected 5 L3 hindcast_benchmark cases");
 assert(l3.cases.every((c) => c.classification === "hindcast_benchmark"));
 
 const corpusCase = l3.cases.find((c) => c.id === "hindcast_multi_event_historical_corpus");
@@ -61,12 +61,19 @@ assert.strictEqual(e2eGeoCase.details.meanSpatialRecall, 1);
 assert.strictEqual(e2eGeoCase.details.allReproducible, true);
 assert(e2eGeoCase.details.meanPopulationApePct <= 5.0);
 
+const wbgtCase = l3.cases.find((c) => c.id === "hindcast_era5_luzon_wbgt_heatwave_2024");
+assert(wbgtCase && wbgtCase.passed, "April 2024 Luzon ERA5 WBGT heatwave replay must pass");
+assert.strictEqual(wbgtCase.details.zonesEvaluated, 4);
+assert.strictEqual(wbgtCase.details.continuousSemanticsPreserved, true);
+assert(wbgtCase.details.peakOutdoorWbgtC >= 35.0, "Expected Cagayan Valley peak outdoor WBGT >= 35C");
+assert(wbgtCase.details.highlandCoolingDeltaC >= 2.0, "Expected Cordillera highland cooling delta >= 2C");
+
 // 3. Full Suite Maturity Summary
 const all = runReplayValidation({ suite: "all" });
 assert.strictEqual(all.valid, true);
-assert.strictEqual(all.totalCases, 14);
+assert.strictEqual(all.totalCases, 15);
 assert.strictEqual(all.maturitySummary.L0_L1_synthetic_reference.passed, 6);
 assert.strictEqual(all.maturitySummary.L2_reference_model.passed, 4);
-assert.strictEqual(all.maturitySummary.L3_hindcast_benchmark.passed, 4);
+assert.strictEqual(all.maturitySummary.L3_hindcast_benchmark.passed, 5);
 
 console.log("✅ L2 Reference Model & L3 Multi-Event Historical Hindcast Validation tests passed!");
