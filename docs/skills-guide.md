@@ -641,7 +641,7 @@ dataConfidence, missingDataList, and run drr_benchmark_run to confirm agent guar
 
 ## Multi-Skill End-to-End Prompt Chains
 
-For real operations, you can combine multiple skills in a single prompt. Here are three battle-tested templates:
+For real operations, you can combine multiple skills in a single prompt. Here are three example multi-skill workflow templates:
 
 ### Chain 1: Sudden-Onset Earthquake EOC Response (First 30 Minutes)
 *Skills chained:* `early-warning-telemetry` → `event-identity-and-linkage` → `hazard-exposure-modeling` → `vulnerability-matrix` → `oasis-cap-alerting`
