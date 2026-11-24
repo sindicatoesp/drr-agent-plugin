@@ -231,29 +231,29 @@ Each skill in `skills/*/SKILL.md` encodes DRR scientific guardrails, tool orches
 
 ## Validation Maturity & Evidence Status (L0–L6)
 
-`drr-agent-plugin` is a **deterministic DRR analytics and decision-support toolkit**—not an autonomously authorized emergency broadcast or official reporting system. Evidence status is tracked explicitly against a seven-level validation ladder (see **[docs/methodology.md](docs/methodology.md#7-validation-maturity-ladder-l0l6--scope-boundaries)**):
+`drr-agent-plugin` is a **deterministic DRR analytics and decision-support toolkit**—not an autonomously authorized emergency broadcast or official reporting system. **Verification in CI (L0–L2)** confirms that software, schemas, and formulas match their published specifications; it does **not** by itself establish real-world impact accuracy. Published L2/L3 metrics and benchmark outputs are generated directly from code in **[docs/validation-results.md](docs/validation-results.md)** (see also **[docs/methodology.md](docs/methodology.md#7-validation-maturity-ladder-l0l6--scope-boundaries)** and the **[Code-Enforced vs. Prompt-Only Guardrail Matrix](docs/methodology.md#10-guardrail-enforcement-matrix-code-enforced-vs-skill-prompt-only)**):
 
 | Level | Tier | Status | Evidence |
 | :--- | :--- | :--- | :--- |
-| **L0** | Software Verified | ✅ Verified in CI | Zero-dep lint, unit/integration tests, MCP stdio contract tests (`npm run check`). |
-| **L1** | Standards Verified | ✅ Verified in CI | CAP v1.2 structural/XXE/scope checks, UNDRR-ISC HIP crosswalk, Sendai `C-01`..`C-03` semantics, DELTA schema checks. |
-| **L2** | Reference Model Verified | ✅ Verified in CI | Golden numerical checks against published Wald (1999) GMICE, lognormal fragility/MDR, trapezoidal AEP EAL, and OASIS CAP v1.2 reference payloads (`node bin/cli.js replay-validate --suite reference_model`). |
-| **L3** | Historical Hindcast Validated | 🟡 Multi-Event Suite in CI | Multi-event historical hindcast fixtures paired with observed outcome bands, uncertainty coverage, and FbF trigger skill metrics (`node bin/cli.js replay-validate --suite hindcast_benchmark`). |
+| **L0** | Software Verified | ✅ Formula/Software Verified in CI | Zero-dep lint, unit/integration tests, MCP stdio contract tests (`npm run check`). |
+| **L1** | Standards Verified | ✅ Formula/Software Verified in CI | CAP v1.2 structural/XXE/scope checks, UNDRR-ISC HIP crosswalk, Sendai `C-01`..`C-03` semantics, DELTA schema checks. |
+| **L2** | Reference Model Verified | ✅ Formula/Software Verified in CI | Golden numerical checks against published Wald (1999) GMICE, lognormal fragility/MDR, trapezoidal AEP EAL, and OASIS CAP v1.2 reference payloads (`node bin/cli.js replay-validate --suite reference_model`). |
+| **L3** | Historical Hindcast Validated | 🟡 Multi-Event Suite in CI *(screening fidelity)* | Frozen multi-event historical hindcasts, FbF trigger skill (POD/FAR/CSI), end-to-end geospatial replays, and April 2024 Luzon ERA5 WBGT reanalysis ([docs/validation-results.md](docs/validation-results.md)). Not a substitute for local calibration. |
 | **L4** | Independent Domain Review | ⏳ External / Planned | Independent peer review by seismologists, hydrologists, and DRR specialists. |
-| **L5** | Operational Pilot (Shadow Mode) | ⏳ Institutional / Planned | Multi-month EOC shadow-mode trial (`--read-only true`) across live hazard events. |
+| **L5** | Operational Pilot (Shadow Mode) | ⏳ Institutional / Planned | Multi-month EOC shadow-mode trial (`--read-only true`) across live hazard events + live cross-assistant LLM evaluation. |
 | **L6** | Operational Decision Support | ⏳ Institutional Only | Requires L4 + L5, locally calibrated registries, and explicit human-in-the-loop authority. |
 
 ---
 
-## Digital Public Goods (DPG) Standard & UN SDG Alignment
+## Digital Public Goods (DPG) Standard & UN SDG Alignment *(Self-Assessed)*
 
-`drr-agent-plugin` is engineered to align with all **9 indicators** of the [Digital Public Goods Standard](https://www.digitalpublicgoods.net/standard) (including the **September 2025 DPGA Privacy & Data Security Framework**):
+> **Status Note**: Alignment with the [Digital Public Goods Standard](https://www.digitalpublicgoods.net/standard) (including the **September 2025 DPGA Privacy & Data Security Framework**) is currently **self-assessed** via automated repository checks (`npm run dpg:audit`) and has not yet undergone formal Digital Public Goods Alliance (DPGA) registry review.
 
 * **UN Sustainable Development Goals (Indicator 1)**: Directly advances **SDG 11** (Targets `11.5`, `11.b`), **SDG 13** (Targets `13.1`, `13.3`), **SDG 1** (`1.5`), **SDG 9** (`9.1`), and **SDG 17** (`17.6`, `17.18`).
 * **Open Licensing & Clear Ownership (Indicators 2–3)**: Full OSI **[Apache-2.0](LICENSE)** for software, **CC-BY-4.0** for documentation/skills/reference data ([NOTICE](NOTICE)), and transparent stewardship ([GOVERNANCE.md](GOVERNANCE.md)).
 * **Platform Independence & Data Portability (Indicators 4 & 6)**: `0` external npm dependencies, offline/air-gap mode (`DRR_OFFLINE_MODE=true`), and non-proprietary state extraction (`npm run data:export` in JSON, GeoJSON, and CSV).
 * **Privacy, Security & Do No Harm (Indicators 7 & 9A–9C)**: Zero individual PII collected by design ([PRIVACY.md](PRIVACY.md)), built-in retention/erasure (`npm run data:purge`), vulnerability disclosure & hardening ([SECURITY.md](SECURITY.md)), [CODE_OF_CONDUCT.md](CODE_OF_CONDUCT.md), and [CONTRIBUTING.md](CONTRIBUTING.md).
-* **Full Compliance Matrix & Automated Audit**: See **[docs/dpg-compliance.md](docs/dpg-compliance.md)**, **[dpg-assessment.json](dpg-assessment.json)**, and run `npm run dpg:audit`.
+* **Self-Assessment Matrix & Automated Audit**: See **[docs/dpg-compliance.md](docs/dpg-compliance.md)**, **[dpg-assessment.json](dpg-assessment.json)**, and run `npm run dpg:audit`.
 
 ---
 

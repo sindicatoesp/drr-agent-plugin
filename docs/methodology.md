@@ -87,11 +87,63 @@ Deterministic computation does not by itself establish operational reliability�
 
 ---
 
-## 8. Authoritative References & Standards
+## 8. Parameter Provenance & Domain-of-Validity Limits
+
+| Component | Parameters / Equation | Provenance & Attribution | Domain of Validity & Tectonic / Regional Caveats |
+| :--- | :--- | :--- | :--- |
+| **Seismic GMICE (`lib/usgs.js`)** | Wald et al. (1999) Eq. 1–2 (`log10(PGA)` vs. MMI) | Published empirical regression: Wald et al. (1999), *Earthquake Spectra* 15(3), Table 1 / USGS ShakeMap `wald99` | Calibrated on **California crustal earthquakes, MMI V–VIII**. Extrapolation outside MMI V–VIII is explicitly flagged (`extrapolated: true`). **Not a GMPE** (no fault distance, focal mechanism, or $V_{s30}$ site amplification). In subduction/megathrust settings (e.g., Philippines, Indonesia, Japan), prefer authoritative ShakeMap PGA/PGV/$V_{s30}$ grids via `drr_fdsn_shakemap_fetch`. |
+| **Seismic Fragility (`lib/fragility.js`)** | `URM`, `C1_PRE_CODE`, `C1_MODERATE_CODE`, `C2`, `S1`, `W1` medians ($\theta$) & dispersions ($\beta$); damage factors `0%, 5%, 25%, 60%, 100%` | **Synthetic illustrative baseline ranges** informed by FEMA HAZUS-MH 2.1 Technical Manual (Ch. 5, Table 5.9 structural damage states) and GEM Building Taxonomy v2.0 (Silva et al., 2018) | **Screening only (`calibrationStatus: "illustrative_baseline"`)**; blocked by code from `mode: "production"` until superseded by a locally calibrated national/regional fragility registry. |
+| **Flood Depth-Damage (`lib/fragility.js`)** | `residential_1story`, `residential_2story`, `commercial` piecewise depth-damage curves | **Synthetic illustrative baseline ranges** informed by JRC Global Flood Depth-Damage Functions (Huizinga et al., 2017) & FEMA HAZUS-MH Flood Model | Requires a **validated inundation depth grid** (e.g., STAC EO or hydraulic model). Never derived from Open-Meteo rainfall totals (`depthStatus: "depth_unavailable"`). Blocked from `mode: "production"` without local calibration. |
+| **Wind Fragility (`lib/fragility.js`)** | Wind-speed MDR curve (`km/h`, `m/s`, `kt` normalized) | **Synthetic illustrative baseline** informed by HAZUS-MH Hurricane Model / GEM wind vulnerability literature | Screening only; does not model storm surge or wind-driven rain ingress separately. Blocked from `mode: "production"` without local calibration. |
+| **Humanitarian Severity (`lib/severity.js`)** | 4-pillar weighted composite (`0–10` → Phases `1–5`) | Inspired by OCHA/IASC **JIAF 2.0** and EU JRC **INFORM** risk structure (see Section 9 below for exact weights & departures) | Screening/prioritization index (`reportingEligibility: "screening_only"`). Requires local inter-cluster calibration before operational humanitarian classification. |
+
+---
+
+## 9. Humanitarian Severity Weighting & Departures from JIAF 2.0 / INFORM
+
+`lib/severity.js` (`assessment.humanitarian.severity_v1`) computes a transparent 0–10 composite score mapped to 5 severity phases (`1: Minimal [0–2)`, `2: Stress [2–4)`, `3: Severe [4–6)`, `4: Extreme [6–8)`, `5: Catastrophic [8–10]`):
+
+* **Default Pillar Weights (`DEFAULT_PILLAR_WEIGHTS`)**:
+  * `hazardIntensity`: **0.25**
+  * `exposure`: **0.30**
+  * `vulnerability`: **0.25**
+  * `copingCapacityDeficit`: **0.20**
+* **Exposure Normalization (`deriveExposurePillar`)**:
+  * When `affectedPopulation` and `totalPopulation` are provided: $\min(10, \sqrt{\text{share}} \times 14)$ (so 1% → ~1.4, 10% → ~4.4, 50%+ → ~9.9–10).
+  * When only absolute `affectedPopulation` is provided: $\min(10, \log_{10}(\text{pop} + 1) \times 2)$.
+  * Missing pillars stay `null` (never coerced to `0`), weights are re-normalized across available pillars with an explicit `dataConfidence` penalty, and **hazard-only scoring is blocked**.
+* **Explicit Departures from Published Frameworks**:
+  * Full **JIAF 2.0** relies on sector-specific People in Need (PiN) indicators, multi-sector severity convergence rules, and expert inter-cluster consensus rather than a single fixed linear weighted sum.
+  * Full **INFORM** uses geometric aggregation across Hazard & Exposure, Vulnerability, and Lack of Coping Capacity (`(H&E × V × LCC)^(1/3)`) over curated national/sub-national indicator sets.
+  * `lib/severity.js` intentionally uses an explicit, inspectable linear baseline for rapid screening so analysts can override `weights` and audit every pillar score, and marks all outputs `approvalStatus: "draft"` and `reportingEligibility: "screening_only"`.
+
+---
+
+## 10. Guardrail Enforcement Matrix: Code-Enforced vs. Skill-Prompt Only
+
+Because LLM instructions can be ignored under prompt pressure or model drift, `drr-agent-plugin` explicitly distinguishes **hard code-enforced gates** from **advisory skill instructions**:
+
+| Guardrail / Safety Rule | Enforcement Layer | Where Enforced | Failure Behavior |
+| :--- | :--- | :--- | :--- |
+| **No flood depth fabricated from rainfall** | **Code-Enforced (Hard)** | `lib/openmeteo.js`, `lib/hydro.js` | Always returns `depthStatus: "depth_unavailable"` and `estimatedInundationDepthMeters: null`. |
+| **Missing data preserved (`null` ≠ `0`)** | **Code-Enforced (Hard)** | `lib/contracts.js`, `lib/vulnerability.js`, `lib/severity.js`, `lib/reconcile.js` | Missing numeric fields stay `null`; per-100k metrics require non-zero `referencePopulation`. |
+| **CAP defaults to `Draft`; prod publish blocked** | **Code-Enforced (Hard)** | `lib/cap.js`, `lib/security.js` | Defaults to `status: "Draft"`; live publish blocked unless `DRR_ENABLE_PRODUCTION_PUBLISH === "true"` + HMAC approval token bound to payload/destination. |
+| **XML XXE / DOCTYPE / SSRF blocking** | **Code-Enforced (Hard)** | `lib/security.js`, `lib/config.js` | Rejects `<!DOCTYPE>`/`<!ENTITY>` XML payloads and private/link-local webhook/API hosts. |
+| **Illustrative fragility blocked in production** | **Code-Enforced (Hard)** | `lib/registry.js`, `lib/fragility.js` | Throws error if `mode: "production"` is requested on any `illustrative_baseline` method. |
+| **Sendai displacement ≠ `B-1`; physical damage ≠ service disruption** | **Code-Enforced (Hard)** | `lib/vulnerability.js`, `lib/sendai.js` | Sets `b1DirectlyAffected: null` on modelled outputs and rejects conflated submissions in `validateSendaiSubmission`. |
+| **Non-silent SitRep conflict preservation** | **Code-Enforced (Hard)** | `lib/reconcile.js` | Preserves all conflicting source records; never promotes `modelled_estimate` or `media_unverified` as official reporting. |
+| **Prompt-injection detection on external feeds** | **Code-Enforced (Flag) + Prompt-Guided (Compliance)** | `lib/security.js`, `lib/gdacs.js`, `lib/reconcile.js` | Code sanitizes control chars and sets `promptInjectionFlagged: true`; ignoring injected instructions in prose still depends on the host LLM (tested via `evaluateAgentClaimGrounding`). |
+| **Human escalation handoffs (Duty Officer / Hydrologist / Focal Point)** | **Skill-Prompt Only (Advisory)** | `skills/*/SKILL.md` | Instructs the agent when to pause and escalate; cannot physically stop a human or host UI from ignoring the advice outside write-gated tools. |
+| **Prefer ShakeMap over GMICE & narrative caveat phrasing** | **Skill-Prompt Only (Advisory) + Eval-Checked** | `skills/early-warning-telemetry/SKILL.md`, `lib/benchmarks.js` | Instructs tool precedence and narrative discipline; audited post-hoc by `runDualLayerEvaluation` / `evaluateAgentClaimGrounding`. |
+
+---
+
+## 11. Authoritative References & Standards
 * **UNDRR Sendai Framework Monitor**: *Technical Guidance for Monitoring and Reporting on Progress in Achieving the Global Targets of the Sendai Framework (2015–2030)*. [S1]
 * **UNDRR / ISC (2020 & 2025)**: *Hazard Information Profiles (HIPs)* — 2025 revision covering 281 hazards across 8 types. [S2]
 * **Wald et al. (1999)**: *Relationships between Peak Ground Acceleration, Peak Ground Velocity, and Modified Mercalli Intensity in California* (Earthquake Spectra / USGS ShakeMap `wald99`). [S3, S4]
 * **OASIS / ITU-T**: *Common Alerting Protocol Version 1.2* / *Recommendation X.1303* and *WMO CAP Validator*. [S5, S6]
 * **FEMA & GEM**: *HAZUS-MH 2.1 Technical Manuals* & *GEM Building Taxonomy v2.0* (Silva et al., 2018). [S7]
+* **JRC (Huizinga et al., 2017)**: *Global Flood Depth-Damage Functions: Methodology and the Database with Guidelines* (EUR 28552 EN).
 * **Open-Meteo Flood API**: GloFAS river discharge (~5 km grid) documentation and spatial applicability notes. [S8]
-* **Operational Playbook**: See [`docs/operational-playbook.md`](./operational-playbook.md) and [`docs/tool-inventory.md`](./tool-inventory.md).
+* **Published Validation & Benchmark Results**: See [`docs/validation-results.md`](./validation-results.md), [`docs/operational-playbook.md`](./operational-playbook.md), and [`docs/tool-inventory.md`](./tool-inventory.md).
