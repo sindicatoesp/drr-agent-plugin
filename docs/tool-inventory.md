@@ -4,12 +4,12 @@
 
 ## Baseline & Manifest Reconciliation
 
-- **Package**: `@sindicatoesp/drr-agent-plugin` v1.10.0
-- **Plugin Manifest**: `drr-analytics` v1.10.0
-- **MCP Server**: `drr-analytics-mcp` v1.10.0 (protocol `2024-11-05`)
-- **Git Branch**: `feat/wfp-adam-ogc-api`
-- **Reference Baseline Commit (`origin/dev`)**: `unknown`
-- **Current HEAD Commit**: `73b9efde319744ea3232c8b800a34d52e3a6294d`
+- **Package**: `@sindicatoesp/drr-agent-plugin` v1.11.0
+- **Plugin Manifest**: `drr-analytics` v1.11.0
+- **MCP Server**: `drr-analytics-mcp` v1.11.0 (protocol `2024-11-05`)
+- **Git Branch**: `main`
+- **Reference Baseline Commit (`origin/dev`)**: `b9e459c402c3a5706b0f82d9c7b06c2206f97e83`
+- **Current HEAD Commit**: `1be202cd1882b52683a9044e11405fe464f93f30`
 - **Registered MCP Tools**: 42
 - **Registered CLI Subcommands**: 42
 - **Library Modules (`lib/*.js`)**: 34
