@@ -1,0 +1,68 @@
+{
+  "type": "FeatureCollection",
+  "id": "adam.adam_eq_events",
+  "title": "adam.adam_eq_events",
+  "numberMatched": 2,
+  "numberReturned": 2,
+  "features": [
+    {
+      "type": "Feature",
+      "geometry": { "type": "Point", "coordinates": [125.15, 6.85] },
+      "id": 1001,
+      "properties": {
+        "id": 1001,
+        "uid": "eq_us7000sample1",
+        "source": "USGS",
+        "source_id": "us7000sample1",
+        "event_type": "EQ",
+        "adm0_name": "Philippines",
+        "adm1_name": "Davao del Sur",
+        "iso3": "PHL",
+        "mag": 6.4,
+        "mag_type": "mww",
+        "depth": 14.0,
+        "mmi": 6.8,
+        "on_land": true,
+        "dist_to_land_km": 0.0,
+        "dist_km_buff_1": 15,
+        "dist_km_buff_2": 30,
+        "dist_km_buff_3": 50,
+        "pop_est_buff_1": 85000,
+        "pop_est_buff_2": 210000,
+        "pop_est_buff_3": 540000,
+        "place": "12 km W of Digos, Philippines",
+        "published_at": "2026-11-20T04:15:00",
+        "detail_url": "https://earthquake.usgs.gov/fdsnws/event/1/query?eventid=us7000sample1&format=geojson",
+        "output_map_url": "https://static.gis.wfp.org/adam_eq/events/2026/11/eq_us7000sample1/eq_us7000sample1.jpg"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": { "type": "Point", "coordinates": [172.1413, -22.7448] },
+      "id": 1,
+      "properties": {
+        "id": 1,
+        "uid": "eq_us6000e13e",
+        "source": "USGS",
+        "source_id": "us6000e13e",
+        "event_type": "EQ",
+        "adm0_name": "New Caledonia",
+        "iso3": "NCL",
+        "mag": 5.2,
+        "mag_type": "mww",
+        "depth": 10.0,
+        "mmi": null,
+        "on_land": false,
+        "dist_to_land_km": 39.138,
+        "dist_km_buff_1": 15,
+        "dist_km_buff_2": 30,
+        "dist_km_buff_3": 50,
+        "pop_est_buff_1": 0,
+        "pop_est_buff_2": 0,
+        "pop_est_buff_3": 0,
+        "place": "Southeast of the Loyalty Islands",
+        "published_at": "2021-04-12T22:44:32"
+      }
+    }
+  ]
+}

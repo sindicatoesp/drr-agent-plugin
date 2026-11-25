@@ -81,6 +81,7 @@ config-check: ## Validate syntax and integrity of .env and alerts-config.json
 		console.log('  \x1b[32m✓\x1b[0m Config module loaded successfully.'); \
 		console.log('  \x1b[32m✓\x1b[0m USGS API: ' + CONFIG.USGS_API_URL); \
 		console.log('  \x1b[32m✓\x1b[0m GDACS Feed: ' + CONFIG.GDACS_FEED_URL); \
+		console.log('  \x1b[32m✓\x1b[0m WFP ADAM API: ' + CONFIG.WFP_ADAM_API_URL); \
 		console.log('  \x1b[32m✓\x1b[0m Open-Meteo: ' + CONFIG.OPENMETEO_API_URL); \
 		console.log('  \x1b[32m✓\x1b[0m DELTA MCP API: ' + CONFIG.DELTA_API_URL); \
 		console.log('  \x1b[32m✓\x1b[0m Target Country Scope: ' + (CONFIG.TARGET_COUNTRIES.join(', '))); \

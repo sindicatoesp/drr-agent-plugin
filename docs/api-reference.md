@@ -1,12 +1,12 @@
 # MCP Tools & CLI Technical Reference
 
-Complete technical specification of all **41 MCP tools** provided by `bin/mcp-server.js` and the **41 CLI commands** in `bin/cli.js`.
+Complete technical specification of all **42 MCP tools** provided by `bin/mcp-server.js` and the **42 CLI commands** in `bin/cli.js`.
 
-> **Inventory Note (R-01)**: Historically at baseline commit `1d7600ce5cc50dcdea7b438ccbd59d28282793dd` (`origin/dev`), `bin/mcp-server.js` registered 11 tools (including `drr_delta_docs`) while this reference listed 10. Both `docs/api-reference.md` and `docs/tool-inventory.md` are now reconciled with the full **41-tool** registration source.
+> **Inventory Note (R-01)**: Historically at baseline commit `1d7600ce5cc50dcdea7b438ccbd59d28282793dd` (`origin/dev`), `bin/mcp-server.js` registered 11 tools (including `drr_delta_docs`) while this reference listed 10. Both `docs/api-reference.md` and `docs/tool-inventory.md` are now reconciled with the full **42-tool** registration source.
 
 ---
 
-# Part 1: Model Context Protocol (MCP) Tools (41 Tools)
+# Part 1: Model Context Protocol (MCP) Tools (42 Tools)
 
 ## 1. `drr_gdacs_fetch`
 Ingests and filters active GDACS alerts by severity, hazard type (`EQ`, `TC`, `FL`, `VO`, `DR`), or country, with untrusted feed sanitization (`promptInjectionFlagged`), `sourceIssuedAt`, `retrievedAt`, and `payloadHash`.
@@ -20,7 +20,41 @@ Ingests and filters active GDACS alerts by severity, hazard type (`EQ`, `TC`, `F
 }
 ```
 
-## 2. `drr_usgs_earthquake_fetch`
+## 2. `drr_adam_fetch`
+Ingests pre-processed humanitarian impact and exposure feeds from the **WFP ADAM (Automated Disaster Analysis and Mapping)** OGC API – Features service (`WFP_ADAM_API_URL`, default `https://api.adam.geospatial.wfp.org/api`). Normalizes `ISO3`/`iso3`, `"-9999.0"` GloFAS probability sentinels to `null`, concentric population buffers, flood cropland/population totals, and WFP map/CSV/shapefile/PDF artifact URLs, with untrusted feed sanitization and SHA-256 `payloadHash`.
+
+| Parameter | Type | Default | Description |
+| :--- | :--- | :--- | :--- |
+| `collection` | `string` | `"eq"` | Collection alias (`eq`, `fl`, `fl_alerts`, `fl_mom`, `glofas`, `ts`, `ts_buffers`, `ts_tracks`, `ts_nodes`, `ts_disturbance_tracks`, `ts_disturbance_buffers`, `ts_disturbance_nodes`) or full OGC ID (e.g. `adam.adam_eq_events`). |
+| `limit` | `number` | `20` | Maximum number of OGC API items to request per page. |
+| `offset` | `number` | *None* | Pagination offset for OGC API `/items` queries. |
+| `bbox` | `string \| number[]` | *None* | Spatial bounding box `"minLon,minLat,maxLon,maxLat"` passed to the OGC API. |
+| `datetime` | `string` | *None* | OGC API ISO-8601 temporal instant or interval (e.g. `"2026-11-01T00:00:00Z/.."`). |
+| `country` | `string` | *None* | Case-insensitive country name substring filter (`country`, `adm0_name`, or `countries`). |
+| `iso3` | `string` | *None* | Exact case-insensitive ISO3/ISO2 country code filter (e.g. `"PHL"`, `"GHA"`). |
+| `minMagnitude` | `number` | *None* | Minimum earthquake magnitude filter (for `eq` collections). |
+| `minAlertLevel` | `string` | *None* | Minimum alert severity (`"Green"`, `"Orange"`, or `"Red"`). |
+| `listCollections` | `boolean` | `false` | When `true`, returns the list of available WFP ADAM OGC API collections and extents instead of features. |
+| `samplePayload` | `object` | *None* | Offline GeoJSON `FeatureCollection` (or `/collections` JSON) for air-gapped or deterministic testing. |
+
+```json
+{
+  "collection": "eq",
+  "limit": 10,
+  "minMagnitude": 5.5,
+  "iso3": "PHL"
+}
+```
+
+```json
+{
+  "collection": "glofas",
+  "bbox": "97.0,5.0,106.0,21.0",
+  "limit": 20
+}
+```
+
+## 3. `drr_usgs_earthquake_fetch`
 Queries real-time seismic events from the USGS Earthquake Hazards Program and converts MMI to Peak Ground Acceleration (PGA in $g$) via **Wald et al. (1999) GMICE** (`REG_WALD99_GMICE`), recording empirical applicability (MMI V–VIII) and extrapolation flags.
 
 ```json
@@ -526,7 +560,7 @@ Searches the public **OCHA HDX CKAN v3** dataset catalog (no API key required) f
 }
 ```
 
-## 41. `drr_sitrep_reconcile`
+## 42. `drr_sitrep_reconcile`
 Reconciles conflicting multi-source disaster impact claims (national official authorities, sub-national LGUs, humanitarian clusters, modelled estimates, and unverified media) without silently collapsing figures into a single unattributed number, and/or computes a deterministic version-to-version SitRep diff with SHA-256 provenance.
 
 ```json
@@ -550,11 +584,11 @@ Reconciles conflicting multi-source disaster impact claims (national official au
 
 ---
 
-# Part 2: Command-Line Interface (CLI) Reference (41 Subcommands)
+# Part 2: Command-Line Interface (CLI) Reference (42 Subcommands)
 
 Run `node bin/cli.js --help` (or `drr-tool --help`) for usage.
 
-* **Telemetry & Hydro**: `gdacs`, `usgs`, `fdsn-shakemap`, `forecast`, `sensorthings`, `stac-hazard`, `hdx-hapi`, `hdx-search`, `basin-rainfall`, `river-discharge`, `monitor`
+* **Telemetry & Hydro**: `gdacs`, `adam`, `usgs`, `fdsn-shakemap`, `forecast`, `sensorthings`, `stac-hazard`, `hdx-hapi`, `hdx-search`, `basin-rainfall`, `river-discharge`, `monitor`
 * **Contracts, Registry, Replay & Benchmarks**: `validate-input`, `registry`, `replay-validate`, `benchmark`
 * **Spatial, COD-AB, Overlay & Raster**: `spatial-join`, `infra-overlay`, `osm-infra`, `cod-validate`, `hdx-polygon-pop`, `geojson-validate`, `geometry-repair`, `crs-transform`, `raster-zonal-stats`
 * **Fragility, Vulnerability, Severity & Sendai**: `fragility` *(requires `--intensity`)*, `vulnerability` *(requires `--spatial` and `--intensity`)*, `severity-assess`, `sendai-validate`
@@ -562,3 +596,12 @@ Run `node bin/cli.js --help` (or `drr-tool --help`) for usage.
 * **Uncertainty & Appraisal**: `uncertainty`, `eal`, `cba`
 * **CAP & SitRep**: `cap-generate` *(defaults to `--status Draft`)*, `cap-validate`, `sitrep`
 * **DELTA Interoperability**: `delta-validate`, `delta-push` *(requires `--file`)*, `delta-docs`, `delta-hazards`
+
+### `drr-tool adam` Options
+```bash
+node bin/cli.js adam --list-collections
+node bin/cli.js adam --collection eq --min-mag 5.5 --iso3 PHL --limit 10
+node bin/cli.js adam --collection glofas --bbox 97.0,5.0,106.0,21.0 --limit 20
+node bin/cli.js adam --collection ts_buffers --min-level Orange --file examples/wfp-adam-ogc/sample-adam-eq.json
+```
+Supported flags: `--collection <alias|id>`, `--limit <n>`, `--offset <n>`, `--bbox <minLon,minLat,maxLon,maxLat>`, `--datetime <iso8601>`, `--country <name>`, `--iso3 <code>`, `--min-mag <n>`, `--min-level <Green|Orange|Red>`, `--list-collections`, `--file <path>`.
