@@ -1,0 +1,29 @@
+{
+  "type": "FeatureCollection",
+  "id": "adam.adam_fl_glofas_gauges_forecast",
+  "title": "adam.adam_fl_glofas_gauges_forecast",
+  "numberMatched": 1,
+  "numberReturned": 1,
+  "features": [
+    {
+      "type": "Feature",
+      "geometry": { "type": "Point", "coordinates": [100.51, 7.01] },
+      "id": "4102",
+      "properties": {
+        "2yrProb": "92.5",
+        "5yrProb": "64.0",
+        "20yrProb": "-9999.0",
+        "alertlvl": "2",
+        "continent": "Asia",
+        "country": "Thailand",
+        "dateofpeak": 3,
+        "forecast_base_date": "20261125",
+        "forecast_peakflow": "20261128",
+        "iso2": "THA",
+        "provid": "4102",
+        "riverbasin": "Songkhla Lake",
+        "rivername": "U-Tapao"
+      }
+    }
+  ]
+}

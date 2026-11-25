@@ -56,7 +56,7 @@ async function run() {
 	send({ jsonrpc: "2.0", id: 2, method: "tools/list", params: {} });
 	const listRes = await waitForResponse(2);
 	assert(listRes, "Expected tools/list response");
-	assert.strictEqual(listRes.result.tools.length, 41);
+	assert.strictEqual(listRes.result.tools.length, 42);
 
 	// 3. tools/call: drr_fragility_eval
 	send({

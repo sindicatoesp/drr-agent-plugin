@@ -23,6 +23,7 @@ A template configuration is provided in [`drr-agent-plugin/.env.example`](../.en
 | Variable | Default Value | Description |
 | :--- | :--- | :--- |
 | **`GDACS_FEED_URL`** | `https://www.gdacs.org/gdacsapi/api/events/geteventlist/events4app` | Endpoint for the UN OCHA / DG ECHO global disaster alert GeoJSON API feed. Override to use an internal proxy or mirror. |
+| **`WFP_ADAM_API_URL`** | `https://api.adam.geospatial.wfp.org/api` | Base URL for the WFP ADAM (Automated Disaster Analysis and Mapping) OGC API – Features service (`drr_adam_fetch` / `drr-tool adam`). |
 | **`USGS_API_URL`** | `https://earthquake.usgs.gov/fdsnws/event/1/query` | Base URL for the USGS Earthquake Hazards FDSN-WS event API. |
 | **`USGS_MIN_MAGNITUDE`**| `4.5` | Default minimum magnitude threshold when querying seismic events without an explicit parameter. |
 | **`USGS_DEFAULT_LIMIT`**| `20` | Maximum number of seismic events to return per query. |

@@ -25,7 +25,7 @@ This plugin equips AI coding assistants and autonomous agents with sourced domai
 * **End-User Skills & Prompting Guide**: See **[docs/skills-guide.md](docs/skills-guide.md)** (ready-to-use prompt examples & specific DRR use cases for all **19 domain skills**, plus multi-skill chains).
 * **Machine-Readable Skills Manifest**: See **[skills-manifest.json](skills-manifest.json)** (auto-generated skill catalog with safety tiers and validated MCP tool bindings).
 * **Programmatic Inventory**: See **[docs/tool-inventory.md](docs/tool-inventory.md)** (generated directly from executable registration sources via `npm run generate:inventory`).
-* **MCP & CLI Specification**: See **[docs/api-reference.md](docs/api-reference.md)** (41 MCP tools and 41 CLI commands).
+* **MCP & CLI Specification**: See **[docs/api-reference.md](docs/api-reference.md)** (42 MCP tools and 42 CLI commands).
 * **Scientific Methodology & Boundaries**: See **[docs/methodology.md](docs/methodology.md)**.
 * **Operational Playbook**: See **[docs/operational-playbook.md](docs/operational-playbook.md)**.
 * **Offline Copernicus CDS / ERA5 → STAC Workflow**: See **[docs/offline-cds-stac-workflow.md](docs/offline-cds-stac-workflow.md)** (how to preprocess NetCDF/GRIB climate reanalyses into zero-dep `rasterGrid` JSON snapshots).
@@ -47,8 +47,8 @@ drr-agent-plugin/
 ├── README.md                   # Master documentation
 ├── LICENSE                     # Apache 2.0
 ├── bin/
-│   ├── mcp-server.js           # Zero-dependency Node.js MCP server (41 active tools)
-│   ├── cli.js                  # Direct CLI for shell & CI/CD (41 subcommands)
+│   ├── mcp-server.js           # Zero-dependency Node.js MCP server (42 active tools)
+│   ├── cli.js                  # Direct CLI for shell & CI/CD (42 subcommands)
 │   └── serve.js                # Local static preview server
 ├── lib/                        # Pure stdlib computational & governance modules (33 JS modules + HIP data)
 │   ├── contracts.js            # Input contracts, unit conversions, C-03 provenance manifests (R-02/R-03)
@@ -92,7 +92,7 @@ drr-agent-plugin/
 │   └── next-version.js         # Automated SemVer calculator for dev -> main releases
 ├── docs/
 │   ├── skills-guide.md         # End-user prompt examples & specific use cases for all 19 skills
-│   ├── api-reference.md        # 41 MCP tools & 41 CLI subcommands specification
+│   ├── api-reference.md        # 42 MCP tools & 42 CLI subcommands specification
 │   ├── tool-inventory.md       # Programmatically generated capability & test inventory
 │   ├── methodology.md          # Scientific equations, bounds & C-01..C-08 governance
 │   ├── operational-playbook.md # Personas, timelines & operational workflows
@@ -144,13 +144,16 @@ npm run generate:inventory
 ```
 
 ### 2. Direct Command-Line Interface (CLI) Highlights
-For all 41 MCP tools and 41 CLI subcommands, see **[docs/api-reference.md](docs/api-reference.md)** and **[docs/tool-inventory.md](docs/tool-inventory.md)**.
+For all 42 MCP tools and 42 CLI subcommands, see **[docs/api-reference.md](docs/api-reference.md)** and **[docs/tool-inventory.md](docs/tool-inventory.md)**.
 
 ```bash
 # Real-time telemetry & screening
 node bin/cli.js usgs --min-mag 5.0 --limit 10
 node bin/cli.js forecast --lat -6.2 --lon 106.8 --days 5
 node bin/cli.js gdacs --min-level Orange
+node bin/cli.js adam --list-collections
+node bin/cli.js adam --collection eq --min-mag 5.5 --limit 5
+node bin/cli.js adam --collection glofas --bbox 97.0,5.0,106.0,21.0 --limit 10
 
 # Interim OSM critical infra, OCHA HDX/HAPI, COD-AB validation, polygon population, severity & benchmarks
 node bin/cli.js osm-infra --file examples/critical-infra-overlay/sample-osm-overpass.json
@@ -181,13 +184,13 @@ node bin/cli.js cap-generate \
 
 ---
 
-## MCP Server Tools (41 Tools)
+## MCP Server Tools (42 Tools)
 
-The MCP server (`bin/mcp-server.js`) exposes **41 deterministic, provenance-aware tools**:
+The MCP server (`bin/mcp-server.js`) exposes **42 deterministic, provenance-aware tools**:
 
 | Category | MCP Tools |
 | :--- | :--- |
-| **Telemetry & Hydrology** | `drr_gdacs_fetch`, `drr_usgs_earthquake_fetch`, `drr_fdsn_shakemap_fetch`, `drr_openmeteo_forecast`, `drr_sensorthings_fetch`, `drr_stac_hazard_fetch`, `drr_hdx_hapi_fetch`, `drr_hdx_catalog_search`, `drr_basin_rainfall_aggregate`, `drr_river_discharge_screen`, `drr_monitor_check` |
+| **Telemetry & Hydrology** | `drr_gdacs_fetch`, `drr_adam_fetch`, `drr_usgs_earthquake_fetch`, `drr_fdsn_shakemap_fetch`, `drr_openmeteo_forecast`, `drr_sensorthings_fetch`, `drr_stac_hazard_fetch`, `drr_hdx_hapi_fetch`, `drr_hdx_catalog_search`, `drr_basin_rainfall_aggregate`, `drr_river_discharge_screen`, `drr_monitor_check` |
 | **Contracts, Governance & Benchmarks** | `drr_input_contract_validate`, `drr_source_provenance_manifest`, `drr_model_registry_list`, `drr_assessment_replay_validate`, `drr_benchmark_run` |
 | **Spatial, COD-AB, Overlay & Raster** | `drr_spatial_exposure_join`, `drr_critical_infra_overlay`, `drr_osm_critical_infra_fetch`, `drr_cod_boundary_validate`, `drr_hdx_polygon_population_estimate`, `drr_geojson_validate`, `drr_geometry_repair`, `drr_crs_transform`, `drr_raster_zonal_stats` |
 | **Fragility, Loss, Severity & Sendai** | `drr_fragility_eval`, `drr_vulnerability_matrix_calc`, `drr_humanitarian_severity_assess`, `drr_sendai_validate` |
