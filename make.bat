@@ -167,7 +167,7 @@ exit /b 0
 
 :target_config_check
 echo Checking configuration integrity...
-node -e "const { CONFIG } = require('./lib/config.js'); console.log('  OK Config module loaded successfully.'); console.log('  OK USGS API: ' + CONFIG.USGS_API_URL); console.log('  OK GDACS Feed: ' + CONFIG.GDACS_FEED_URL); console.log('  OK Open-Meteo: ' + CONFIG.OPENMETEO_API_URL); console.log('  OK DELTA MCP API: ' + CONFIG.DELTA_API_URL); console.log('  OK Target Country Scope: ' + CONFIG.TARGET_COUNTRIES.join(', ')); console.log('  OK Strict DELTA Country Push: ' + CONFIG.DELTA_COUNTRY_STRICT); console.log('  OK Offline Mode: ' + CONFIG.DRR_OFFLINE_MODE);"
+node -e "const { CONFIG } = require('./lib/config.js'); console.log('  OK Config module loaded successfully.'); console.log('  OK USGS API: ' + CONFIG.USGS_API_URL); console.log('  OK GDACS Feed: ' + CONFIG.GDACS_FEED_URL); console.log('  OK WFP ADAM API: ' + CONFIG.WFP_ADAM_API_URL); console.log('  OK Open-Meteo: ' + CONFIG.OPENMETEO_API_URL); console.log('  OK DELTA MCP API: ' + CONFIG.DELTA_API_URL); console.log('  OK Target Country Scope: ' + CONFIG.TARGET_COUNTRIES.join(', ')); console.log('  OK Strict DELTA Country Push: ' + CONFIG.DELTA_COUNTRY_STRICT); console.log('  OK Offline Mode: ' + CONFIG.DRR_OFFLINE_MODE);"
 if errorlevel 1 exit /b 1
 if exist "alerts-config.json" (
     node -e "const c = JSON.parse(require('fs').readFileSync('alerts-config.json','utf8')); const n = c.rules ? (Array.isArray(c.rules) ? c.rules.length : Object.keys(c.rules).length) : 0; console.log('  OK alerts-config.json is valid JSON (' + n + ' rules declared).');"

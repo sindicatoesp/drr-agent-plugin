@@ -7,6 +7,7 @@
 const readline = require("readline");
 const path = require("path");
 const { ingestGdacsAlerts } = require("../lib/gdacs");
+const { ingestAdamFeed, fetchAdamCollections, ADAM_COLLECTIONS } = require("../lib/adam");
 const { spatialExposureJoin, validateGeoJson, repairGeoJsonGeometry, transformCrs, computeRasterZonalStats } = require("../lib/spatial");
 const { evaluateSeismicFragility, evaluateFloodDamage, evaluateWindDamage } = require("../lib/fragility");
 const { evaluateVulnerabilityMatrix } = require("../lib/vulnerability");
@@ -65,6 +66,63 @@ const TOOLS = [
 				samplePayload: {
 					type: "object",
 					description: "Optional offline/test GeoJSON payload to parse instead of fetching live network",
+				},
+			},
+		},
+	},
+	{
+		name: "drr_adam_fetch",
+		description:
+			"Ingest pre-processed WFP ADAM (Automated Disaster Analysis and Mapping) OGC API - Features feeds (earthquakes, floods, GloFAS gauge return periods, tropical storm tracks/wind buffers, and population/cropland exposure).",
+		inputSchema: {
+			type: "object",
+			properties: {
+				collection: {
+					type: "string",
+					enum: [...Object.keys(ADAM_COLLECTIONS), ...Object.values(ADAM_COLLECTIONS)],
+					description:
+						"WFP ADAM collection alias or ID (e.g. 'eq', 'fl', 'fl_alerts', 'glofas', 'ts', 'ts_buffers', 'ts_tracks', or 'adam.adam_eq_events'). Defaults to 'eq'.",
+				},
+				limit: {
+					type: "number",
+					description: "Maximum number of features to fetch (default: 20)",
+				},
+				offset: {
+					type: "number",
+					description: "Pagination offset for OGC API items",
+				},
+				bbox: {
+					type: "string",
+					description: "Optional spatial bounding box 'minLon,minLat,maxLon,maxLat'",
+				},
+				datetime: {
+					type: "string",
+					description: "Optional OGC API temporal filter (ISO-8601 instant or interval)",
+				},
+				country: {
+					type: "string",
+					description: "Optional country name substring filter",
+				},
+				iso3: {
+					type: "string",
+					description: "Optional ISO3/ISO2 country code filter",
+				},
+				minMagnitude: {
+					type: "number",
+					description: "Optional minimum magnitude filter (for earthquake collections)",
+				},
+				minAlertLevel: {
+					type: "string",
+					enum: ["Green", "Orange", "Red"],
+					description: "Optional minimum alert level filter",
+				},
+				listCollections: {
+					type: "boolean",
+					description: "If true, list available WFP ADAM OGC API collections instead of fetching items",
+				},
+				samplePayload: {
+					type: "object",
+					description: "Optional offline/test OGC API GeoJSON payload to parse instead of fetching live network",
 				},
 			},
 		},
@@ -1387,6 +1445,28 @@ async function handleToolCall(name, args) {
 				country: args.country,
 			});
 			return { totalEvents: events.length, events: events.slice(0, 20) };
+		}
+
+		case "drr_adam_fetch": {
+			if (args.listCollections) {
+				return fetchAdamCollections({ samplePayload: args.samplePayload });
+			}
+			const result = await ingestAdamFeed({
+				collection: args.collection || "eq",
+				limit: args.limit,
+				offset: args.offset,
+				bbox: args.bbox,
+				datetime: args.datetime,
+				country: args.country,
+				iso3: args.iso3,
+				minMagnitude: args.minMagnitude,
+				minAlertLevel: args.minAlertLevel,
+				samplePayload: args.samplePayload,
+			});
+			return {
+				...result,
+				features: result.features.slice(0, 20),
+			};
 		}
 
 		case "drr_usgs_earthquake_fetch": {

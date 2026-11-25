@@ -5,6 +5,7 @@
 
 const fs = require("fs");
 const { ingestGdacsAlerts } = require("../lib/gdacs");
+const { ingestAdamFeed, fetchAdamCollections } = require("../lib/adam");
 const {
 	spatialExposureJoin,
 	validateGeoJson,
@@ -49,6 +50,7 @@ Usage:
 
 Commands:
   gdacs                Fetch or parse GDACS active hazard alerts
+  adam                 Query WFP ADAM OGC API - Features (EQ/FL/TS impact, GloFAS gauges, wind buffers)
   usgs                 Query USGS Earthquake Hazards Program (Wald99 GMICE PGA)
   fdsn-shakemap        Ingest custom national FDSN-WS events & ShakeMap PGA/Vs30 contours/grids (C-04 upgrade)
   forecast             Open-Meteo Anticipatory Action rainfall-threshold screening
@@ -152,6 +154,32 @@ async function main() {
 					country: options.country,
 				});
 				console.log(JSON.stringify({ totalEvents: events.length, events: events.slice(0, 10) }, null, 2));
+				break;
+			}
+
+			case "adam": {
+				let samplePayload = null;
+				if (options.file) {
+					samplePayload = JSON.parse(fs.readFileSync(options.file, "utf8"));
+				}
+				if (options["list-collections"]) {
+					const collections = await fetchAdamCollections({ samplePayload });
+					console.log(JSON.stringify(collections, null, 2));
+					break;
+				}
+				const res = await ingestAdamFeed({
+					collection: options.collection || "eq",
+					limit: options.limit ? parseInt(options.limit, 10) : 20,
+					offset: options.offset ? parseInt(options.offset, 10) : undefined,
+					bbox: options.bbox,
+					datetime: options.datetime,
+					country: options.country,
+					iso3: options.iso3,
+					minMagnitude: options["min-mag"] ? parseFloat(options["min-mag"]) : undefined,
+					minAlertLevel: options["min-level"],
+					samplePayload,
+				});
+				console.log(JSON.stringify({ ...res, features: res.features.slice(0, 10) }, null, 2));
 				break;
 			}
 

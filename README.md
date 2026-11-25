@@ -25,9 +25,10 @@ This plugin equips AI coding assistants and autonomous agents with sourced domai
 * **End-User Skills & Prompting Guide**: See **[docs/skills-guide.md](docs/skills-guide.md)** (ready-to-use prompt examples & specific DRR use cases for all **19 domain skills**, plus multi-skill chains).
 * **Machine-Readable Skills Manifest**: See **[skills-manifest.json](skills-manifest.json)** (auto-generated skill catalog with safety tiers and validated MCP tool bindings).
 * **Programmatic Inventory**: See **[docs/tool-inventory.md](docs/tool-inventory.md)** (generated directly from executable registration sources via `npm run generate:inventory`).
-* **MCP & CLI Specification**: See **[docs/api-reference.md](docs/api-reference.md)** (41 MCP tools and 41 CLI commands).
+* **MCP & CLI Specification**: See **[docs/api-reference.md](docs/api-reference.md)** (42 MCP tools and 42 CLI commands).
 * **Scientific Methodology & Boundaries**: See **[docs/methodology.md](docs/methodology.md)**.
 * **Operational Playbook**: See **[docs/operational-playbook.md](docs/operational-playbook.md)**.
+* **Offline Copernicus CDS / ERA5 → STAC Workflow**: See **[docs/offline-cds-stac-workflow.md](docs/offline-cds-stac-workflow.md)** (how to preprocess NetCDF/GRIB climate reanalyses into zero-dep `rasterGrid` JSON snapshots).
 
 ### Directory Structure & Layout
 
@@ -46,8 +47,8 @@ drr-agent-plugin/
 ├── README.md                   # Master documentation
 ├── LICENSE                     # Apache 2.0
 ├── bin/
-│   ├── mcp-server.js           # Zero-dependency Node.js MCP server (41 active tools)
-│   ├── cli.js                  # Direct CLI for shell & CI/CD (41 subcommands)
+│   ├── mcp-server.js           # Zero-dependency Node.js MCP server (42 active tools)
+│   ├── cli.js                  # Direct CLI for shell & CI/CD (42 subcommands)
 │   └── serve.js                # Local static preview server
 ├── lib/                        # Pure stdlib computational & governance modules (33 JS modules + HIP data)
 │   ├── contracts.js            # Input contracts, unit conversions, C-03 provenance manifests (R-02/R-03)
@@ -91,10 +92,11 @@ drr-agent-plugin/
 │   └── next-version.js         # Automated SemVer calculator for dev -> main releases
 ├── docs/
 │   ├── skills-guide.md         # End-user prompt examples & specific use cases for all 19 skills
-│   ├── api-reference.md        # 41 MCP tools & 41 CLI subcommands specification
+│   ├── api-reference.md        # 42 MCP tools & 42 CLI subcommands specification
 │   ├── tool-inventory.md       # Programmatically generated capability & test inventory
 │   ├── methodology.md          # Scientific equations, bounds & C-01..C-08 governance
 │   ├── operational-playbook.md # Personas, timelines & operational workflows
+│   ├── offline-cds-stac-workflow.md # Offline Copernicus CDS / ERA5 -> STAC & rasterGrid JSON handoff guide
 │   ├── configuration.md        # Environment variables, proxies, country scoping & shadow monitor
 │   └── platforms/              # Platform setup guides (Antigravity, Claude, Cursor, Copilot, OpenCode)
 ├── skills/                     # 19 Reusable AI Agent Skills (SKILL.md)
@@ -123,7 +125,8 @@ drr-agent-plugin/
     │   └── geodisaster-scenarios.json
     ├── validation/
     │   ├── historical-hindcasts.json
-    │   └── geospatial-event-replays.json
+    │   ├── geospatial-event-replays.json
+    │   └── era5-luzon-wbgt-2024-04.json
     └── run-all-tests.sh
 ```
 
@@ -141,13 +144,16 @@ npm run generate:inventory
 ```
 
 ### 2. Direct Command-Line Interface (CLI) Highlights
-For all 41 MCP tools and 41 CLI subcommands, see **[docs/api-reference.md](docs/api-reference.md)** and **[docs/tool-inventory.md](docs/tool-inventory.md)**.
+For all 42 MCP tools and 42 CLI subcommands, see **[docs/api-reference.md](docs/api-reference.md)** and **[docs/tool-inventory.md](docs/tool-inventory.md)**.
 
 ```bash
 # Real-time telemetry & screening
 node bin/cli.js usgs --min-mag 5.0 --limit 10
 node bin/cli.js forecast --lat -6.2 --lon 106.8 --days 5
 node bin/cli.js gdacs --min-level Orange
+node bin/cli.js adam --list-collections
+node bin/cli.js adam --collection eq --min-mag 5.5 --limit 5
+node bin/cli.js adam --collection glofas --bbox 97.0,5.0,106.0,21.0 --limit 10
 
 # Interim OSM critical infra, OCHA HDX/HAPI, COD-AB validation, polygon population, severity & benchmarks
 node bin/cli.js osm-infra --file examples/critical-infra-overlay/sample-osm-overpass.json
@@ -178,13 +184,13 @@ node bin/cli.js cap-generate \
 
 ---
 
-## MCP Server Tools (41 Tools)
+## MCP Server Tools (42 Tools)
 
-The MCP server (`bin/mcp-server.js`) exposes **41 deterministic, provenance-aware tools**:
+The MCP server (`bin/mcp-server.js`) exposes **42 deterministic, provenance-aware tools**:
 
 | Category | MCP Tools |
 | :--- | :--- |
-| **Telemetry & Hydrology** | `drr_gdacs_fetch`, `drr_usgs_earthquake_fetch`, `drr_fdsn_shakemap_fetch`, `drr_openmeteo_forecast`, `drr_sensorthings_fetch`, `drr_stac_hazard_fetch`, `drr_hdx_hapi_fetch`, `drr_hdx_catalog_search`, `drr_basin_rainfall_aggregate`, `drr_river_discharge_screen`, `drr_monitor_check` |
+| **Telemetry & Hydrology** | `drr_gdacs_fetch`, `drr_adam_fetch`, `drr_usgs_earthquake_fetch`, `drr_fdsn_shakemap_fetch`, `drr_openmeteo_forecast`, `drr_sensorthings_fetch`, `drr_stac_hazard_fetch`, `drr_hdx_hapi_fetch`, `drr_hdx_catalog_search`, `drr_basin_rainfall_aggregate`, `drr_river_discharge_screen`, `drr_monitor_check` |
 | **Contracts, Governance & Benchmarks** | `drr_input_contract_validate`, `drr_source_provenance_manifest`, `drr_model_registry_list`, `drr_assessment_replay_validate`, `drr_benchmark_run` |
 | **Spatial, COD-AB, Overlay & Raster** | `drr_spatial_exposure_join`, `drr_critical_infra_overlay`, `drr_osm_critical_infra_fetch`, `drr_cod_boundary_validate`, `drr_hdx_polygon_population_estimate`, `drr_geojson_validate`, `drr_geometry_repair`, `drr_crs_transform`, `drr_raster_zonal_stats` |
 | **Fragility, Loss, Severity & Sendai** | `drr_fragility_eval`, `drr_vulnerability_matrix_calc`, `drr_humanitarian_severity_assess`, `drr_sendai_validate` |
@@ -228,29 +234,29 @@ Each skill in `skills/*/SKILL.md` encodes DRR scientific guardrails, tool orches
 
 ## Validation Maturity & Evidence Status (L0–L6)
 
-`drr-agent-plugin` is a **deterministic DRR analytics and decision-support toolkit**—not an autonomously authorized emergency broadcast or official reporting system. Evidence status is tracked explicitly against a seven-level validation ladder (see **[docs/methodology.md](docs/methodology.md#7-validation-maturity-ladder-l0l6--scope-boundaries)**):
+`drr-agent-plugin` is a **deterministic DRR analytics and decision-support toolkit**—not an autonomously authorized emergency broadcast or official reporting system. **Verification in CI (L0–L2)** confirms that software, schemas, and formulas match their published specifications; it does **not** by itself establish real-world impact accuracy. Published L2/L3 metrics and benchmark outputs are generated directly from code in **[docs/validation-results.md](docs/validation-results.md)** (see also **[docs/methodology.md](docs/methodology.md#7-validation-maturity-ladder-l0l6--scope-boundaries)** and the **[Code-Enforced vs. Prompt-Only Guardrail Matrix](docs/methodology.md#10-guardrail-enforcement-matrix-code-enforced-vs-skill-prompt-only)**):
 
 | Level | Tier | Status | Evidence |
 | :--- | :--- | :--- | :--- |
-| **L0** | Software Verified | ✅ Verified in CI | Zero-dep lint, unit/integration tests, MCP stdio contract tests (`npm run check`). |
-| **L1** | Standards Verified | ✅ Verified in CI | CAP v1.2 structural/XXE/scope checks, UNDRR-ISC HIP crosswalk, Sendai `C-01`..`C-03` semantics, DELTA schema checks. |
-| **L2** | Reference Model Verified | ✅ Verified in CI | Golden numerical checks against published Wald (1999) GMICE, lognormal fragility/MDR, trapezoidal AEP EAL, and OASIS CAP v1.2 reference payloads (`node bin/cli.js replay-validate --suite reference_model`). |
-| **L3** | Historical Hindcast Validated | 🟡 Multi-Event Suite in CI | Multi-event historical hindcast fixtures paired with observed outcome bands, uncertainty coverage, and FbF trigger skill metrics (`node bin/cli.js replay-validate --suite hindcast_benchmark`). |
+| **L0** | Software Verified | ✅ Formula/Software Verified in CI | Zero-dep lint, unit/integration tests, MCP stdio contract tests (`npm run check`). |
+| **L1** | Standards Verified | ✅ Formula/Software Verified in CI | CAP v1.2 structural/XXE/scope checks, UNDRR-ISC HIP crosswalk, Sendai `C-01`..`C-03` semantics, DELTA schema checks. |
+| **L2** | Reference Model Verified | ✅ Formula/Software Verified in CI | Golden numerical checks against published Wald (1999) GMICE, lognormal fragility/MDR, trapezoidal AEP EAL, and OASIS CAP v1.2 reference payloads (`node bin/cli.js replay-validate --suite reference_model`). |
+| **L3** | Historical Hindcast Validated | 🟡 Multi-Event Suite in CI *(screening fidelity)* | Frozen multi-event historical hindcasts, FbF trigger skill (POD/FAR/CSI), end-to-end geospatial replays, and April 2024 Luzon ERA5 WBGT reanalysis ([docs/validation-results.md](docs/validation-results.md)). Not a substitute for local calibration. |
 | **L4** | Independent Domain Review | ⏳ External / Planned | Independent peer review by seismologists, hydrologists, and DRR specialists. |
-| **L5** | Operational Pilot (Shadow Mode) | ⏳ Institutional / Planned | Multi-month EOC shadow-mode trial (`--read-only true`) across live hazard events. |
+| **L5** | Operational Pilot (Shadow Mode) | ⏳ Institutional / Planned | Multi-month EOC shadow-mode trial (`--read-only true`) across live hazard events + live cross-assistant LLM evaluation. |
 | **L6** | Operational Decision Support | ⏳ Institutional Only | Requires L4 + L5, locally calibrated registries, and explicit human-in-the-loop authority. |
 
 ---
 
-## Digital Public Goods (DPG) Standard & UN SDG Alignment
+## Digital Public Goods (DPG) Standard & UN SDG Alignment *(Self-Assessed)*
 
-`drr-agent-plugin` is engineered to align with all **9 indicators** of the [Digital Public Goods Standard](https://www.digitalpublicgoods.net/standard) (including the **September 2025 DPGA Privacy & Data Security Framework**):
+> **Status Note**: Alignment with the [Digital Public Goods Standard](https://www.digitalpublicgoods.net/standard) (including the **September 2025 DPGA Privacy & Data Security Framework**) is currently **self-assessed** via automated repository checks (`npm run dpg:audit`) and has not yet undergone formal Digital Public Goods Alliance (DPGA) registry review.
 
 * **UN Sustainable Development Goals (Indicator 1)**: Directly advances **SDG 11** (Targets `11.5`, `11.b`), **SDG 13** (Targets `13.1`, `13.3`), **SDG 1** (`1.5`), **SDG 9** (`9.1`), and **SDG 17** (`17.6`, `17.18`).
 * **Open Licensing & Clear Ownership (Indicators 2–3)**: Full OSI **[Apache-2.0](LICENSE)** for software, **CC-BY-4.0** for documentation/skills/reference data ([NOTICE](NOTICE)), and transparent stewardship ([GOVERNANCE.md](GOVERNANCE.md)).
 * **Platform Independence & Data Portability (Indicators 4 & 6)**: `0` external npm dependencies, offline/air-gap mode (`DRR_OFFLINE_MODE=true`), and non-proprietary state extraction (`npm run data:export` in JSON, GeoJSON, and CSV).
 * **Privacy, Security & Do No Harm (Indicators 7 & 9A–9C)**: Zero individual PII collected by design ([PRIVACY.md](PRIVACY.md)), built-in retention/erasure (`npm run data:purge`), vulnerability disclosure & hardening ([SECURITY.md](SECURITY.md)), [CODE_OF_CONDUCT.md](CODE_OF_CONDUCT.md), and [CONTRIBUTING.md](CONTRIBUTING.md).
-* **Full Compliance Matrix & Automated Audit**: See **[docs/dpg-compliance.md](docs/dpg-compliance.md)**, **[dpg-assessment.json](dpg-assessment.json)**, and run `npm run dpg:audit`.
+* **Self-Assessment Matrix & Automated Audit**: See **[docs/dpg-compliance.md](docs/dpg-compliance.md)**, **[dpg-assessment.json](dpg-assessment.json)**, and run `npm run dpg:audit`.
 
 ---
 
