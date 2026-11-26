@@ -7,16 +7,16 @@
 - **Package**: `@sindicatoesp/drr-agent-plugin` v1.10.0
 - **Plugin Manifest**: `drr-analytics` v1.10.0
 - **MCP Server**: `drr-analytics-mcp` v1.10.0 (protocol `2024-11-05`)
-- **Git Branch**: `feat/wfp-adam-ogc-api`
+- **Git Branch**: `feat/agentic-harness-hardening`
 - **Reference Baseline Commit (`origin/dev`)**: `unknown`
-- **Current HEAD Commit**: `73b9efde319744ea3232c8b800a34d52e3a6294d`
+- **Current HEAD Commit**: `927c609b015564e2f92c7973c760394d9a2b5f01`
 - **Registered MCP Tools**: 42
 - **Registered CLI Subcommands**: 42
 - **Library Modules (`lib/*.js`)**: 34
 - **Public Exports (`lib/index.js`)**: 263
 - **Skills (`skills/*/SKILL.md`)**: 19
 - **Skills Manifest**: `skills-manifest.json`
-- **Test Suites (`tests/test-*.js`)**: 34
+- **Test Suites (`tests/test-*.js`)**: 35
 
 ### Documentation Reconciliation Note
 - **Historical 10-vs-11 discrepancy (`origin/dev`)**: `bin/mcp-server.js` registered 11 tools (including `drr_delta_docs`), whereas `docs/api-reference.md` documented 10 tools and omitted `drr_delta_docs`. Both `docs/api-reference.md` and `README.md` are now reconciled with the expanded registration baseline of **42 MCP tools**.
@@ -25,9 +25,9 @@
 
 | # | Tool Name | Required Args | Optional Args | Test Mapping | Description |
 | :---: | :--- | :--- | :--- | :--- | :--- |
-| 1 | `drr_gdacs_fetch` | — | `minAlertLevel`, `eventType`, `country`, `samplePayload` | `tests/test-monitor.js, tests/test-security-cap.js, tests/test-mcp-server.js` | Ingest and filter GDACS (Global Disaster Alert and Coordination System) active alerts by severity, event type (EQ, TC, FL, VO), or country. |
-| 2 | `drr_adam_fetch` | — | `collection`, `limit`, `offset`, `bbox`, `datetime`, `country`, `iso3`, `minMagnitude`, `minAlertLevel`, `listCollections`, `samplePayload` | `tests/test-mcp-server.js` | Ingest pre-processed WFP ADAM (Automated Disaster Analysis and Mapping) OGC API - Features feeds (earthquakes, floods, GloFAS gauge return periods, tropical storm tracks/wind buffers, and population/cropland exposure). |
-| 3 | `drr_usgs_earthquake_fetch` | — | `minMagnitude`, `limit`, `samplePayload` | `tests/test-usgs.js, tests/test-mcp-server.js` | Query the USGS Earthquake Hazards Program for real-time seismic events and calculate estimated Peak Ground Acceleration (PGA in g) using Wald et al. (1999) GMICE. |
+| 1 | `drr_gdacs_fetch` | — | `minAlertLevel`, `eventType`, `country`, `samplePayload`, `compact` | `tests/test-monitor.js, tests/test-security-cap.js, tests/test-mcp-server.js` | Ingest and filter GDACS (Global Disaster Alert and Coordination System) active alerts by severity, event type (EQ, TC, FL, VO), or country. |
+| 2 | `drr_adam_fetch` | — | `collection`, `limit`, `offset`, `bbox`, `datetime`, `country`, `iso3`, `minMagnitude`, `minAlertLevel`, `listCollections`, `samplePayload`, `compact` | `tests/test-mcp-server.js` | Ingest pre-processed WFP ADAM (Automated Disaster Analysis and Mapping) OGC API - Features feeds (earthquakes, floods, GloFAS gauge return periods, tropical storm tracks/wind buffers, and population/cropland exposure). |
+| 3 | `drr_usgs_earthquake_fetch` | — | `minMagnitude`, `limit`, `samplePayload`, `compact` | `tests/test-usgs.js, tests/test-mcp-server.js` | Query the USGS Earthquake Hazards Program for real-time seismic events and calculate estimated Peak Ground Acceleration (PGA in g) using Wald et al. (1999) GMICE. |
 | 4 | `drr_openmeteo_forecast` | — | `latitude`, `longitude`, `days`, `triggerPolicy`, `previousRuns`, `samplePayload` | `tests/test-openmeteo.js, tests/test-mcp-server.js` | Retrieve Open-Meteo multi-day weather forecasts for Anticipatory Action rainfall-threshold screening (never fabricates flood depth). |
 | 5 | `drr_spatial_exposure_join` | `hazardGeoJSON`, `exposureGeoJSON` | `epicenter`, `bufferKm` | `tests/test-spatial.js, tests/test-spatial-hydro.js` | Execute deterministic spatial joins between a hazard footprint (Polygon/MultiPolygon GeoJSON) and exposed assets (FeatureCollection). |
 | 6 | `drr_fragility_eval` | `hazardType`, `intensity` | `unit`, `taxonomy`, `occupancy`, `mode` | `tests/test-fragility.js, tests/test-contracts-registry.js, tests/test-mcp-server.js` | Calculate illustrative GEM/HAZUS structural damage state probabilities and Mean Damage Ratio (MDR) with explicit unit conversions and model registry provenance. |
@@ -172,7 +172,7 @@
 - `skills/undrr-hip-hazard-classification/SKILL.md`
 - `skills/vulnerability-matrix/SKILL.md`
 
-## Automated Test Suites (34)
+## Automated Test Suites (35)
 
 - `tests/test-adam.js`
 - `tests/test-agent-eval-harness.js`
@@ -186,6 +186,7 @@
 - `tests/test-dpg-compliance.js`
 - `tests/test-events-crosswalk.js`
 - `tests/test-fragility.js`
+- `tests/test-harness-eval.js`
 - `tests/test-hdx-cod.js`
 - `tests/test-hindcast-regression.js`
 - `tests/test-infra-overlay.js`

@@ -17,7 +17,8 @@
   },
   "scripts": {
     "lint": "node scripts/lint.js",
-    "check": "node scripts/lint.js && bash tests/run-all-tests.sh",
+    "arch:check": "node scripts/arch-check.js",
+    "check": "node scripts/lint.js && node scripts/arch-check.js && bash tests/run-all-tests.sh",
     "test": "bash tests/run-all-tests.sh",
     "dpg:audit": "node scripts/dpg-audit.js",
     "data:export": "node scripts/dpg-data-portability.js export",

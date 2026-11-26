@@ -83,6 +83,7 @@
         "drr_fdsn_shakemap_fetch",
         "drr_usgs_earthquake_fetch",
         "drr_gdacs_fetch",
+        "drr_adam_fetch",
         "drr_openmeteo_forecast",
         "drr_river_discharge_screen",
         "drr_event_match_deduplicate"
