@@ -1,7 +1,7 @@
 {
   "$schema": "https://agent-plugins.org/schemas/1.0.0/plugin.schema.json",
   "name": "drr-analytics",
-  "version": "1.11.0",
+  "version": "1.12.0",
   "description": "Disaster Risk Reduction (DRR) Agent Plugin: Multi-source disaster telemetry (GDACS, USGS, Open-Meteo), automated early warning monitoring daemon, hazard exposure modeling, GEM/HAZUS fragility curves, OASIS CAP alerting, and two-way UNDRR DELTA Resilience integration.",
   "author": "DRR Agent Plugin Contributors (sindicatoesp)",
   "homepage": "https://sindicatoesp.github.io/drr-agent-plugin/",
