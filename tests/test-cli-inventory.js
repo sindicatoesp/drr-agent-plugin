@@ -41,8 +41,8 @@ assert(helpOut.includes("sitrep-reconcile"), "CLI --help must list sitrep-reconc
 assert(helpOut.includes("benchmark"), "CLI --help must list benchmark");
 
 const cliCmds = extractCliCommands();
-assert.strictEqual(TOOLS.length, 42, "MCP server must expose 42 tools");
-assert.strictEqual(cliCmds.length, 42, "CLI must register 42 subcommands");
+assert.strictEqual(TOOLS.length, 43, "MCP server must expose 43 tools");
+assert.strictEqual(cliCmds.length, 43, "CLI must register 43 subcommands");
 
 const invMd = generateInventoryMarkdown();
 for (const tool of TOOLS) {
@@ -55,7 +55,7 @@ for (const cmd of cliCmds) {
 const manifest = generateSkillsManifest();
 assert.strictEqual(manifest.valid, true, `Skills manifest invalid: ${manifest.validationErrors.join("; ")}`);
 assert.strictEqual(manifest.skillCount, 19, "Skills manifest must index 19 skills");
-assert.strictEqual(manifest.registeredToolCount, 42);
+assert.strictEqual(manifest.registeredToolCount, 43);
 const manifestOnDisk = JSON.parse(fs.readFileSync(path.join(ROOT, "skills-manifest.json"), "utf8"));
 assert.strictEqual(manifestOnDisk.skillCount, manifest.skillCount, "skills-manifest.json on disk must stay synced");
 assert.strictEqual(manifestOnDisk.valid, true);
