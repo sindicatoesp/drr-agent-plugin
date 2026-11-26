@@ -78,10 +78,12 @@ for (const tool of TOOLS) {
 if (missingHandlers === 0) pass(`All ${TOOLS.length} MCP tools have matching switch handlers`);
 if (schemaIssues === 0) pass(`All ${TOOLS.length} MCP tools have valid descriptions and object schemas`);
 
-// 3. Inventory & skills-manifest freshness
-const expectedInv = generateInventoryMarkdown();
+// 3. Inventory & skills-manifest freshness (ignore volatile git branch/SHA header lines in CI)
+const stripVolatileGitLines = (md) =>
+	String(md || "").replace(/^- \*\*(?:Git Branch|Reference Baseline Commit \(`origin\/dev`\)|Current HEAD Commit)\*\*:.*$/gm, "");
+const expectedInv = stripVolatileGitLines(generateInventoryMarkdown());
 const actualInv = fs.existsSync(path.join(ROOT, "docs", "tool-inventory.md"))
-	? fs.readFileSync(path.join(ROOT, "docs", "tool-inventory.md"), "utf8")
+	? stripVolatileGitLines(fs.readFileSync(path.join(ROOT, "docs", "tool-inventory.md"), "utf8"))
 	: "";
 if (expectedInv !== actualInv) {
 	fail("docs/tool-inventory.md is stale; run `npm run generate:inventory`");
