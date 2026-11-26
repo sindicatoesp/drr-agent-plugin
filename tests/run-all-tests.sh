@@ -41,8 +41,9 @@ node "$DIR/test-dpg-compliance.js"
 node "$DIR/test-reconcile.js"
 node "$DIR/test-agent-eval-harness.js"
 node "$DIR/test-harness-eval.js"
+node "$DIR/test-end-user-workflows.js"
 
 echo "=================================================="
-echo " 🎉 ALL 35 TEST SUITES PASSED SUCCESSFULLY!"
+echo " 🎉 ALL 36 TEST SUITES PASSED SUCCESSFULLY!"
 echo "=================================================="
 

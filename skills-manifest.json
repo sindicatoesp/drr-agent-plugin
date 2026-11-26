@@ -4,7 +4,7 @@
   "pluginVersion": "1.10.0",
   "mcpServer": "drr-analytics-mcp",
   "mcpProtocolVersion": "2024-11-05",
-  "registeredToolCount": 42,
+  "registeredToolCount": 43,
   "skillCount": 19,
   "safetyTiers": {
     "read_only_analytics": "Pure local deterministic computation, spatial validation, or benchmark verification.",
