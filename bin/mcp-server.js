@@ -5,6 +5,7 @@
  */
 
 const readline = require("readline");
+const fs = require("fs");
 const path = require("path");
 const { ingestGdacsAlerts } = require("../lib/gdacs");
 const { ingestAdamFeed, fetchAdamCollections, ADAM_COLLECTIONS } = require("../lib/adam");
@@ -35,6 +36,12 @@ const { ingestHdxHapiData, searchHdxCkanCatalog, validateCodBoundaries, estimate
 const { evaluateHumanitarianSeverity } = require("../lib/severity");
 const { runBenchmarkSuite } = require("../lib/benchmarks");
 const { reconcileAndDiffSitRep } = require("../lib/reconcile");
+const {
+	WORKFLOW_CATALOG,
+	classifyToolActionTier,
+	buildOperationalContext,
+	planGoalWorkflow,
+} = require("../lib/workflows");
 
 const pkg = require("../package.json");
 
@@ -66,6 +73,10 @@ const TOOLS = [
 				samplePayload: {
 					type: "object",
 					description: "Optional offline/test GeoJSON payload to parse instead of fetching live network",
+				},
+				compact: {
+					type: "boolean",
+					description: "Omit rawProperties and large geometry arrays to conserve agent context",
 				},
 			},
 		},
@@ -124,6 +135,10 @@ const TOOLS = [
 					type: "object",
 					description: "Optional offline/test OGC API GeoJSON payload to parse instead of fetching live network",
 				},
+				compact: {
+					type: "boolean",
+					description: "Omit rawProperties and large geometry coordinate arrays to conserve agent context",
+				},
 			},
 		},
 	},
@@ -145,6 +160,10 @@ const TOOLS = [
 				samplePayload: {
 					type: "object",
 					description: "Optional offline/test GeoJSON payload to parse instead of fetching live network",
+				},
+				compact: {
+					type: "boolean",
+					description: "Omit rawProperties to conserve agent context",
 				},
 			},
 		},
@@ -1266,7 +1285,206 @@ const TOOLS = [
 			},
 		},
 	},
+	{
+		name: "drr_workflow_plan",
+		description:
+			"Plan a goal-oriented DRR workflow (flood infrastructure risk, earthquake rapid impact, cyclone early warning, SitRep reconciliation, or anticipatory action trigger check) with action-tier permissions, missing-input clarification questions, and human-approval gates.",
+		inputSchema: {
+			type: "object",
+			properties: {
+				goal: {
+					type: "string",
+					description: "Natural-language end-user DRR goal (e.g. 'Assess flood risk to critical infrastructure in Hat Yai')",
+				},
+				workflowId: {
+					type: "string",
+					enum: [
+						"flood_infra_risk_assessment",
+						"earthquake_rapid_impact",
+						"cyclone_early_warning_brief",
+						"multi_source_sitrep_reconcile",
+						"anticipatory_action_trigger_check",
+					],
+					description: "Optional explicit workflow ID",
+				},
+				context: {
+					type: "object",
+					description: "Optional operational context overrides ({ role, country, municipality, coordinates, bbox, timeWindow, contextTimestamp })",
+				},
+				availableInputs: {
+					type: "object",
+					description: "Inputs already provided by the user/session ({ latitude, longitude, bbox, municipality, country, iso3, triggerPolicy, claims, currentSitRep })",
+				},
+			},
+		},
+	},
 ];
+
+function getAnnotatedTools() {
+	return TOOLS.map((tool) => {
+		const actionTier = classifyToolActionTier(tool.name);
+		return {
+			...tool,
+			annotations: {
+				actionTier,
+				readOnlyHint: actionTier === "read_only",
+				destructiveHint: actionTier === "consequential",
+			},
+		};
+	});
+}
+
+const MCP_PROMPTS = WORKFLOW_CATALOG.map((wf) => ({
+	name: wf.id,
+	description: wf.objective,
+	arguments: [
+		{ name: "location", description: "Target municipality, country, or lat/lon", required: wf.requiredContext.includes("location") },
+		{ name: "timeWindow", description: "Optional assessment period or forecast horizon", required: false },
+	],
+}));
+
+const MCP_RESOURCES = [
+	{
+		uri: "drr://context/operational",
+		name: "Operational Context & Authorization Policy",
+		description: "Active target countries, user role, offline/publish gates, and staleness policy.",
+		mimeType: "application/json",
+	},
+	{
+		uri: "drr://registry/models",
+		name: "Scientific Model & Parameter Registry",
+		description: "Registered empirical equations, fragility baselines, units, and applicability bounds.",
+		mimeType: "application/json",
+	},
+	{
+		uri: "drr://skills/manifest",
+		name: "DRR Domain Skills Manifest",
+		description: "Machine-readable index of 19 domain skills, safety tiers, and allowed MCP tools.",
+		mimeType: "application/json",
+	},
+];
+
+function readMcpResource(uri) {
+	if (uri === "drr://context/operational") {
+		return {
+			uri,
+			mimeType: "application/json",
+			text: JSON.stringify(buildOperationalContext(), null, 2),
+		};
+	}
+	if (uri === "drr://registry/models") {
+		return {
+			uri,
+			mimeType: "application/json",
+			text: JSON.stringify(listRegisteredMethods(), null, 2),
+		};
+	}
+	if (uri === "drr://skills/manifest") {
+		const manifestPath = path.join(__dirname, "..", "skills-manifest.json");
+		const text = fs.existsSync(manifestPath) ? fs.readFileSync(manifestPath, "utf8") : "{}";
+		return {
+			uri,
+			mimeType: "application/json",
+			text,
+		};
+	}
+	return null;
+}
+
+function compactFeedRecords(records = []) {
+	return records.map((rec) => {
+		if (!rec || typeof rec !== "object") return rec;
+		const copy = { ...rec };
+		delete copy.rawProperties;
+		if (copy.geometry && copy.geometry.type && copy.geometry.type !== "Point") {
+			copy.geometry = { type: copy.geometry.type, summary: "omitted_in_compact_mode" };
+		}
+		return copy;
+	});
+}
+
+function validateToolArguments(toolDef, args) {
+	if (!toolDef || !toolDef.inputSchema) return;
+	const schema = toolDef.inputSchema;
+	const provided = args && typeof args === "object" && !Array.isArray(args) ? args : {};
+	const required = Array.isArray(schema.required) ? schema.required : [];
+	for (const reqKey of required) {
+		if (provided[reqKey] === undefined || provided[reqKey] === null) {
+			const err = new Error(`Missing required argument "${reqKey}" for tool "${toolDef.name}".`);
+			err.errorCode = "MISSING_REQUIRED_ARGUMENT";
+			err.remediation = `Provide "${reqKey}" matching schema: ${JSON.stringify(schema.properties?.[reqKey] || {})}`;
+			err.retryable = true;
+			throw err;
+		}
+	}
+	const props = schema.properties || {};
+	for (const [key, val] of Object.entries(provided)) {
+		if (val === undefined || val === null) continue;
+		const propSchema = props[key];
+		if (!propSchema) continue;
+		if (Array.isArray(propSchema.enum) && !propSchema.enum.includes(val)) {
+			const err = new Error(`Invalid value "${val}" for "${key}" in "${toolDef.name}". Allowed: ${propSchema.enum.join(", ")}.`);
+			err.errorCode = "INVALID_ENUM_ARGUMENT";
+			err.remediation = `Use one of: ${propSchema.enum.join(", ")}`;
+			err.retryable = true;
+			throw err;
+		}
+		if (propSchema.type === "number" && (typeof val !== "number" || !Number.isFinite(val))) {
+			const err = new Error(`Argument "${key}" in "${toolDef.name}" must be a finite number.`);
+			err.errorCode = "INVALID_ARGUMENT_TYPE";
+			err.remediation = `Pass a numeric value for "${key}".`;
+			err.retryable = true;
+			throw err;
+		}
+		if (propSchema.type === "boolean" && typeof val !== "boolean") {
+			const err = new Error(`Argument "${key}" in "${toolDef.name}" must be a boolean.`);
+			err.errorCode = "INVALID_ARGUMENT_TYPE";
+			err.remediation = `Pass true or false for "${key}".`;
+			err.retryable = true;
+			throw err;
+		}
+	}
+}
+
+function formatToolErrorResponse(toolName, err) {
+	const msg = String(err?.message || err || "Tool execution failed");
+	let errorCode = err?.errorCode || "TOOL_EXECUTION_ERROR";
+	let remediation = err?.remediation || "Inspect tool parameters against tools/list inputSchema and retry.";
+	let retryable = err?.retryable !== undefined ? Boolean(err.retryable) : true;
+
+	if (msg.includes("DRR_OFFLINE_MODE")) {
+		errorCode = "OFFLINE_MODE_BLOCKED";
+		remediation = "Supply an offline samplePayload or disable DRR_OFFLINE_MODE.";
+	} else if (msg.includes("SINGLE_EVENT_CANNOT_ESTABLISH_EAL")) {
+		errorCode = "SINGLE_EVENT_CANNOT_ESTABLISH_EAL";
+		remediation = "Provide at least 2 distinct returnPeriodYears points to integrate Expected Annual Loss.";
+	} else if (msg.includes("DRR_ENABLE_PRODUCTION_PUBLISH")) {
+		errorCode = "PRODUCTION_PUBLISH_DISABLED";
+		remediation = "Keep status as Draft or obtain Duty Officer authorization with DRR_ENABLE_PRODUCTION_PUBLISH=true.";
+		retryable = false;
+	}
+
+	return {
+		isError: true,
+		content: [
+			{
+				type: "text",
+				text: JSON.stringify(
+					{
+						error: true,
+						errorCode,
+						tool: toolName,
+						message: msg,
+						remediation,
+						retryable,
+					},
+					null,
+					2,
+				),
+			},
+		],
+	};
+}
 
 async function handleToolCall(name, args) {
 	switch (name) {
@@ -1444,7 +1662,8 @@ async function handleToolCall(name, args) {
 				eventType: args.eventType,
 				country: args.country,
 			});
-			return { totalEvents: events.length, events: events.slice(0, 20) };
+			const sliced = events.slice(0, 20);
+			return { totalEvents: events.length, events: args.compact ? compactFeedRecords(sliced) : sliced };
 		}
 
 		case "drr_adam_fetch": {
@@ -1463,9 +1682,10 @@ async function handleToolCall(name, args) {
 				minAlertLevel: args.minAlertLevel,
 				samplePayload: args.samplePayload,
 			});
+			const sliced = result.features.slice(0, 20);
 			return {
 				...result,
-				features: result.features.slice(0, 20),
+				features: args.compact ? compactFeedRecords(sliced) : sliced,
 			};
 		}
 
@@ -1475,7 +1695,8 @@ async function handleToolCall(name, args) {
 				limit: args.limit,
 				samplePayload: args.samplePayload,
 			});
-			return { totalEvents: earthquakes.length, earthquakes: earthquakes.slice(0, 20) };
+			const sliced = earthquakes.slice(0, 20);
+			return { totalEvents: earthquakes.length, earthquakes: args.compact ? compactFeedRecords(sliced) : sliced };
 		}
 
 		case "drr_openmeteo_forecast": {
@@ -1693,6 +1914,10 @@ async function handleToolCall(name, args) {
 			return evaluateMitigationCostBenefit(args || {});
 		}
 
+		case "drr_workflow_plan": {
+			return planGoalWorkflow(args || {});
+		}
+
 		default:
 			throw new Error(`Unknown tool: ${name}`);
 	}
@@ -1749,14 +1974,57 @@ if (require.main === module) {
 				case "initialize":
 					sendResponse(id, {
 						protocolVersion: PROTOCOL_VERSION,
-						capabilities: { tools: {} },
+						capabilities: { tools: {}, prompts: {}, resources: {} },
 						serverInfo: { name: SERVER_NAME, version: SERVER_VERSION },
 					});
 					break;
 
 				case "tools/list":
-					sendResponse(id, { tools: TOOLS });
+					sendResponse(id, { tools: getAnnotatedTools() });
 					break;
+
+				case "prompts/list":
+					sendResponse(id, { prompts: MCP_PROMPTS });
+					break;
+
+				case "prompts/get": {
+					const promptName = params?.name;
+					const wf = WORKFLOW_CATALOG.find((w) => w.id === promptName);
+					if (!wf) {
+						sendResponse(id, null, { code: -32602, message: `Unknown prompt: ${promptName}` });
+						return;
+					}
+					const loc = params?.arguments?.location || "<specify municipality/country/coordinates>";
+					const tw = params?.arguments?.timeWindow || "latest available";
+					sendResponse(id, {
+						description: wf.objective,
+						messages: [
+							{
+								role: "user",
+								content: {
+									type: "text",
+									text: `Execute workflow "${wf.id}" (${wf.title}) for ${loc} (${tw}). First call drr_workflow_plan with workflowId="${wf.id}", check missingInputs/clarificationQuestions, run read-only/reversible steps deterministically, and never auto-publish consequential actions without human approval.`,
+								},
+							},
+						],
+					});
+					break;
+				}
+
+				case "resources/list":
+					sendResponse(id, { resources: MCP_RESOURCES });
+					break;
+
+				case "resources/read": {
+					const uri = params?.uri;
+					const content = readMcpResource(uri);
+					if (!content) {
+						sendResponse(id, null, { code: -32602, message: `Unknown resource URI: ${uri}` });
+						return;
+					}
+					sendResponse(id, { contents: [content] });
+					break;
+				}
 
 				case "tools/call": {
 					if (!params || !params.name) {
@@ -1766,15 +2034,29 @@ if (require.main === module) {
 						});
 						return;
 					}
-					const toolResult = await handleToolCall(params.name, params.arguments || {});
-					sendResponse(id, {
-						content: [
-							{
-								type: "text",
-								text: JSON.stringify(toolResult, null, 2),
-							},
-						],
-					});
+					const toolDef = TOOLS.find((t) => t.name === params.name);
+					if (!toolDef) {
+						sendResponse(id, null, {
+							code: -32602,
+							message: `Unknown tool: ${params.name}`,
+						});
+						return;
+					}
+					try {
+						const toolArgs = params.arguments || {};
+						validateToolArguments(toolDef, toolArgs);
+						const toolResult = await handleToolCall(params.name, toolArgs);
+						sendResponse(id, {
+							content: [
+								{
+									type: "text",
+									text: JSON.stringify(toolResult, null, 2),
+								},
+							],
+						});
+					} catch (toolErr) {
+						sendResponse(id, formatToolErrorResponse(params.name, toolErr));
+					}
 					break;
 				}
 

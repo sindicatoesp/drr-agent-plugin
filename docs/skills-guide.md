@@ -8,7 +8,7 @@ This guide explains how end users—**EOC Duty Officers, Anticipatory Action Lea
 
 Each skill in `skills/<skill-name>/SKILL.md` provides your AI assistant with:
 1. **Domain Methodology & Guardrails** (what is scientifically valid and what is strictly forbidden, such as fabricating flood depths from rainfall or auto-publishing live CAP sirens).
-2. **Exact Tool Orchestration** (which of the **42 deterministic MCP tools** to call instead of letting the LLM guess numbers).
+2. **Exact Tool Orchestration** (which of the **43 deterministic MCP tools** to call instead of letting the LLM guess numbers).
 3. **Escalation & Governance Rules** (when the assistant must stop and ask a human Duty Officer, Hydrologist, or National Focal Point for review or approval).
 
 ### Tips for Effective Prompts
@@ -691,7 +691,7 @@ examples/thailand-flood-scenario/spatial-report.json (flood depth 2.2 m, USD, 20
 ---
 
 ## See Also
-* **[MCP Tools & CLI Reference (`docs/api-reference.md`)](./api-reference.md)** — Full schemas for all 42 MCP tools and 42 CLI subcommands.
+* **[MCP Tools & CLI Reference (`docs/api-reference.md`)](./api-reference.md)** — Full schemas for all 43 MCP tools and 43 CLI subcommands.
 * **[Operational Playbook (`docs/operational-playbook.md`)](./operational-playbook.md)** — Personas, response timelines, and monitoring daemon workflows.
 * **[Scientific Methodology (`docs/methodology.md`)](./methodology.md)** — Equations, applicability bounds, and C-01..C-08 governance standards.
 * **[Authoritative Tool Inventory (`docs/tool-inventory.md`)](./tool-inventory.md)** — Auto-generated tool, CLI, skill, module, and test inventory.

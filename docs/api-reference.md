@@ -1,12 +1,12 @@
 # MCP Tools & CLI Technical Reference
 
-Complete technical specification of all **42 MCP tools** provided by `bin/mcp-server.js` and the **42 CLI commands** in `bin/cli.js`.
+Complete technical specification of all **43 MCP tools** provided by `bin/mcp-server.js` and the **43 CLI commands** in `bin/cli.js`.
 
-> **Inventory Note (R-01)**: Historically at baseline commit `1d7600ce5cc50dcdea7b438ccbd59d28282793dd` (`origin/dev`), `bin/mcp-server.js` registered 11 tools (including `drr_delta_docs`) while this reference listed 10. Both `docs/api-reference.md` and `docs/tool-inventory.md` are now reconciled with the full **42-tool** registration source.
+> **Inventory Note (R-01)**: Historically at baseline commit `1d7600ce5cc50dcdea7b438ccbd59d28282793dd` (`origin/dev`), `bin/mcp-server.js` registered 11 tools (including `drr_delta_docs`) while this reference listed 10. Both `docs/api-reference.md` and `docs/tool-inventory.md` are now reconciled with the full **43-tool** registration source.
 
 ---
 
-# Part 1: Model Context Protocol (MCP) Tools (42 Tools)
+# Part 1: Model Context Protocol (MCP) Tools (43 Tools)
 
 ## 1. `drr_gdacs_fetch`
 Ingests and filters active GDACS alerts by severity, hazard type (`EQ`, `TC`, `FL`, `VO`, `DR`), or country, with untrusted feed sanitization (`promptInjectionFlagged`), `sourceIssuedAt`, `retrievedAt`, and `payloadHash`.
@@ -582,14 +582,25 @@ Reconciles conflicting multi-source disaster impact claims (national official au
 }
 ```
 
+## 43. `drr_workflow_plan`
+Plans a goal-oriented DRR workflow (`flood_infra_risk_assessment`, `earthquake_rapid_impact`, `cyclone_early_warning_brief`, `multi_source_sitrep_reconcile`, `anticipatory_action_trigger_check`) with action-tier permissions (`read_only` | `reversible` | `consequential`), missing-input clarification questions, operational context staleness checks, and human-approval gates.
+
+```json
+{
+  "goal": "Assess flood risk to critical infrastructure in Hat Yai using latest rainfall and hydrological info",
+  "context": { "country": "Thailand", "municipality": "Hat Yai", "coordinates": [100.47, 7.0] },
+  "availableInputs": { "latitude": 7.0, "longitude": 100.47 }
+}
+```
+
 ---
 
-# Part 2: Command-Line Interface (CLI) Reference (42 Subcommands)
+# Part 2: Command-Line Interface (CLI) Reference (43 Subcommands)
 
 Run `node bin/cli.js --help` (or `drr-tool --help`) for usage.
 
 * **Telemetry & Hydro**: `gdacs`, `adam`, `usgs`, `fdsn-shakemap`, `forecast`, `sensorthings`, `stac-hazard`, `hdx-hapi`, `hdx-search`, `basin-rainfall`, `river-discharge`, `monitor`
-* **Contracts, Registry, Replay & Benchmarks**: `validate-input`, `registry`, `replay-validate`, `benchmark`
+* **Contracts, Registry, Replay & Benchmarks**: `workflow-plan`, `validate-input`, `registry`, `replay-validate`, `benchmark`
 * **Spatial, COD-AB, Overlay & Raster**: `spatial-join`, `infra-overlay`, `osm-infra`, `cod-validate`, `hdx-polygon-pop`, `geojson-validate`, `geometry-repair`, `crs-transform`, `raster-zonal-stats`
 * **Fragility, Vulnerability, Severity & Sendai**: `fragility` *(requires `--intensity`)*, `vulnerability` *(requires `--spatial` and `--intensity`)*, `severity-assess`, `sendai-validate`
 * **Taxonomy, Event Identity & SitRep Reconciliation**: `hazard-crosswalk`, `event-dedup`, `sitrep-reconcile`
@@ -605,3 +616,9 @@ node bin/cli.js adam --collection glofas --bbox 97.0,5.0,106.0,21.0 --limit 20
 node bin/cli.js adam --collection ts_buffers --min-level Orange --file examples/wfp-adam-ogc/sample-adam-eq.json
 ```
 Supported flags: `--collection <alias|id>`, `--limit <n>`, `--offset <n>`, `--bbox <minLon,minLat,maxLon,maxLat>`, `--datetime <iso8601>`, `--country <name>`, `--iso3 <code>`, `--min-mag <n>`, `--min-level <Green|Orange|Red>`, `--list-collections`, `--file <path>`.
+
+### `drr-tool workflow-plan` Options
+```bash
+node bin/cli.js workflow-plan --goal "Assess flood risk to critical infrastructure in Hat Yai" --country Thailand --lat 7.0 --lon 100.47
+```
+Supported flags: `--goal <text>`, `--workflow <id>`, `--role <role>`, `--country <name>`, `--municipality <name>`, `--lat <num>`, `--lon <num>`, `--bbox <str>`, `--time-window <str>`.

@@ -28,6 +28,7 @@ description: Multi-source disaster telemetry ingestion and rainfall/seismic scre
 * `drr_fdsn_shakemap_fetch`
 * `drr_usgs_earthquake_fetch`
 * `drr_gdacs_fetch`
+* `drr_adam_fetch` *(for pre-computed WFP ADAM population buffers, GloFAS gauge return periods, and cyclone wind swaths; pass `compact: true` to conserve context)*
 * `drr_openmeteo_forecast`
 * `drr_river_discharge_screen`
 * `drr_event_match_deduplicate`

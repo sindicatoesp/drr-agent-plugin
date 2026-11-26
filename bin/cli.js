@@ -6,6 +6,7 @@
 const fs = require("fs");
 const { ingestGdacsAlerts } = require("../lib/gdacs");
 const { ingestAdamFeed, fetchAdamCollections } = require("../lib/adam");
+const { planGoalWorkflow } = require("../lib/workflows");
 const {
 	spatialExposureJoin,
 	validateGeoJson,
@@ -64,6 +65,7 @@ Commands:
   hdx-polygon-pop      Estimate exposed population inside a hazard polygon via COD-AB overlap & HDX HAPI areal interpolation
   severity-assess      Evaluate JIAF/INFORM multi-factor humanitarian rapid impact & severity (phases 1-5)
   sitrep-reconcile     Reconcile multi-source impact claims (preserving conflicts) and/or diff two SitRep versions
+  workflow-plan        Plan a goal-oriented DRR workflow with action tiers and clarification checks
   benchmark            Run curated GeoDisaster-inspired multi-step DRR agent benchmark suite
   basin-rainfall       Aggregate rainfall forecasts (mm) across catchment polygon/points
   river-discharge      Screen GloFAS / Open-Meteo river discharge (m^3/s)
@@ -906,6 +908,32 @@ async function main() {
 					},
 				});
 				console.log(JSON.stringify(report, null, 2));
+				break;
+			}
+
+			case "workflow-plan": {
+				const lat = options.lat ? parseFloat(options.lat) : undefined;
+				const lon = options.lon ? parseFloat(options.lon) : undefined;
+				const plan = planGoalWorkflow({
+					goal: options.goal || "",
+					workflowId: options.workflow,
+					context: {
+						role: options.role,
+						country: options.country,
+						municipality: options.municipality,
+						coordinates: Number.isFinite(lat) && Number.isFinite(lon) ? [lon, lat] : undefined,
+						bbox: options.bbox,
+						timeWindow: options["time-window"],
+					},
+					availableInputs: {
+						latitude: lat,
+						longitude: lon,
+						bbox: options.bbox,
+						municipality: options.municipality,
+						country: options.country,
+					},
+				});
+				console.log(JSON.stringify(plan, null, 2));
 				break;
 			}
 
