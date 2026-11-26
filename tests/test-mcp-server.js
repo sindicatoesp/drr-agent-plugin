@@ -483,11 +483,14 @@ async function run() {
 		},
 	});
 	const errRes = await waitForResponse(99);
-	assert(errRes.error && errRes.error.message.includes("SINGLE_EVENT_CANNOT_ESTABLISH_EAL"));
+	assert(errRes.result && errRes.result.isError === true, "Expected MCP isError: true on invalid tool arguments");
+	const errPayload = JSON.parse(errRes.result.content[0].text);
+	assert(errPayload.message.includes("SINGLE_EVENT_CANNOT_ESTABLISH_EAL"));
+	assert.strictEqual(errPayload.errorCode, "SINGLE_EVENT_CANNOT_ESTABLISH_EAL");
 
 	fs.rmSync(path.join(__dirname, "../alerts"), { recursive: true, force: true });
 	child.kill();
-	console.log("✅ MCP Server Stdio tests passed (41 tools + error handling verified)!");
+	console.log(`✅ MCP Server Stdio tests passed (${listRes.result.tools.length} tools + error handling verified)!`);
 }
 
 run().catch((err) => {

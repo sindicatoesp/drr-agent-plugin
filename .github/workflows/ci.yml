@@ -27,6 +27,9 @@ jobs:
       - name: Run Static Lint & Syntax Check
         run: node scripts/lint.js
 
+      - name: Run Architectural Governance Check
+        run: node scripts/arch-check.js
+
       - name: Run Digital Public Goods (DPG) Standard Audit
         run: node scripts/dpg-audit.js
 
