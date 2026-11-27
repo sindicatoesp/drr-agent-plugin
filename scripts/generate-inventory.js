@@ -80,6 +80,7 @@ const TEST_MAPPING = {
 	drr_humanitarian_severity_assess: "tests/test-severity.js, tests/test-mcp-server.js",
 	drr_benchmark_run: "tests/test-benchmarks.js, tests/test-agent-eval-harness.js, tests/test-mcp-server.js",
 	drr_sitrep_reconcile: "tests/test-reconcile.js, tests/test-mcp-server.js",
+	drr_gemini_analyze: "tests/test-gemini.js, tests/test-mcp-server.js",
 };
 
 const WRITE_GATED_TOOLS = new Set(["drr_cap_publish", "drr_delta_push_draft_record"]);
@@ -98,6 +99,7 @@ const NETWORK_READ_TOOLS = new Set([
 	"drr_hdx_hapi_fetch",
 	"drr_hdx_catalog_search",
 	"drr_hdx_polygon_population_estimate",
+	"drr_gemini_analyze",
 ]);
 
 function parseSkillMarkdown(relPath, content, registeredToolSet) {

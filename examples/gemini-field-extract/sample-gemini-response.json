@@ -1,0 +1,21 @@
+{
+  "candidates": [
+    {
+      "content": {
+        "role": "model",
+        "parts": [
+          {
+            "text": "{\"hazardType\":\"flood\",\"country\":\"THA\",\"reportedAt\":\"2026-11-26T06:00:00Z\",\"depthStatus\":\"depth_unavailable\",\"claims\":[{\"metric\":\"rainfall_mm\",\"value\":215,\"unit\":\"mm\",\"sendaiTarget\":null,\"adminArea\":\"Hat Yai, Songkhla\",\"pcode\":\"TH9011\",\"geographicScope\":\"district\",\"sourceQuote\":\"215 mm of rainfall recorded over 24 hours in Hat Yai\",\"notes\":\"Rainfall total only; no flood inundation depth reported.\"},{\"metric\":\"displaced_persons\",\"value\":4200,\"unit\":\"persons\",\"sendaiTarget\":\"B-2..B-5\",\"adminArea\":\"Hat Yai, Songkhla\",\"pcode\":\"TH9011\",\"geographicScope\":\"district\",\"sourceQuote\":\"4,200 residents evacuated to municipal shelters\",\"notes\":\"Sendai Target B displacement kept separate from B-1 directly affected.\"},{\"metric\":\"damaged_facilities\",\"value\":3,\"unit\":\"facilities\",\"sendaiTarget\":\"D-2..D-4\",\"adminArea\":\"Hat Yai, Songkhla\",\"pcode\":\"TH9011\",\"geographicScope\":\"district\",\"sourceQuote\":\"3 community health clinics suffered ground-floor water damage\",\"notes\":\"Physical infrastructure damage (D-2..D-4).\"},{\"metric\":\"economic_loss_usd\",\"value\":null,\"unit\":\"USD\",\"sendaiTarget\":\"C\",\"adminArea\":\"Hat Yai, Songkhla\",\"pcode\":\"TH9011\",\"geographicScope\":\"district\",\"sourceQuote\":\"Economic losses have not yet been assessed\",\"notes\":\"Unknown value preserved as null (never coerced to 0).\"}],\"unresolvedAmbiguities\":[\"Total directly affected population (B-1) not specified separately from evacuated count.\"]}"
+          }
+        ]
+      },
+      "finishReason": "STOP"
+    }
+  ],
+  "usageMetadata": {
+    "promptTokenCount": 312,
+    "candidatesTokenCount": 248,
+    "totalTokenCount": 560
+  },
+  "modelVersion": "gemini-2.5-flash"
+}

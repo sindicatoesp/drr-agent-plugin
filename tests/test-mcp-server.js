@@ -56,7 +56,7 @@ async function run() {
 	send({ jsonrpc: "2.0", id: 2, method: "tools/list", params: {} });
 	const listRes = await waitForResponse(2);
 	assert(listRes, "Expected tools/list response");
-	assert.strictEqual(listRes.result.tools.length, 43);
+	assert.strictEqual(listRes.result.tools.length, 44);
 
 	// 3. tools/call: drr_fragility_eval
 	send({
@@ -471,6 +471,20 @@ async function run() {
 	});
 	assert.strictEqual(ckanRes.summary.returnedDatasets, 3);
 	assert.strictEqual(ckanRes.provenance.requiresApiKey, false);
+
+	const geminiSample = JSON.parse(
+		fs.readFileSync(path.join(__dirname, "../examples/gemini-field-extract/sample-gemini-response.json"), "utf8"),
+	);
+	const geminiRes = await callTool(38, "drr_gemini_analyze", {
+		mode: "extract_claims",
+		text: "Hat Yai EOC: 215 mm rainfall, 4,200 evacuated, 3 clinics damaged.",
+		country: "THA",
+		samplePayload: geminiSample,
+	});
+	assert.strictEqual(geminiRes.mode, "extract_claims");
+	assert.strictEqual(geminiRes.claimCount, 4);
+	assert.strictEqual(geminiRes.depthStatus, "depth_unavailable");
+	assert.strictEqual(geminiRes.governance.status, "Draft");
 
 	// 10. Error propagation verification for invalid input
 	send({

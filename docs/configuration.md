@@ -47,6 +47,9 @@ A template configuration is provided in [`drr-agent-plugin/.env.example`](../.en
 | **`HDX_CKAN_URL`** | `https://data.humdata.org/api/3/action/package_search` | Public OCHA HDX CKAN Action API v3 endpoint (no API key required) used by `drr_hdx_catalog_search` and monitor enrichment to discover COD-AB, COD-PS, WorldPop, Kontur, and HOTOSM datasets. |
 | **`DELTA_API_URL`** | `http://localhost:3000/en/api/mcp` | Target endpoint for connecting to DELTA Resilience core application MCP server. |
 | **`DELTA_MCP_API_KEY`** | *None (empty)* | Secret API token passed in `X-Auth` header to authenticate against DELTA's database. |
+| **`GEMINI_API_KEY`** | *None (empty)* | Optional Google Gemini API key passed via `x-goog-api-key` header for `drr_gemini_analyze` / `drr-tool gemini-analyze` (redacted from logs and provenance hashes; omit when using offline `samplePayload`). |
+| **`GEMINI_MODEL`** | `gemini-2.5-flash` | Default Gemini model ID used by `drr_gemini_analyze` (e.g., `gemini-2.5-flash`, `gemini-2.5-pro`). |
+| **`GEMINI_API_URL`** | `https://generativelanguage.googleapis.com/v1beta` | Base URL for the Google Gemini REST API (SSRF-guarded). |
 | **`TARGET_COUNTRIES`** | `*` (all) | Comma-separated list of target country names or ISO-2/3 codes (e.g. `Indonesia,ID,IDN`). Foreign events are excluded from DELTA push. |
 | **`DELTA_COUNTRY`** | *None* | Explicit single country name for the national DELTA instance (e.g. `Vanuatu`). |
 | **`DELTA_COUNTRY_STRICT`**| `true` | When true, strictly gates all DELTA disaster record pushes so only events matching `TARGET_COUNTRIES` or `DELTA_COUNTRY` are saved. |

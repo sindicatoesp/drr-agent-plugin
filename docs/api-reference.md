@@ -1,12 +1,12 @@
 # MCP Tools & CLI Technical Reference
 
-Complete technical specification of all **43 MCP tools** provided by `bin/mcp-server.js` and the **43 CLI commands** in `bin/cli.js`.
+Complete technical specification of all **44 MCP tools** provided by `bin/mcp-server.js` and the **44 CLI commands** in `bin/cli.js`.
 
-> **Inventory Note (R-01)**: Historically at baseline commit `1d7600ce5cc50dcdea7b438ccbd59d28282793dd` (`origin/dev`), `bin/mcp-server.js` registered 11 tools (including `drr_delta_docs`) while this reference listed 10. Both `docs/api-reference.md` and `docs/tool-inventory.md` are now reconciled with the full **43-tool** registration source.
+> **Inventory Note (R-01)**: Historically at baseline commit `1d7600ce5cc50dcdea7b438ccbd59d28282793dd` (`origin/dev`), `bin/mcp-server.js` registered 11 tools (including `drr_delta_docs`) while this reference listed 10. Both `docs/api-reference.md` and `docs/tool-inventory.md` are now reconciled with the full **44-tool** registration source.
 
 ---
 
-# Part 1: Model Context Protocol (MCP) Tools (43 Tools)
+# Part 1: Model Context Protocol (MCP) Tools (44 Tools)
 
 ## 1. `drr_gdacs_fetch`
 Ingests and filters active GDACS alerts by severity, hazard type (`EQ`, `TC`, `FL`, `VO`, `DR`), or country, with untrusted feed sanitization (`promptInjectionFlagged`), `sourceIssuedAt`, `retrievedAt`, and `payloadHash`.
@@ -593,9 +593,27 @@ Plans a goal-oriented DRR workflow (`flood_infra_risk_assessment`, `earthquake_r
 }
 ```
 
+## 44. `drr_gemini_analyze`
+Invokes the Google Gemini REST API (`generativelanguage.googleapis.com/v1beta`, pure Node.js stdlib, zero external dependencies) with Structured JSON Outputs (`responseMimeType: "application/json"`, `responseSchema`) across three DRR-native modes:
+- `extract_claims`: Extracts structured, Sendai-aligned impact claims from unstructured field reports/SMS/NGO bulletins directly compatible with `drr_sitrep_reconcile` (preserves `unknown !== 0`, never fabricates flood depth from rainfall, separates Target B displacement from B-1 and Target D damage from disruption).
+- `translate_brief`: Translates deterministic SitRep/CAP briefs into a target language while running a deterministic `verifyNumericFidelity` check to flag any altered or dropped numbers.
+- `damage_photo_screen`: Preliminary multimodal visual damage screening from base64 imagery mapped to the 9 Sendai Target D sectors (explicitly non-authoritative).
+
+All outputs enforce C-03 `Draft` / `unreviewed` / `ineligible` governance, `sanitizeUntrustedFeedText` input/output hygiene, secret redaction, and offline `samplePayload` support.
+
+```json
+{
+  "mode": "extract_claims",
+  "text": "Hat Yai EOC: 215 mm rainfall recorded over 24h; 4,200 residents evacuated; 3 clinics damaged.",
+  "source": "Hat Yai EOC WhatsApp Dispatch",
+  "authorityTier": "subnational_official",
+  "country": "THA"
+}
+```
+
 ---
 
-# Part 2: Command-Line Interface (CLI) Reference (43 Subcommands)
+# Part 2: Command-Line Interface (CLI) Reference (44 Subcommands)
 
 Run `node bin/cli.js --help` (or `drr-tool --help`) for usage.
 
@@ -603,7 +621,7 @@ Run `node bin/cli.js --help` (or `drr-tool --help`) for usage.
 * **Contracts, Registry, Replay & Benchmarks**: `workflow-plan`, `validate-input`, `registry`, `replay-validate`, `benchmark`
 * **Spatial, COD-AB, Overlay & Raster**: `spatial-join`, `infra-overlay`, `osm-infra`, `cod-validate`, `hdx-polygon-pop`, `geojson-validate`, `geometry-repair`, `crs-transform`, `raster-zonal-stats`
 * **Fragility, Vulnerability, Severity & Sendai**: `fragility` *(requires `--intensity`)*, `vulnerability` *(requires `--spatial` and `--intensity`)*, `severity-assess`, `sendai-validate`
-* **Taxonomy, Event Identity & SitRep Reconciliation**: `hazard-crosswalk`, `event-dedup`, `sitrep-reconcile`
+* **Taxonomy, Event Identity, SitRep & Gemini AI**: `hazard-crosswalk`, `event-dedup`, `sitrep-reconcile`, `gemini-analyze`
 * **Uncertainty & Appraisal**: `uncertainty`, `eal`, `cba`
 * **CAP & SitRep**: `cap-generate` *(defaults to `--status Draft`)*, `cap-validate`, `sitrep`
 * **DELTA Interoperability**: `delta-validate`, `delta-push` *(requires `--file`)*, `delta-docs`, `delta-hazards`
@@ -622,3 +640,16 @@ Supported flags: `--collection <alias|id>`, `--limit <n>`, `--offset <n>`, `--bb
 node bin/cli.js workflow-plan --goal "Assess flood risk to critical infrastructure in Hat Yai" --country Thailand --lat 7.0 --lon 100.47
 ```
 Supported flags: `--goal <text>`, `--workflow <id>`, `--role <role>`, `--country <name>`, `--municipality <name>`, `--lat <num>`, `--lon <num>`, `--bbox <str>`, `--time-window <str>`.
+
+### `drr-tool gemini-analyze` Options
+```bash
+# Offline structured field-claim extraction using bundled sample fixture
+node bin/cli.js gemini-analyze --mode extract_claims --text "Hat Yai EOC: 215 mm rainfall, 4,200 evacuated" --country THA --sample-file examples/gemini-field-extract/sample-gemini-response.json
+
+# Live Gemini API brief translation with numeric-fidelity verification (requires GEMINI_API_KEY)
+node bin/cli.js gemini-analyze --mode translate_brief --file sitrep.md --target-lang es --audience public
+
+# Live multimodal visual damage triage (requires GEMINI_API_KEY)
+node bin/cli.js gemini-analyze --mode damage_photo_screen --image flood-bridge.jpg --text "Hat Yai northern bridge"
+```
+Supported flags: `--mode <extract_claims|translate_brief|damage_photo_screen>`, `--text <str>`, `--file <path>`, `--sample-file <path>`, `--target-lang <code>`, `--audience <eoc|public|humanitarian_cluster>`, `--image <path>`, `--mime-type <mime>`, `--source <str>`, `--authority-tier <tier>`, `--country <str>`, `--reported-at <iso8601>`, `--model <id>`.

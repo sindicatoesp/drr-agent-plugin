@@ -38,11 +38,12 @@ assert(helpOut.includes("cod-validate"), "CLI --help must list cod-validate");
 assert(helpOut.includes("hdx-polygon-pop"), "CLI --help must list hdx-polygon-pop");
 assert(helpOut.includes("severity-assess"), "CLI --help must list severity-assess");
 assert(helpOut.includes("sitrep-reconcile"), "CLI --help must list sitrep-reconcile");
+assert(helpOut.includes("gemini-analyze"), "CLI --help must list gemini-analyze");
 assert(helpOut.includes("benchmark"), "CLI --help must list benchmark");
 
 const cliCmds = extractCliCommands();
-assert.strictEqual(TOOLS.length, 43, "MCP server must expose 43 tools");
-assert.strictEqual(cliCmds.length, 43, "CLI must register 43 subcommands");
+assert.strictEqual(TOOLS.length, 44, "MCP server must expose 44 tools");
+assert.strictEqual(cliCmds.length, 44, "CLI must register 44 subcommands");
 
 const invMd = generateInventoryMarkdown();
 for (const tool of TOOLS) {
@@ -55,7 +56,7 @@ for (const cmd of cliCmds) {
 const manifest = generateSkillsManifest();
 assert.strictEqual(manifest.valid, true, `Skills manifest invalid: ${manifest.validationErrors.join("; ")}`);
 assert.strictEqual(manifest.skillCount, 19, "Skills manifest must index 19 skills");
-assert.strictEqual(manifest.registeredToolCount, 43);
+assert.strictEqual(manifest.registeredToolCount, 44);
 const manifestOnDisk = JSON.parse(fs.readFileSync(path.join(ROOT, "skills-manifest.json"), "utf8"));
 assert.strictEqual(manifestOnDisk.skillCount, manifest.skillCount, "skills-manifest.json on disk must stay synced");
 assert.strictEqual(manifestOnDisk.valid, true);
@@ -212,5 +213,23 @@ assert(sevOut.severityPhase >= 3);
 const benchOut = JSON.parse(runCli(["benchmark"]));
 assert.strictEqual(benchOut.allPassed, true);
 assert(benchOut.totalScenarios >= 6);
+
+const geminiCliOut = JSON.parse(
+	runCli([
+		"gemini-analyze",
+		"--mode",
+		"extract_claims",
+		"--text",
+		"Hat Yai EOC: 215 mm rainfall, 4,200 evacuated, 3 clinics damaged.",
+		"--country",
+		"THA",
+		"--sample-file",
+		"examples/gemini-field-extract/sample-gemini-response.json",
+	]),
+);
+assert.strictEqual(geminiCliOut.mode, "extract_claims");
+assert.strictEqual(geminiCliOut.claimCount, 4);
+assert.strictEqual(geminiCliOut.depthStatus, "depth_unavailable");
+assert.strictEqual(geminiCliOut.governance.status, "Draft");
 
 console.log("✅ CLI subcommands & programmatic inventory tests passed!");

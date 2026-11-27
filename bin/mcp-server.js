@@ -42,6 +42,7 @@ const {
 	buildOperationalContext,
 	planGoalWorkflow,
 } = require("../lib/workflows");
+const { analyzeWithGemini } = require("../lib/gemini");
 
 const pkg = require("../package.json");
 
@@ -1318,6 +1319,68 @@ const TOOLS = [
 			},
 		},
 	},
+	{
+		name: "drr_gemini_analyze",
+		description:
+			"Invoke Google Gemini API (pure Node.js REST, zero external deps) for structured DRR field-report impact claim extraction (compatible with drr_sitrep_reconcile), multilingual CAP/SitRep brief translation with deterministic numeric-fidelity checks, or preliminary multimodal visual damage screening mapped to Sendai Target D sectors. Enforces unknown !== 0, C-03 Draft/unreviewed governance, secret redaction, and offline samplePayload support.",
+		inputSchema: {
+			type: "object",
+			properties: {
+				mode: {
+					type: "string",
+					enum: ["extract_claims", "translate_brief", "damage_photo_screen"],
+					description: "Analysis mode: 'extract_claims' (default), 'translate_brief', or 'damage_photo_screen'",
+				},
+				text: {
+					type: "string",
+					description: "Unstructured field report (extract_claims), deterministic SitRep/CAP brief (translate_brief), or optional photo context (damage_photo_screen)",
+				},
+				targetLanguage: {
+					type: "string",
+					description: "Target language code or name for translate_brief mode (e.g., 'es', 'fr', 'ar', 'id', 'tl', 'th')",
+				},
+				audience: {
+					type: "string",
+					enum: ["eoc", "public", "humanitarian_cluster"],
+					description: "Target audience tone for translate_brief mode (default: 'eoc')",
+				},
+				imageBase64: {
+					type: "string",
+					description: "Base64-encoded image (or data URI) for damage_photo_screen mode (max 10 MB decoded)",
+				},
+				imageMimeType: {
+					type: "string",
+					enum: ["image/jpeg", "image/png", "image/webp", "image/gif"],
+					description: "Image MIME type for damage_photo_screen mode (default: 'image/jpeg')",
+				},
+				source: {
+					type: "string",
+					description: "Source attribution label for extracted claims (e.g., 'Local EOC WhatsApp Dispatch')",
+				},
+				authorityTier: {
+					type: "string",
+					enum: ["national_official", "subnational_official", "humanitarian_cluster", "modelled_estimate", "media_unverified"],
+					description: "Authority tier for extracted claims (default: 'media_unverified')",
+				},
+				country: {
+					type: "string",
+					description: "Optional country name or ISO3 code context",
+				},
+				reportedAt: {
+					type: "string",
+					description: "Optional ISO-8601 timestamp when the source report was issued",
+				},
+				model: {
+					type: "string",
+					description: "Optional Gemini model override (default: GEMINI_MODEL or 'gemini-2.5-flash')",
+				},
+				samplePayload: {
+					type: "object",
+					description: "Optional offline Gemini generateContent response or pre-parsed payload for deterministic/air-gapped execution",
+				},
+			},
+		},
+	},
 ];
 
 function getAnnotatedTools() {
@@ -1916,6 +1979,23 @@ async function handleToolCall(name, args) {
 
 		case "drr_workflow_plan": {
 			return planGoalWorkflow(args || {});
+		}
+
+		case "drr_gemini_analyze": {
+			return analyzeWithGemini({
+				mode: args.mode || "extract_claims",
+				text: args.text,
+				targetLanguage: args.targetLanguage,
+				audience: args.audience,
+				imageBase64: args.imageBase64,
+				imageMimeType: args.imageMimeType,
+				source: args.source,
+				authorityTier: args.authorityTier,
+				country: args.country,
+				reportedAt: args.reportedAt,
+				model: args.model,
+				samplePayload: args.samplePayload,
+			});
 		}
 
 		default:
