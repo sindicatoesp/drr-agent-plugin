@@ -39,12 +39,13 @@ const { ingestHdxHapiData, searchHdxCkanCatalog, validateCodBoundaries, estimate
 const { evaluateHumanitarianSeverity } = require("../lib/severity");
 const { runBenchmarkSuite } = require("../lib/benchmarks");
 const { reconcileAndDiffSitRep } = require("../lib/reconcile");
+const { analyzeWithGemini } = require("../lib/gemini");
 const pkg = require("../package.json");
 
 function printHelp() {
 	console.log(`
 DRR Analytics & Agent Plugin CLI v${pkg.version}
-Disaster Risk Reduction Tools: GDACS, USGS, FDSN-WS/ShakeMap, Open-Meteo, OGC SensorThings, STAC EO Grids, Sendai Infra Overlay, OSM Interim Infra, HDX/HAPI & COD-AB, Humanitarian Severity, SitRep Reconciliation & Diff, Benchmarks, Hydro, Spatial/CRS/Raster, Fragility, CAP Alerts, Sendai, DELTA, Uncertainty, Appraisal & Replay
+Disaster Risk Reduction Tools: GDACS, USGS, FDSN-WS/ShakeMap, Open-Meteo, OGC SensorThings, STAC EO Grids, Sendai Infra Overlay, OSM Interim Infra, HDX/HAPI & COD-AB, Humanitarian Severity, SitRep Reconciliation & Diff, Gemini AI Extraction/Translation/Visual Triage, Benchmarks, Hydro, Spatial/CRS/Raster, Fragility, CAP Alerts, Sendai, DELTA, Uncertainty, Appraisal & Replay
 
 Usage:
   drr-tool <command> [options]
@@ -66,6 +67,7 @@ Commands:
   severity-assess      Evaluate JIAF/INFORM multi-factor humanitarian rapid impact & severity (phases 1-5)
   sitrep-reconcile     Reconcile multi-source impact claims (preserving conflicts) and/or diff two SitRep versions
   workflow-plan        Plan a goal-oriented DRR workflow with action tiers and clarification checks
+  gemini-analyze       Google Gemini API structured field-claim extraction, numeric-fidelity brief translation, or visual damage triage
   benchmark            Run curated GeoDisaster-inspired multi-step DRR agent benchmark suite
   basin-rainfall       Aggregate rainfall forecasts (mm) across catchment polygon/points
   river-discharge      Screen GloFAS / Open-Meteo river discharge (m^3/s)
@@ -934,6 +936,33 @@ async function main() {
 					},
 				});
 				console.log(JSON.stringify(plan, null, 2));
+				break;
+			}
+
+			case "gemini-analyze": {
+				let text = options.text;
+				if (!text && options.file) {
+					text = fs.readFileSync(options.file, "utf8");
+				}
+				let samplePayload = undefined;
+				if (options["sample-file"]) {
+					samplePayload = JSON.parse(fs.readFileSync(options["sample-file"], "utf8"));
+				}
+				const result = await analyzeWithGemini({
+					mode: options.mode || "extract_claims",
+					text,
+					targetLanguage: options["target-lang"] || options.lang,
+					audience: options.audience,
+					imagePath: options.image,
+					imageMimeType: options["mime-type"],
+					source: options.source,
+					authorityTier: options["authority-tier"],
+					country: options.country,
+					reportedAt: options["reported-at"],
+					model: options.model,
+					samplePayload,
+				});
+				console.log(JSON.stringify(result, null, 2));
 				break;
 			}
 
